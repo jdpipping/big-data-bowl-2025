@@ -1,3 +1,4 @@
+s
 # History files
 .Rhistory
 .Rapp.history
@@ -48,5 +49,6 @@ po/*~
 # RStudio Connect folder
 rsconnect/
 
-# raw data
+# omit data
+processed-data
 raw-data
