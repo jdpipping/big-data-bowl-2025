@@ -16,7 +16,7 @@ library(tidyverse)
 # read tracking data
 read_tracking = function(weeks) {
   # require tidyverse
-  require(tidyverse)
+  require(tidyverse, quietly = T)
   # initialize tracking
   tracking = tibble()
   # loop through each week
@@ -35,7 +35,7 @@ read_tracking = function(weeks) {
 # standardize tracking data
 standardize_tracking = function(tracking) {
   # require tidyverse
-  require(tidyverse)
+  require(tidyverse, quietly = T)
   # field standardization
   tracking_std = tracking |> 
     mutate(
