@@ -50,5 +50,5 @@ po/*~
 rsconnect/
 
 # omit data
-processed-data
-raw-data
+processed-data/*
+raw-data/*
