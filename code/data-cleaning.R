@@ -72,21 +72,21 @@ tracking_std = read_csv('processed-data/tracking_std.csv')
 ##########################
 
 # extract example play: https://www.youtube.com/watch?v=2mPxPOjnAg0
-example_play = tracking_std |> 
+example_play_Davis_TD = tracking_std |> 
   filter(gameId == 2022100901, playId == 117) |> 
   mutate(color = case_when(club == 'PIT' ~ 'gold',
                            club == 'BUF' ~ 'blue',
                            club == 'football' ~ 'brown'))
 
 # play visualization
-play_animation = example_play |> 
+play_animation_Davis_TD = example_play_Davis_TD |> 
   ggplot() +
   geom_point(aes(x = x, y = y, color = color, size = 3)) +
   # ensure colors display as assigned
   scale_color_identity() +
-  # omit size from legend
+  # omit size from legend ... COMMENT OUT THE guides() LINE IF ANIMATE() FUNCTION DOESN'T WORK
   guides(size = FALSE) +
   theme_minimal() +
   transition_time(frameId)
 # show animation
-animate(play_animation, nframes = max(example_play$frameId), fps = 10, renderer = gifski_renderer())
+animate(play_animation_Davis_TD, nframes = max(example_play_Davis_TD$frameId), fps = 10, renderer = gifski_renderer())
