@@ -88,12 +88,14 @@ play_animation_Davis_TD = example_play_Davis_TD |>
   guides(size = FALSE) +
   theme_minimal() +
   transition_time(frameId) +
+#   scale_x_continuous(breaks = seq(0, 120, 20)) +
+#   scale_y_continuous(breaks = seq(0, 60, 10)) +
   labs(x = " ", y = " ",
        title = "Josh Allen 98-Yard TD Pass to Gabe Davis",
        subtitle = "First Quarter of Bills' 38-3 win over Steelers in Week 5, 2022",
        caption = "Data provided by Kaggle") +
-  theme(plot.title = element_text(size = 10, hjust = 0.5),
-        plot.subtitle = element_text(size = 8, hjust = 0.5)) 
+  theme(plot.title = element_text(size = 14, hjust = 0.5),
+        plot.subtitle = element_text(size = 12, hjust = 0.5)) 
 # Could add geom_abline() for each team's goal line, LOS, etc. if/when we want to
 
 # show animation
