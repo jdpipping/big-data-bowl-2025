@@ -87,6 +87,14 @@ play_animation_Davis_TD = example_play_Davis_TD |>
   # omit size from legend ... COMMENT OUT THE guides() LINE IF ANIMATE() FUNCTION DOESN'T WORK
   guides(size = FALSE) +
   theme_minimal() +
-  transition_time(frameId)
+  transition_time(frameId) +
+  labs(x = " ", y = " ",
+       title = "Josh Allen 98-Yard TD Pass to Gabe Davis",
+       subtitle = "First Quarter of Bills' 38-3 win over Steelers in Week 5, 2022",
+       caption = "Data provided by Kaggle") +
+  theme(plot.title = element_text(size = 10, hjust = 0.5),
+        plot.subtitle = element_text(size = 8, hjust = 0.5)) 
+# Could add geom_abline() for each team's goal line, LOS, etc. if/when we want to
+
 # show animation
 animate(play_animation_Davis_TD, nframes = max(example_play_Davis_TD$frameId), fps = 10, renderer = gifski_renderer())
