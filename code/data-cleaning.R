@@ -105,8 +105,7 @@ animate(play_animation_Davis_TD, nframes = max(example_play_Davis_TD$frameId), f
 ### BACK TO CLEANING DATA ###
 #############################
 
-# Note that the first frame is typically huddle_break_offense: View(tracking_std[1:5000, ])
-# But not always: View(tracking_std %>% filter(frameId == 1 & !event %in% "huddle_break_offense"))
+# Note that the first frame is typically, but not always, huddle_break_offense
 FirstFrame_NotHuddleBreak <- tracking_std %>% filter(frameId == 1 & !event %in% "huddle_break_offense")
 # Just glance at a few samples ... They often start with NA, then line_set comes a few frames later
 # View(tracking_std %>% filter(gameId == 2022091200 & playId == 741 | gameId == 2022091102 & playId == 322 | gameId == 2022091101 & playId == 1785 |  gameId == 2022090800 & playId == 3190 | gameId == 2022091811 & playId == 2348 | gameId == 2022091805 & playId == 79))
