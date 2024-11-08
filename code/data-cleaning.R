@@ -100,3 +100,37 @@ play_animation_Davis_TD = example_play_Davis_TD |>
 
 # show animation
 animate(play_animation_Davis_TD, nframes = max(example_play_Davis_TD$frameId), fps = 10, renderer = gifski_renderer())
+
+#############################
+### BACK TO CLEANING DATA ###
+#############################
+
+# Note that the first frame is typically huddle_break_offense: View(tracking_std[1:5000, ])
+# But not always: View(tracking_std %>% filter(frameId == 1 & !event %in% "huddle_break_offense"))
+FirstFrame_NotHuddleBreak <- tracking_std %>% filter(frameId == 1 & !event %in% "huddle_break_offense")
+# Just glance at a few samples ... They often start with NA, then line_set comes a few frames later
+# View(tracking_std %>% filter(gameId == 2022091200 & playId == 741 | gameId == 2022091102 & playId == 322 | gameId == 2022091101 & playId == 1785 |  gameId == 2022090800 & playId == 3190 | gameId == 2022091811 & playId == 2348 | gameId == 2022091805 & playId == 79))
+# But sometimes first frame is line_set, or huddle_start_offense, or ball_snap, or man_in_motion
+table(FirstFrame_NotHuddleBreak$event)
+
+# View(tracking_std %>% filter(is.na(frameId))) - this is empty, as it should be 
+
+# First, find out if the minimum frameId on any given play is always 1, or if there are data entry errors where a play starts w/ higher frameId
+OpeningFrame_EachPlay <- tracking_std %>%
+  group_by(gameId, playId, nflId, displayName) %>%
+  mutate(Frame_Rank = rank(frameId, ties.method = "first")) %>%
+  ungroup() 
+OpeningFrame_EachPlay <- OpeningFrame_EachPlay %>% filter(Frame_Rank == 1)
+OpeningFrame_EachPlay <- OpeningFrame_EachPlay %>% select(-"Frame_Rank")
+table(OpeningFrame_EachPlay$frameId) # it's always 1, so there are no "late frameId" errors
+
+# Now that we know this, use group_by() to mutate tracking_std so every frame is labelled with the event from that play's first frame
+# In other words, did this play's tracking data begin w/ huddle_break_offense, or ball_snap, or sommething else?
+OpeningFrame_Event <- OpeningFrame_EachPlay %>% select("playId", "gameId", "nflId", "displayName", "event")
+OpeningFrame_Event <- OpeningFrame_Event %>% rename(Frame1_Event = `event`)
+  
+tracking_std <- merge(x = tracking_std, y = OpeningFrame_Event, 
+                          by = c("playId", "gameId", "nflId", "displayName"))
+tracking_std <- tracking_std %>% arrange(gameId, playId, nflId, frameId)
+table(tracking_std$Frame1_Event)
+rm(FirstFrame_NotHuddleBreak, OpeningFrame_EachPlay, OpeningFrame_Event)
