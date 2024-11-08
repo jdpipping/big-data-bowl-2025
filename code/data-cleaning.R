@@ -125,7 +125,7 @@ OpeningFrame_EachPlay <- OpeningFrame_EachPlay %>% select(-"Frame_Rank")
 table(OpeningFrame_EachPlay$frameId) # it's always 1, so there are no "late frameId" errors
 
 # Now that we know this, use group_by() to mutate tracking_std so every frame is labelled with the event from that play's first frame
-# In other words, did this play's tracking data begin w/ huddle_break_offense, or ball_snap, or sommething else?
+# In other words, did this play's tracking data begin w/ huddle_break_offense, or ball_snap, or something else?
 OpeningFrame_Event <- OpeningFrame_EachPlay %>% select("playId", "gameId", "nflId", "displayName", "event")
 OpeningFrame_Event <- OpeningFrame_Event %>% rename(Frame1_Event = `event`)
   
