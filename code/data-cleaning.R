@@ -105,7 +105,7 @@ animate(play_animation_Davis_TD, nframes = max(example_play_Davis_TD$frameId), f
 ### BACK TO CLEANING DATA ###
 #############################
 
-# Note that the first frame is typically, but not always, huddle_break_offense
+# Note that the first frame is typically, but not always, huddle_break_offense: View(tracking_std[1:5000, ])
 FirstFrame_NotHuddleBreak <- tracking_std %>% filter(frameId == 1 & !event %in% "huddle_break_offense")
 # Just glance at a few samples ... They often start with NA, then line_set comes a few frames later
 # View(tracking_std %>% filter(gameId == 2022091200 & playId == 741 | gameId == 2022091102 & playId == 322 | gameId == 2022091101 & playId == 1785 |  gameId == 2022090800 & playId == 3190 | gameId == 2022091811 & playId == 2348 | gameId == 2022091805 & playId == 79))
@@ -123,7 +123,7 @@ OpeningFrame_EachPlay <- OpeningFrame_EachPlay %>% filter(Frame_Rank == 1)
 OpeningFrame_EachPlay <- OpeningFrame_EachPlay %>% select(-"Frame_Rank")
 table(OpeningFrame_EachPlay$frameId) # it's always 1, so there are no "late frameId" errors
 
-# Now that we know this, use group_by() to mutate tracking_std so every frame is labelled with the event from that play's first frame
+# Now that we know this, use group_by() to mutate tracking_std so all frames are labelled with the event from that play's first frame
 # In other words, did this play's tracking data begin w/ huddle_break_offense, or ball_snap, or something else?
 OpeningFrame_Event <- OpeningFrame_EachPlay %>% select("playId", "gameId", "nflId", "displayName", "event")
 OpeningFrame_Event <- OpeningFrame_Event %>% rename(Frame1_Event = `event`)
@@ -133,3 +133,132 @@ tracking_std <- merge(x = tracking_std, y = OpeningFrame_Event,
 tracking_std <- tracking_std %>% arrange(gameId, playId, nflId, frameId)
 table(tracking_std$Frame1_Event)
 rm(FirstFrame_NotHuddleBreak, OpeningFrame_EachPlay, OpeningFrame_Event)
+
+# Let's diagnose whether a play included the event for huddle_break_offense
+# This will also allow us to see if any play erroneously includes multiple "huddle_break_offense" events
+tracking_std <- tracking_std %>% mutate(HuddleBreak_OnFrame = 
+      ifelse(!is.na(event) & event %in% "huddle_break_offense", 1, 
+             ifelse(!is.na(event) & !event %in% "huddle_break_offense", 0, NA)))
+
+tracking_std <- tracking_std %>%
+  group_by(gameId, playId, nflId, displayName) %>%
+  mutate(HuddleBreak_OnFullPlay = sum(HuddleBreak_OnFrame, na.rm = TRUE)) %>%
+  ungroup() 
+# View(tracking_std %>% filter(is.na(HuddleBreak_OnFullPlay))) - it's empty
+table(tracking_std$HuddleBreak_OnFullPlay)
+# View(tracking_std %>% filter(HuddleBreak_OnFullPlay > 1))
+# Some examples: gameId 2022091107, playId 959 ... gameId 2022092500, playId 906
+
+# For any play w/ multiple "huddle_break_offense" events, get rid of any frames before the most recent such event
+HuddleBreak_DF <- tracking_std %>%
+  filter(event %in% "huddle_break_offense") %>%
+  select(gameId, playId, nflId, displayName, frameId) %>%
+  rename(FrameNumber_HuddleBreak = frameId)
+
+# Account for plays that could have multiple of these events ... we want to keep only the most recent
+HuddleBreak_DF <- HuddleBreak_DF %>%
+  group_by(gameId, playId, nflId, displayName) %>%
+  mutate(Frame_Rank = rank(-FrameNumber_HuddleBreak, ties.method = "first")) %>%
+  ungroup() 
+HuddleBreak_DF <- HuddleBreak_DF %>% filter(Frame_Rank == 1)
+HuddleBreak_DF <- HuddleBreak_DF %>% select(-"Frame_Rank")
+
+# Do a quick confirmation that there are no plays left with more than one
+# None of these should have more than 23 (i.e. one huddle break event per player, and the ball)
+HuddleBreak_Multiples <- HuddleBreak_DF %>%
+  group_by(gameId, playId) %>%
+  summarize(n = n()) %>% arrange(desc(n))
+rm(HuddleBreak_Multiples)
+
+tracking_std <- merge(x = tracking_std, y = HuddleBreak_DF, 
+                          by = c("playId", "gameId", "nflId", "displayName"), all.x = TRUE)
+tracking_std <- tracking_std %>% arrange(gameId, playId, nflId, frameId)
+
+tracking_std <- tracking_std %>% group_by(gameId, playId, nflId) %>% 
+  mutate(Unnecessary_Early = ifelse(!is.na(FrameNumber_HuddleBreak) & frameId < FrameNumber_HuddleBreak & HuddleBreak_OnFullPlay > 1, TRUE, FALSE)) %>% 
+  ungroup()
+
+tracking_std <- tracking_std %>% filter(Unnecessary_Early == FALSE | is.na(Unnecessary_Early))
+rm(HuddleBreak_DF)
+tracking_std <- tracking_std %>% select(-c("Unnecessary_Early", "FrameNumber_HuddleBreak"))
+
+# Repeat that process for huddle_start_offense
+tracking_std <- tracking_std %>% mutate(HuddleStart_OnFrame = 
+                                                    ifelse(!is.na(event) & event %in% "huddle_start_offense", 1, 
+                                                           ifelse(!is.na(event) & !event %in% "huddle_start_offense", 0, NA)))
+
+tracking_std <- tracking_std %>%
+  group_by(gameId, playId, nflId, displayName) %>%
+  mutate(HuddleStart_OnFullPlay = sum(HuddleStart_OnFrame, na.rm = TRUE)) %>%
+  ungroup() 
+# View(tracking_std %>% filter(is.na(HuddleStart_OnFullPlay))) - it's empty
+table(tracking_std$HuddleStart_OnFullPlay)
+# View(tracking_std %>% filter(HuddleStart_OnFullPlay > 1))
+
+# For any play w/ multiple "huddle_start_offense" events, get rid of any frames before the most recent such event
+HuddleStart_DF <- tracking_std %>%
+  filter(event %in% "huddle_start_offense") %>%
+  select(gameId, playId, nflId, displayName, frameId) %>%
+  rename(FrameNumber_HuddleStart = frameId)
+
+# Account for plays that could have multiple of these events ... we want to keep only the most recent
+HuddleStart_DF <- HuddleStart_DF %>%
+  group_by(gameId, playId, nflId, displayName) %>%
+  mutate(Frame_Rank = rank(-FrameNumber_HuddleStart, ties.method = "first")) %>%
+  ungroup() 
+HuddleStart_DF <- HuddleStart_DF %>% filter(Frame_Rank == 1)
+HuddleStart_DF <- HuddleStart_DF %>% select(-"Frame_Rank")
+
+# Do a quick confirmation that there are no plays left with more than one
+# None of these should have more than 23 (i.e. one huddle start event per player, and the ball)
+HuddleStart_Multiples <- HuddleStart_DF %>%
+  group_by(gameId, playId) %>%
+  summarize(n = n()) %>% arrange(desc(n))
+rm(HuddleStart_Multiples)
+
+tracking_std <- merge(x = tracking_std, y = HuddleStart_DF, 
+                           by = c("playId", "gameId", "nflId", "displayName"), all.x = TRUE)
+tracking_std <- tracking_std %>% arrange(gameId, playId, nflId, frameId)
+
+tracking_std <- tracking_std %>% group_by(gameId, playId, nflId) %>% 
+  mutate(Unnecessary_Early = ifelse(!is.na(FrameNumber_HuddleStart) & frameId < FrameNumber_HuddleStart & HuddleStart_OnFullPlay > 1, TRUE, FALSE)) %>% 
+  ungroup()
+
+tracking_std <- tracking_std %>% filter(Unnecessary_Early == FALSE | is.na(Unnecessary_Early))
+rm(HuddleStart_DF)
+tracking_std <- tracking_std %>% select(-c("Unnecessary_Early", "FrameNumber_HuddleStart"))
+
+# Do something similar for the snap of the ball
+# But slightly different, b/c if there are two "ball_snap" events, we don't want to get rid of all frames before the latter one
+# We just want to change event column, so the first one says "NA" instead of "ball_snap"
+Frames_AtBallSnap <- tracking_std %>%
+  filter(event %in% c("ball_snap", "snap_direct")) %>%
+  select(gameId, playId, nflId, displayName, frameId) %>%
+  rename(FrameNumber_AtBallSnap = frameId)
+
+# Account for plays that could have multiple of these events ... we want to keep only the most recent
+Frames_AtBallSnap <- Frames_AtBallSnap %>%
+  group_by(gameId, playId, nflId, displayName) %>%
+  mutate(Frame_Rank = rank(-FrameNumber_AtBallSnap, ties.method = "first")) %>%
+  ungroup() 
+
+# Do a quick confirmation that there are no plays with zero events for ball being snapped
+tracking_std <- tracking_std %>% mutate(BallSnap_OnFrame = 
+     ifelse(!is.na(event) & event %in% c("ball_snap", "snap_direct"), 1, 
+          ifelse(!is.na(event) & !event %in% c("ball_snap", "snap_direct"), 0, NA)))
+tracking_std <- tracking_std %>%
+  group_by(gameId, playId, nflId, displayName) %>%
+  mutate(BallSnap_OnFullPlay = sum(BallSnap_OnFrame, na.rm = TRUE)) %>%
+  ungroup() 
+# View(tracking_std %>% filter(is.na(BallSnap_OnFullPlay))) - it's empty
+table(tracking_std$BallSnap_OnFullPlay)
+# View(tracking_std %>% filter(BallSnap_OnFullPlay != 1)) - it's empty
+
+tracking_std <- merge(x = tracking_std, y = Frames_AtBallSnap, 
+                             by = c("playId", "gameId", "nflId", "displayName")) # no need for all.x b/c every play has a snap
+tracking_std <- tracking_std %>% arrange(gameId, playId, nflId, frameId)
+
+tracking_std <- tracking_std %>% mutate(event = ifelse(!is.na(Frame_Rank) & Frame_Rank > 1, NA, 
+      ifelse(!is.na(Frame_Rank) & Frame_Rank == 1, event, event)))
+rm(Frames_AtBallSnap)
+tracking_std <- tracking_std %>% select(-c("Frame_Rank", "BallSnap_OnFullPlay"))
