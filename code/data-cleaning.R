@@ -322,3 +322,44 @@ tracking_std <- tracking_std %>% mutate(event = ifelse(!is.na(Frame_Rank) & Fram
       ifelse(!is.na(Frame_Rank) & Frame_Rank == 1, event, event)))
 rm(Frames_AtBallSnap)
 tracking_std <- tracking_std %>% select(-c("Frame_Rank", "BallSnap_OnFullPlay"))
+
+# Now create line of scrimmage for each play using ball data
+# Obviously, where the ball is during the ball_snap event is the LOS
+Snap_Ball_Location <- tracking_std %>%
+  filter(club == "football", event %in% c("ball_snap", "snap_direct")) %>%
+  select(gameId, playId, x, y) %>%
+  rename(Ball_X_Snap = x, Ball_Y_Snap = y)
+
+tracking_std <- tracking_std %>%
+  left_join(Snap_Ball_Location, by = c("playId", "gameId"))
+
+tracking_std <- tracking_std %>%
+  mutate(X_dist_FromBall_OrigLocation = x - Ball_X_Snap, Y_distFromMOF = y - 26.65,
+         Y_dist_FromBall_OrigLocation = y - Ball_Y_Snap)
+
+# Code for where the ball is at any given point, and each player's distance from it
+ball_df <- tracking_std %>% 
+  filter(club == "football") %>% 
+  select(gameId, playId, frameId, x, y) %>% 
+  rename(ball_x = x,
+         ball_y = y)
+
+tracking_std <- tracking_std %>% 
+  left_join(ball_df, by = c("playId", "gameId", "frameId"))
+
+tracking_std <- tracking_std %>% 
+  mutate(TotDistFromBall = sqrt((x - ball_x)^2 + (y - ball_y)^2),
+         TotDistFromBall_OrigLocation = sqrt((x - Ball_X_Snap)^2 + (y - Ball_Y_Snap)^2),
+         Y_DistFromBall = (y - ball_y), X_DistFromBall = (x - ball_x),
+         Y_AbsDistFromBall = abs(y - ball_y), X_AbsDistFromBall = abs(x - ball_x))
+rm(ball_df, Snap_Ball_Location)
+
+# Likewise, add the ball's distance from goal line and sideline
+tracking_std <- tracking_std %>%
+  mutate(Ball_DistFromGoalLine = 110 - ball_x,
+         Ball_DistFromSideline = ifelse(ball_y >= 26.65, 53.3 - ball_y, ball_y))
+
+# And mutate a binary variable for being near goal line or sideline
+tracking_std <- tracking_std %>% 
+  mutate(BallNearGoalLine = ifelse(Ball_DistFromGoalLine <= 3, 1, 0),
+         BallNearSideline = ifelse(Ball_DistFromSideline <= 3, 1, 0))
