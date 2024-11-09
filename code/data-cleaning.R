@@ -105,7 +105,67 @@ animate(play_animation_Davis_TD, nframes = max(example_play_Davis_TD$frameId), f
 ### BACK TO CLEANING DATA ###
 #############################
 
-# Note that the first frame is typically, but not always, huddle_break_offense: View(tracking_std[1:5000, ])
+# These plays (among others) have multiple "first_contact" events, but we want only first instance
+# View(tracking_std %>% filter(gameId == 2022100209, playId == 1581, event == "first_contact"))
+# View(tracking_std %>% filter(gameId == 2022103100, playId == 1689, event == "first_contact"))
+# View(tracking_std %>% filter(gameId == 2022103004, playId == 2106, event == "first_contact"))
+FirstContact_Events <- tracking_std %>% filter(event == "first_contact") %>%
+  group_by(gameId, playId, nflId, displayName) %>%
+  mutate(FirstContact_rank = rank(frameId, ties.method = "first")) %>%
+  ungroup()
+FirstContact_Events <- FirstContact_Events %>% 
+  select(c("gameId", "playId", "nflId", "displayName", "frameId", "FirstContact_rank"))
+MultiFirstContact_Plays <- FirstContact_Events %>% 
+  group_by(gameId, playId) %>% 
+  summarize(n = n(), Frames = n_distinct(frameId)) %>% arrange(desc(Frames))
+tracking_std <- tracking_std %>%
+  left_join(FirstContact_Events, by = c("gameId", "playId", "nflId", "displayName", "frameId"))
+
+table(tracking_std$event)
+# For any "FirstContact_rank" bigger than 1, change the event name to NA
+tracking_std <- tracking_std %>% mutate(event =
+                                                    ifelse(is.na(FirstContact_rank), event,
+                                                           ifelse(FirstContact_rank > 1 & event == "first_contact", NA, event)))
+
+rm(FirstContact_Events, MultiFirstContact_Plays)
+tracking_std <- tracking_std %>% select(-"FirstContact_rank")
+
+# Do the same thing with ball_snap, except this time we only want the last instance
+# But first, do a quick confirmation that there are no plays with zero events for ball being snapped
+tracking_std <- tracking_std %>% mutate(BallSnap_OnFrame = 
+                                                    ifelse(!is.na(event) & event %in% c("ball_snap", "snap_direct"), 1, 
+                                                           ifelse(!is.na(event) & !event %in% c("ball_snap", "snap_direct"), 0, NA)))
+tracking_std <- tracking_std %>%
+  group_by(gameId, playId, nflId, displayName) %>%
+  mutate(BallSnap_OnFullPlay = sum(BallSnap_OnFrame, na.rm = TRUE)) %>%
+  ungroup() 
+# View(tracking_std %>% filter(is.na(BallSnap_OnFullPlay))) - it's empty
+table(tracking_std$BallSnap_OnFullPlay)
+# View(tracking_std %>% filter(BallSnap_OnFullPlay != 1)) - it's empty
+tracking_std <- tracking_std %>% select(-"BallSnap_OnFullPlay")
+
+BallSnap_Events <- tracking_std %>% filter(event %in% c("ball_snap", "snap_direct")) %>%
+  group_by(gameId, playId, nflId, displayName) %>%
+  mutate(BallSnap_rank = rank(-frameId, ties.method = "first")) %>%
+  ungroup()
+BallSnap_Events <- BallSnap_Events %>% 
+  select(c("gameId", "playId", "nflId", "displayName", "frameId", "BallSnap_rank"))
+MultiBallSnap_Plays <- BallSnap_Events %>% 
+  group_by(gameId, playId) %>% 
+  summarize(n = n(), Frames = n_distinct(frameId)) %>% arrange(desc(Frames))
+tracking_std <- tracking_std %>%
+  left_join(BallSnap_Events, by = c("gameId", "playId", "nflId", "displayName", "frameId"))
+
+table(tracking_std$event)
+# For any "BallSnap_rank" bigger than 1, change the event name to NA
+tracking_std <- tracking_std %>% mutate(event =
+                                                    ifelse(is.na(BallSnap_rank), event,
+                                                           ifelse(BallSnap_rank > 1 & event == "first_contact", NA, event)))
+
+rm(BallSnap_Events, MultiBallSnap_Plays)
+tracking_std <- tracking_std %>% select(-"BallSnap_rank")
+
+# Note that the first frame is typically, but not always, huddle_break_offense
 FirstFrame_NotHuddleBreak <- tracking_std %>% filter(frameId == 1 & !event %in% "huddle_break_offense")
 # Just glance at a few samples ... They often start with NA, then line_set comes a few frames later
 # View(tracking_std %>% filter(gameId == 2022091200 & playId == 741 | gameId == 2022091102 & playId == 322 | gameId == 2022091101 & playId == 1785 |  gameId == 2022090800 & playId == 3190 | gameId == 2022091811 & playId == 2348 | gameId == 2022091805 & playId == 79))
