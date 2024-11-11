@@ -363,3 +363,74 @@ tracking_std <- tracking_std %>%
 tracking_std <- tracking_std %>% 
   mutate(BallNearGoalLine = ifelse(Ball_DistFromGoalLine <= 3, 1, 0),
          BallNearSideline = ifelse(Ball_DistFromSideline <= 3, 1, 0))
+
+nflverse_pbp <- nflfastR::load_pbp(2022)
+nflverse_pbp <- nflverse_pbp %>% filter(week %in% 1:9)
+# This gives descriptions of NFLVerse columns: View(field_descriptions)
+
+# View(nflverse_pbp %>% filter(run_location == "middle" & !is.na(run_gap)))
+# This is empty, meaning all "middle" runs have NA for run_gap - adjust this
+nflverse_pbp <- nflverse_pbp %>% mutate(
+  run_gap = ifelse(run_location == "middle", "center", run_gap))
+
+# Make sure that team column has no tricode inconsistency (e.g. JAX vs. JAC)
+GamesDF_HomeTeamTricodes <- unique(games$homeTeamAbbr)
+GamesDF_AwayTeamTricodes <- unique(games$visitorTeamAbbr)
+PlaysDF_PosTeamTricodes <- unique(plays$possessionTeam)
+PlaysDF_DefTeamTricodes <- unique(plays$defensiveTeam)
+PlaysDF_SideOfFieldTricodes <- unique(plays$yardlineSide)
+NFLVerse_HomeTeamTricodes <- unique(nflverse_pbp$home_team)
+NFLVerse_AwayTeamTricodes <- unique(nflverse_pbp$away_team)
+NFLVerse_PosTeamTricodes <- unique(nflverse_pbp$posteam)
+NFLVerse_DefTeamTricodes <- unique(nflverse_pbp$defteam)
+
+GamesDF_HomeTeamTricodes <- sort(GamesDF_HomeTeamTricodes)
+GamesDF_AwayTeamTricodes <- sort(GamesDF_AwayTeamTricodes)
+PlaysDF_PosTeamTricodes <- sort(PlaysDF_PosTeamTricodes)
+PlaysDF_DefTeamTricodes <- sort(PlaysDF_DefTeamTricodes)
+PlaysDF_SideOfFieldTricodes <- sort(PlaysDF_SideOfFieldTricodes)
+NFLVerse_HomeTeamTricodes <- sort(NFLVerse_HomeTeamTricodes)
+NFLVerse_AwayTeamTricodes <- sort(NFLVerse_AwayTeamTricodes)
+NFLVerse_PosTeamTricodes <- sort(NFLVerse_PosTeamTricodes)
+NFLVerse_DefTeamTricodes <- sort(NFLVerse_DefTeamTricodes)
+
+identical(GamesDF_HomeTeamTricodes, GamesDF_AwayTeamTricodes)
+identical(PlaysDF_PosTeamTricodes, PlaysDF_DefTeamTricodes)
+identical(PlaysDF_SideOfFieldTricodes, PlaysDF_DefTeamTricodes)
+identical(PlaysDF_SideOfFieldTricodes, GamesDF_HomeTeamTricodes)
+identical(NFLVerse_HomeTeamTricodes, NFLVerse_AwayTeamTricodes)
+identical(NFLVerse_PosTeamTricodes, NFLVerse_DefTeamTricodes)
+identical(NFLVerse_HomeTeamTricodes, NFLVerse_PosTeamTricodes)
+identical(NFLVerse_HomeTeamTricodes, GamesDF_HomeTeamTricodes)
+# They are all aligned
+rm(GamesDF_HomeTeamTricodes, GamesDF_AwayTeamTricodes,
+   PlaysDF_PosTeamTricodes, PlaysDF_DefTeamTricodes,
+   PlaysDF_SideOfFieldTricodes, NFLVerse_HomeTeamTricodes,
+   NFLVerse_AwayTeamTricodes, NFLVerse_PosTeamTricodes,
+   NFLVerse_DefTeamTricodes)
+
+table(plays$passResult)
+# C means complete, R means scramble, S means sack, IN means interception, I means incomplete
+# All others are designed runs
+plays <- plays %>% mutate(passResult = 
+                            ifelse(passResult %in% c("C", "R", "IN", "I", "S"), passResult, NA))
+
+# Arrange plays so they are sorted chronologically
+plays <- plays %>% arrange(gameId, playId)
+
+# The absoluteYardlineNumber is not accurate, just use nflverse's yardline_100
+# And yardlineNumber doesn't give full field picture, e.g. -35 and +35 both say 35
+# View(plays %>% filter(possessionTeam == yardlineSide & yardlineNumber < 20))
+# This shows us all plays when the offensive team is inside its own 20
+# Sometimes absoluteYardlineNumber is under 30, sometimes it's more than 100
+plays <- plays %>% select(-"absoluteYardlineNumber", -"yardlineNumber")
+
+# Fix one column that is spelled wrong
+plays <- plays %>% rename(visitorTeamWinProbabilityAdded = `visitorTeamWinProbilityAdded`)
+
+# View(plays %>% filter(is.na(expectedPointsAdded)))
+# One play to fix here, a David Montgomery run on 10/09/22
+# Since it's only one play, just find the right answer from nflverse
+# View(nflverse_pbp %>% filter(old_game_id == 2022100904, qtr == 2) %>% select(1:35, 73, 74))
+plays <- plays %>% mutate(expectedPointsAdded =
+                            ifelse(is.na(expectedPointsAdded), -0.29447450, expectedPointsAdded)) 
