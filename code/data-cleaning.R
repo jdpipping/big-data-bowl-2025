@@ -288,41 +288,6 @@ tracking_std <- tracking_std %>% filter(Unnecessary_Early == FALSE | is.na(Unnec
 rm(HuddleStart_DF)
 tracking_std <- tracking_std %>% select(-c("Unnecessary_Early", "FrameNumber_HuddleStart"))
 
-# Do something similar for the snap of the ball
-# But slightly different, b/c if there are two "ball_snap" events, we don't want to get rid of all frames before the latter one
-# We just want to change event column, so the first one says "NA" instead of "ball_snap"
-Frames_AtBallSnap <- tracking_std %>%
-  filter(event %in% c("ball_snap", "snap_direct")) %>%
-  select(gameId, playId, nflId, displayName, frameId) %>%
-  rename(FrameNumber_AtBallSnap = frameId)
-
-# Account for plays that could have multiple of these events ... we want to keep only the most recent
-Frames_AtBallSnap <- Frames_AtBallSnap %>%
-  group_by(gameId, playId, nflId, displayName) %>%
-  mutate(Frame_Rank = rank(-FrameNumber_AtBallSnap, ties.method = "first")) %>%
-  ungroup() 
-
-# Do a quick confirmation that there are no plays with zero events for ball being snapped
-tracking_std <- tracking_std %>% mutate(BallSnap_OnFrame = 
-     ifelse(!is.na(event) & event %in% c("ball_snap", "snap_direct"), 1, 
-          ifelse(!is.na(event) & !event %in% c("ball_snap", "snap_direct"), 0, NA)))
-tracking_std <- tracking_std %>%
-  group_by(gameId, playId, nflId, displayName) %>%
-  mutate(BallSnap_OnFullPlay = sum(BallSnap_OnFrame, na.rm = TRUE)) %>%
-  ungroup() 
-# View(tracking_std %>% filter(is.na(BallSnap_OnFullPlay))) - it's empty
-table(tracking_std$BallSnap_OnFullPlay)
-# View(tracking_std %>% filter(BallSnap_OnFullPlay != 1)) - it's empty
-
-tracking_std <- merge(x = tracking_std, y = Frames_AtBallSnap, 
-                             by = c("playId", "gameId", "nflId", "displayName")) # no need for all.x b/c every play has a snap
-tracking_std <- tracking_std %>% arrange(gameId, playId, nflId, frameId)
-
-tracking_std <- tracking_std %>% mutate(event = ifelse(!is.na(Frame_Rank) & Frame_Rank > 1, NA, 
-      ifelse(!is.na(Frame_Rank) & Frame_Rank == 1, event, event)))
-rm(Frames_AtBallSnap)
-tracking_std <- tracking_std %>% select(-c("Frame_Rank", "BallSnap_OnFullPlay"))
-
 # Now create line of scrimmage for each play using ball data
 # Obviously, where the ball is during the ball_snap event is the LOS
 Snap_Ball_Location <- tracking_std %>%
