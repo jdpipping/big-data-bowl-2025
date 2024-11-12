@@ -288,6 +288,68 @@ tracking_std <- tracking_std %>% filter(Unnecessary_Early == FALSE | is.na(Unnec
 rm(HuddleStart_DF)
 tracking_std <- tracking_std %>% select(-c("Unnecessary_Early", "FrameNumber_HuddleStart"))
 
+# Now see if there are any plays that have huddle_start_offense but not huddle_break_offense (should be impossible)
+# View(tracking_std %>% filter(HuddleStart_OnFullPlay > 0 & HuddleBreak_OnFullPlay == 0))
+# Turns out this is reasonably common ... best route is probably to get rid of any frames before huddle_start_offense, see below
+View(tracking_std %>% filter(HuddleStart_OnFullPlay > 0 & HuddleBreak_OnFullPlay > 0))
+# IN CONTRAST, THIS ONE IS EMPTY ... no plays have an event for huddle starting AND huddle breaking
+
+# Here's how we would get rid of unnecessary frames coming BEFORE offense broke the huddle
+# In other words, doing it for all plays with a huddle_break_offense event, not just the plays that had multiple
+# Isolate the plays that include an event for huddle_break_offense
+Plays_WithHuddleBreak <- tracking_std %>% filter(HuddleBreak_OnFullPlay == 1)
+  
+# Get rid of any frames that came before the huddle_break_offense event, IF THE PLAY HAD ONE
+HuddleBreak_DF <- tracking_std %>%
+  filter(event %in% c("huddle_break_offense")) %>%
+  select(gameId, playId, nflId, displayName, frameId) %>%
+  rename(FrameNumber_HuddleBreak = frameId)
+
+tracking_std <- merge(x = tracking_std, y = HuddleBreak_DF, 
+                            by = c("playId", "gameId", "nflId", "displayName"), all.x = TRUE)
+tracking_std <- tracking_std %>% arrange(gameId, playId, nflId, frameId)
+
+tracking_std <- tracking_std %>% group_by(gameId, playId, nflId) %>% 
+  mutate(Unnecessary_Early = ifelse(!is.na(FrameNumber_HuddleBreak) & frameId < FrameNumber_HuddleBreak, TRUE, FALSE)) %>% 
+  ungroup()
+
+tracking_std <- tracking_std %>% filter(Unnecessary_Early == FALSE | is.na(Unnecessary_Early))
+rm(HuddleBreak_DF)
+tracking_std <- tracking_std %>% select(-c("Unnecessary_Early", "FrameNumber_HuddleBreak"))
+
+# Glance to see if there's ever a huddle_start_offense event that isn't on the first frame ... there is
+# View(tracking_std %>% filter(event %in% "huddle_start_offense" & frameId != 1))
+# View(tracking_std %>% filter(gameId == 2022092505, playId == 2919))
+# Therefore, can repeat the same process that we used with huddle_break_offense
+Plays_WithHuddleStart <- tracking_std %>% filter(HuddleStart_OnFullPlay == 1)
+
+# Get rid of any frames that came before the huddle_start_offense event, IF THE PLAY HAD ONE
+HuddleStart_DF <- tracking_std %>%
+  filter(event %in% c("huddle_start_offense")) %>%
+  select(gameId, playId, nflId, displayName, frameId) %>%
+  rename(FrameNumber_HuddleStart = frameId)
+
+tracking_std <- merge(x = tracking_std, y = HuddleStart_DF, 
+                           by = c("playId", "gameId", "nflId", "displayName"), all.x = TRUE)
+tracking_std <- tracking_std %>% arrange(gameId, playId, nflId, frameId)
+
+tracking_std <- tracking_std %>% group_by(gameId, playId, nflId) %>% 
+  mutate(Unnecessary_Early = ifelse(!is.na(FrameNumber_HuddleStart) & frameId < FrameNumber_HuddleStart, TRUE, FALSE)) %>% 
+  ungroup()
+
+tracking_std <- tracking_std %>% filter(Unnecessary_Early == FALSE | is.na(Unnecessary_Early))
+rm(HuddleStart_DF)
+tracking_std <- tracking_std %>% select(-c("Unnecessary_Early", "FrameNumber_HuddleStart"))
+
+# Then use rank() to retroactively fix frameId for all plays?? (i.e. make them start at 1)
+# This might not even really be necessary, but here's how to do it
+# Probably helpful for incorporating video, i.e. having any play start at Frame 1
+tracking_std <- tracking_std %>%
+  group_by(gameId, playId, nflId, displayName) %>%
+  mutate(frameId = rank(frameId, ties.method = "first")) %>%
+  ungroup() 
+table(tracking_std$frameId)
+
 # Now create line of scrimmage for each play using ball data
 # Obviously, where the ball is during the ball_snap event is the LOS
 Snap_Ball_Location <- tracking_std %>%
