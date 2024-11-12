@@ -291,7 +291,7 @@ tracking_std <- tracking_std %>% select(-c("Unnecessary_Early", "FrameNumber_Hud
 # Now see if there are any plays that have huddle_start_offense but not huddle_break_offense (should be impossible)
 # View(tracking_std %>% filter(HuddleStart_OnFullPlay > 0 & HuddleBreak_OnFullPlay == 0))
 # Turns out this is reasonably common ... best route is probably to get rid of any frames before huddle_start_offense, see below
-View(tracking_std %>% filter(HuddleStart_OnFullPlay > 0 & HuddleBreak_OnFullPlay > 0))
+# View(tracking_std %>% filter(HuddleStart_OnFullPlay > 0 & HuddleBreak_OnFullPlay > 0))
 # IN CONTRAST, THIS ONE IS EMPTY ... no plays have an event for huddle starting AND huddle breaking
 
 # Here's how we would get rid of unnecessary frames coming BEFORE offense broke the huddle
