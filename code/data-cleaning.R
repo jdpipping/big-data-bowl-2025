@@ -461,3 +461,21 @@ plays <- plays %>% rename(visitorTeamWinProbabilityAdded = `visitorTeamWinProbil
 # View(nflverse_pbp %>% filter(old_game_id == 2022100904, qtr == 2) %>% select(1:35, 73, 74))
 plays <- plays %>% mutate(expectedPointsAdded =
                             ifelse(is.na(expectedPointsAdded), -0.29447450, expectedPointsAdded)) 
+
+# Get rid of all QB kneels and spikes
+plays <- plays %>% filter(qbSpike == FALSE | is.na(qbSpike))
+plays <- plays %>% filter(qbKneel == 0 | is.na(qbKneel))
+
+# And fix the Cover-6 Right vs. Cover 6-Left error
+table(plays$pff_passCoverage)
+plays <- plays %>% mutate(pff_passCoverage = 
+    ifelse(!is.na(pff_passCoverage) & pff_passCoverage %in% "Cover 6-Left", "Cover-6 Left", pff_passCoverage))
+# View(plays %>% filter(is.na(pff_passCoverage))) ... none of these are dropbacks, and they're mostly QB sneaks
+
+# Mutate whether post-snap safeties were middle-of-field-open (MOFO) or closed (MOFC)
+plays <- plays %>% mutate(PostSnap_MOF =
+    ifelse(!is.na(pff_passCoverage) & pff_passCoverage %in% c("Cover-1", "Cover-1 Double", "Cover-3", "Cover-3 Cloud Left", "Cover-3 Cloud Right", "Cover-3 Double Cloud", "Cover-3 Seam"), "MOF Closed",
+       ifelse(!is.na(pff_passCoverage) & pff_passCoverage %in% c("Cover-0", "Cover-2", "Quarters", "Cover-4", "2-Man", "Cover-6", "Cover-6 Left", "Cover-6 Right"), "MOF Open", 
+            ifelse(!is.na(pff_passCoverage) & pff_passCoverage %in% c("Bracket", "Goal Line", "Miscellaneous", "Prevent", "Red Zone"), "Ambiguous", NA))))
+table(plays$PostSnap_MOF)
+# View(plays %>% filter(is.na(PostSnap_MOF)))
