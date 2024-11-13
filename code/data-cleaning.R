@@ -479,3 +479,21 @@ plays <- plays %>% mutate(PostSnap_MOF =
             ifelse(!is.na(pff_passCoverage) & pff_passCoverage %in% c("Bracket", "Goal Line", "Miscellaneous", "Prevent", "Red Zone"), "Ambiguous", NA))))
 table(plays$PostSnap_MOF)
 # View(plays %>% filter(is.na(PostSnap_MOF)))
+
+# Turn receiver alignment into numeric variable(s), rather than character
+table(plays$receiverAlignment) # all have exactly three characters
+# Glance at an example of 3x0 so we can diagnose if the numbers mean wide receivers, or eligible receivers
+# View(plays %>% filter(receiverAlignment %in% "3x0")); clearly it means eligible receivers, i.e. TEs are included
+# Use text analysis to extract from the formations; substr() syntax is substr(x, start, stop)
+plays <- plays %>% 
+  mutate(aligned_left_receivers = substr(receiverAlignment, 1, 1))
+plays <- plays %>% 
+  mutate(aligned_right_receivers = substr(receiverAlignment, 3, 3))
+class(plays$aligned_left_receivers) <- "numeric"
+class(plays$aligned_right_receivers) <- "numeric"
+plays <- plays %>% mutate(aligned_total_receivers = aligned_left_receivers + aligned_right_receivers)
+plays <- plays %>% select(1:18, "aligned_left_receivers", "aligned_right_receivers", "aligned_total_receivers", 19:49)
+
+# For the sake of simplicity, let's get rid of weird plays with more than 5
+# View(plays %>% filter(receiverAlignment %in% "4x2")) ... direct snap to RB can make numbers show up
+plays <- plays %>% filter(aligned_total_receivers <= 5)
