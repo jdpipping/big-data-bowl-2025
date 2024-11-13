@@ -450,7 +450,7 @@ plays <- plays %>% arrange(gameId, playId)
 # View(plays %>% filter(possessionTeam == yardlineSide & yardlineNumber < 20))
 # This shows us all plays when the offensive team is inside its own 20
 # Sometimes absoluteYardlineNumber is under 30, sometimes it's more than 100
-plays <- plays %>% select(-"absoluteYardlineNumber", -"yardlineNumber")
+plays <- plays %>% select(-"absoluteYardlineNumber", -"yardlineNumber", -"yardlineSide")
 
 # Fix one column that is spelled wrong
 plays <- plays %>% rename(visitorTeamWinProbabilityAdded = `visitorTeamWinProbilityAdded`)
@@ -492,7 +492,7 @@ plays <- plays %>%
 class(plays$aligned_left_receivers) <- "numeric"
 class(plays$aligned_right_receivers) <- "numeric"
 plays <- plays %>% mutate(aligned_total_receivers = aligned_left_receivers + aligned_right_receivers)
-plays <- plays %>% select(1:18, "aligned_left_receivers", "aligned_right_receivers", "aligned_total_receivers", 19:49)
+plays <- plays %>% select(1:17, "aligned_left_receivers", "aligned_right_receivers", "aligned_total_receivers", 18:48)
 
 # For the sake of simplicity, let's get rid of weird plays with more than 5
 # View(plays %>% filter(receiverAlignment %in% "4x2")) ... direct snap to RB can make numbers show up
