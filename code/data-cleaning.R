@@ -341,9 +341,11 @@ tracking_std <- tracking_std %>% filter(Unnecessary_Early == FALSE | is.na(Unnec
 rm(HuddleStart_DF)
 tracking_std <- tracking_std %>% select(-c("Unnecessary_Early", "FrameNumber_HuddleStart"))
 
+Plays_WithHuddle_StartOrBreak <- tracking_combined %>% filter(HuddleStart_OnFullPlay == 1 | HuddleBreak_OnFullPlay == 1)
+
 # Then use rank() to retroactively fix frameId for all plays?? (i.e. make them start at 1)
 # This might not even really be necessary, but here's how to do it
-# Probably helpful for incorporating video, i.e. having any play start at Frame 1
+# Probably helpful for incorporating video/dots, i.e. having any play start at Frame 1
 tracking_std <- tracking_std %>%
   group_by(gameId, playId, nflId, displayName) %>%
   mutate(frameId = rank(frameId, ties.method = "first")) %>%
