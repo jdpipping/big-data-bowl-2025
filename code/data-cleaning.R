@@ -342,6 +342,8 @@ rm(HuddleStart_DF)
 tracking_std <- tracking_std %>% select(-c("Unnecessary_Early", "FrameNumber_HuddleStart"))
 
 Plays_WithHuddle_StartOrBreak <- tracking_combined %>% filter(HuddleStart_OnFullPlay == 1 | HuddleBreak_OnFullPlay == 1)
+# Can use this in place of the other two
+rm(Plays_WithHuddleBreak, Plays_WithHuddleStart)
 
 # Then use rank() to retroactively fix frameId for all plays?? (i.e. make them start at 1)
 # This might not even really be necessary, but here's how to do it
