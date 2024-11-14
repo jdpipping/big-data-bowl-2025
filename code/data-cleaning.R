@@ -499,3 +499,57 @@ plays <- plays %>% select(1:17, "aligned_left_receivers", "aligned_right_receive
 # For the sake of simplicity, let's get rid of weird plays with more than 5
 # View(plays %>% filter(receiverAlignment %in% "4x2")) ... direct snap to RB can make numbers show up
 plays <- plays %>% filter(aligned_total_receivers <= 5)
+
+
+# These are all empty
+# View(plays %>% filter(is.na(playNullifiedByPenalty)))
+# View(plays %>% filter(is.na(offenseFormation)))
+# View(plays %>% filter(is.na(playAction)))
+# View(plays %>% filter(is.na(yardsGained)))
+# View(plays %>% filter(is.na(isDropback)))
+
+# Fix spelling error
+player_play <- player_play %>% rename(wasTargetedReceiver = `wasTargettedReceiver`)
+
+# View(player_play %>% filter(is.na(wasRunningRoute) & !is.na(routeRan))); it's empty
+# View(player_play %>% filter(!is.na(wasRunningRoute) & is.na(routeRan))); it's empty
+
+# View(player_play %>% filter(tackleAssist >= 1 & assistedTackle >= 1))
+# This is empty, so clearly they are never both true ... make a new column that combines them
+# View(player_play %>% filter(is.na(tackleAssist) | is.na(assistedTackle))) ... this is empty too
+player_play <- player_play %>% mutate(assistedTackle = ifelse(tackleAssist %in% 1 | assistedTackle %in% 1, 1, 0))
+player_play <- player_play %>% select(-"tackleAssist")
+
+# Check if any play has multiple "solo tackle" instances, should be impossible
+SoloTackle_Multiples <- player_play %>% filter(soloTackle > 0) %>%
+  group_by(gameId, playId) %>%
+  summarize(Players = n(), SoloTackles = sum(soloTackle), Assists = sum(assistedTackle)) %>% arrange(desc(SoloTackles))
+# View(SoloTackle_Multiples) ... there are a lot of instances with multiple, probably all turnovers
+# An instance of 3: View(plays %>% filter(gameId == 2022102303, playId == 3627)) ... this one had two separate forced fumbles
+rm(SoloTackle_Multiples)
+
+max(player_play$soloTackle) # it's 1, as it should be
+min(player_play$soloTackle) # it's 0, as it should be
+max(player_play$assistedTackle) # it's 1, as it should be
+min(player_play$assistedTackle) # it's 0, as it should be
+max(player_play$tackleForALoss) # it's 1, as it should be
+min(player_play$tackleForALoss) # it's 0, as it should be
+max(player_play$hadRushAttempt) # it's 1, as it should be
+min(player_play$hadRushAttempt) # it's 0, as it should be
+max(player_play$hadDropback) # it's 1, as it should be
+min(player_play$hadDropback) # it's 0, as it should be
+max(player_play$hadPassReception) # it's 1, as it should be
+min(player_play$hadPassReception) # it's 0, as it should be
+max(player_play$wasTargetedReceiver) # it's 1, as it should be
+min(player_play$wasTargetedReceiver) # it's 0, as it should be
+max(player_play$fumbles) # actually can be more than 1 b/c of weird lateral plays
+# View(plays %>% filter(gameId == 2022100208, playId == 3895))
+min(player_play$fumbles) # it's 0, as it should be
+max(player_play$fumbleOutOfBounds) # it's 1, as it should be
+min(player_play$fumbleOutOfBounds) # it's 0, as it should be
+max(player_play$quarterbackHit) # it's 1, as it should be
+min(player_play$quarterbackHit) # it's 0, as it should be
+max(player_play$safetyAsDefense) # it's 1, as it should be
+min(player_play$safetyAsDefense) # it's 0, as it should be
+max(player_play$hadInterception) # it's 1, as it should be
+min(player_play$hadInterception) # it's 0, as it should be
