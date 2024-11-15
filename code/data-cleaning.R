@@ -555,3 +555,52 @@ max(player_play$safetyAsDefense) # it's 1, as it should be
 min(player_play$safetyAsDefense) # it's 0, as it should be
 max(player_play$hadInterception) # it's 1, as it should be
 min(player_play$hadInterception) # it's 0, as it should be
+
+# Then, next obligation is to properly merge everything
+# Must change the class of nflverse_pbp to make it compatible with the rest
+class(nflverse_pbp) <- c("data.table", "data.frame")
+
+# Also must coerce old_game_id in nflverse into a numeric variable
+nflverse_pbp$old_game_id <- as.numeric(nflverse_pbp$old_game_id)
+
+# And coerce down in nflverse to an ordered factor
+nflverse_pbp <- nflverse_pbp %>% mutate(down = factor(down, ordered = TRUE, levels = c("1", "2", "3", "4")))
+
+PlaysAndGames <- merge(x = games, y = plays, by = "gameId") 
+PlaysAndGames_NFLVerse <- merge(x = PlaysAndGames, y = nflverse_pbp, 
+                                by.x = c("gameId", "playId", "season", "week", "down"), 
+                                by.y = c("old_game_id", "play_id",  "season", "week", "down")) 
+rm(games, plays, nflverse_pbp, PlaysAndGames)
+
+# Use all.y = TRUE, to make sure all tracking data is included
+TrackingWithStats <- merge(x = player_play, y = tracking_combined,
+                             by = c("gameId", "playId", "nflId"), all.y = TRUE)
+
+TrackingWithStats_PlayerNames <- merge(x = TrackingWithStats, y = players,
+                                         by = c("nflId"))
+# View(TrackingWithStats_PlayerNames %>% filter(is.na(club)))
+# If we wanted to keep club == "football", we could use all.x = TRUE here
+rm(players, player_play, tracking_combined, TrackingWithStats)
+
+# Check for name discrepancies besides Chosen/Robbie Anderson within this DF
+NameDiscrepancies <- TrackingWithStats_PlayerNames %>% filter(displayName.x != displayName.y)
+table(NameDiscrepancies$displayName.x)
+table(NameDiscrepancies$displayName.y)
+# Go with the Y one (i.e. players.csv originally)
+TrackingWithStats_PlayerNames <- TrackingWithStats_PlayerNames %>% 
+  mutate(displayName = ifelse(displayName.x != displayName.y, displayName.y, displayName.y))
+# Get rid of extra columns once that's done
+TrackingWithStats_PlayerNames <- TrackingWithStats_PlayerNames %>%
+  select(-"displayName.x", -"displayName.y")
+rm(NameDiscrepancies)
+
+# Check if any FGs are included in merged NFLVerse data
+# View(PlaysAndGames_NFLVerse %>% filter(!is.na(kick_distance))); it's empty
+# Same with timeouts
+# View(PlaysAndGames_NFLVerse %>% filter(timeout > 0)); only includes challenges
+# And general special teams plays
+# View(PlaysAndGames_NFLVerse %>% filter(special_teams_play > 0)); it's empty
+# And kneels/spikes
+# View(PlaysAndGames_NFLVerse %>% filter(qb_kneel > 0 | qb_spike > 0)); empty
+# And two-point conv
+# View(PlaysAndGames_NFLVerse %>% filter(two_point_attempt > 0)); it's empty
