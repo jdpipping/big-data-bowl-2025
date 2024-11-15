@@ -297,7 +297,7 @@ tracking_std <- tracking_std %>% select(-c("Unnecessary_Early", "FrameNumber_Hud
 # Here's how we would get rid of unnecessary frames coming BEFORE offense broke the huddle
 # In other words, doing it for all plays with a huddle_break_offense event, not just the plays that had multiple
 # Isolate the plays that include an event for huddle_break_offense
-Plays_WithHuddleBreak <- tracking_std %>% filter(HuddleBreak_OnFullPlay == 1)
+Tracking_PlaysWithHuddleBreak <- tracking_std %>% filter(HuddleBreak_OnFullPlay == 1)
   
 # Get rid of any frames that came before the huddle_break_offense event, IF THE PLAY HAD ONE
 HuddleBreak_DF <- tracking_std %>%
@@ -321,7 +321,7 @@ tracking_std <- tracking_std %>% select(-c("Unnecessary_Early", "FrameNumber_Hud
 # View(tracking_std %>% filter(event %in% "huddle_start_offense" & frameId != 1))
 # View(tracking_std %>% filter(gameId == 2022092505, playId == 2919))
 # Therefore, can repeat the same process that we used with huddle_break_offense
-Plays_WithHuddleStart <- tracking_std %>% filter(HuddleStart_OnFullPlay == 1)
+Tracking_PlaysWithHuddleStart <- tracking_std %>% filter(HuddleStart_OnFullPlay == 1)
 
 # Get rid of any frames that came before the huddle_start_offense event, IF THE PLAY HAD ONE
 HuddleStart_DF <- tracking_std %>%
@@ -341,9 +341,9 @@ tracking_std <- tracking_std %>% filter(Unnecessary_Early == FALSE | is.na(Unnec
 rm(HuddleStart_DF)
 tracking_std <- tracking_std %>% select(-c("Unnecessary_Early", "FrameNumber_HuddleStart"))
 
-Plays_WithHuddle_StartOrBreak <- tracking_combined %>% filter(HuddleStart_OnFullPlay == 1 | HuddleBreak_OnFullPlay == 1)
+Tracking_PlaysWithHuddle_StartOrBreak <- tracking_combined %>% filter(HuddleStart_OnFullPlay == 1 | HuddleBreak_OnFullPlay == 1)
 # Can use this in place of the other two
-rm(Plays_WithHuddleBreak, Plays_WithHuddleStart)
+rm(Tracking_PlaysWithHuddleBreak, Tracking_PlaysWithHuddleStart)
 
 # Then use rank() to retroactively fix frameId for all plays?? (i.e. make them start at 1)
 # This might not even really be necessary, but here's how to do it
