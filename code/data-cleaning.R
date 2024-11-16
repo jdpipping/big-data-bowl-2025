@@ -608,3 +608,23 @@ TrackingWithStats_PlayerNames <- TrackingWithStats_PlayerNames %>% select(1, "di
 # View(PlaysAndGames_NFLVerse %>% filter(qb_kneel > 0 | qb_spike > 0)); empty
 # And two-point conv
 # View(PlaysAndGames_NFLVerse %>% filter(two_point_attempt > 0)); it's empty
+
+colnames(TrackingWithStats_PlayerNames)
+colnames(PlaysAndGames_NFLVerse)
+# Make a new version of PlaysAndGames_NFLVerse with fewer columns, to save memory space 
+# Note that home_score and away_score in NFLVerse refer to final scores
+# Whereas total_home_score and total_away_score are entering that specific play
+# Also passLocationType refers to QB's location, pass_location refers to where ball was thrown
+NFLVerse_Reduced <- PlaysAndGames_NFLVerse %>% 
+  select(-c(7, 10:11, 15:19, 31, 43:44, 48:49, 55:57, 60:62, 67, 69, 74, 77,
+            80:85, 88:90, 98:105, 109:112, 119:135, 138:162, 165:175, 184, 186:195, 204:205,
+            214:218, 226:325, 329:331, 335:340, 347:348, 352, 355:377, 382, 385, 396:401,
+            405, 407:416, 418:419))
+
+rm(PlaysAndGames_NFLVerse)
+MergedData <- merge(x = NFLVerse_Reduced, y = TrackingWithTackles_PlayerNames,
+                    by = c("gameId", "playId"))
+rm(TrackingWithTackles_PlayerNames, NFLVerse_Reduced)
+
+# Arrange it by game ID, play ID, player ID, and frame ID
+MergedData <- MergedData %>% arrange(gameId, playId, nflId, frameId)
