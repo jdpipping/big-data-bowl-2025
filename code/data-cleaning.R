@@ -459,6 +459,9 @@ plays <- plays %>% select(-"absoluteYardlineNumber", -"yardlineNumber", -"yardli
 # Fix one column that is spelled wrong
 plays <- plays %>% rename(visitorTeamWinProbabilityAdded = `visitorTeamWinProbilityAdded`)
 
+# View(plays %>% filter(is.na(homeTeamWinProbabilityAdded))) - it's empty
+# View(plays %>% filter(is.na(visitorTeamWinProbabilityAdded))) - it's empty
+
 # View(plays %>% filter(is.na(expectedPointsAdded)))
 # One play to fix here, a David Montgomery run on 10/09/22
 # Since it's only one play, just find the right answer from nflverse
