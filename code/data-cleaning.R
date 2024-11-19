@@ -620,6 +620,7 @@ NFLVerse_Reduced <- PlaysAndGames_NFLVerse %>%
             80:85, 88:90, 98:105, 109:112, 119:135, 138:162, 165:175, 184, 186:195, 204:205,
             214:218, 226:325, 329:331, 335:340, 347:348, 352, 355:377, 382, 385, 396:401,
             405, 407:416, 418:419))
+TrackingWithStats_PlayerNames <- TrackingWithStats_PlayerNames %>% select(-"time", -"penaltyYards")
 
 rm(PlaysAndGames_NFLVerse)
 MergedData <- merge(x = NFLVerse_Reduced, y = TrackingWithStats_PlayerNames,
