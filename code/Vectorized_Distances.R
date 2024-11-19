@@ -100,9 +100,9 @@ calc_distance <- function(x, y, x_baseline = 0, y_baseline = 0) {
 #vectorized bit of code:
 #WE CAN PROBABLY CLEAN THIS UP, BUT THIS IS HOW THIS WORKS:
 #1) we use map_dbl. .x is a vector, and in this case it's the row of each frame (excludes the football, so should be 1 - 22)
-#2) the first column (min_dist), basically calculates the distance for each row number in the frame to all other points on the opposing team (but the ball), and calculates the minimum
+#2) the first column (min_dist), basically calculates the distance for each row number in the frame to all other points on the opposing team (besides the ball), and calculates the minimum
 #3) the second column (num_same_dist), takes the number of unique min distances from the previous column to determine if there are any ties
-#4) excludes football fromt that calculation
+#4) excludes football from that calculation
 #5) takes the position in the vector of 
 
 sample_play <- sample_play %>% 
