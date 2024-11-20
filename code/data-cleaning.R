@@ -345,7 +345,7 @@ Tracking_PlaysWithHuddle_StartOrBreak <- tracking_combined %>% filter(HuddleStar
 # Can use this in place of the other two
 rm(Tracking_PlaysWithHuddleBreak, Tracking_PlaysWithHuddleStart)
 
-# Then use rank() to retroactively fix frameId for all plays?? (i.e. make them start at 1)
+# Then use rank() to retroactively fix frameId for all plays (i.e. make them start at 1)
 # This might not even really be necessary, but here's how to do it
 # Probably helpful for incorporating video/dots, i.e. having any play start at Frame 1
 tracking_std <- tracking_std %>%
