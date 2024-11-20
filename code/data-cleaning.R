@@ -632,6 +632,7 @@ rm(TrackingWithStats_PlayerNames, NFLVerse_Reduced)
 # MergedData <- MergedData %>% arrange(gameId, playId, nflId, frameId)
 setDT(MergedData)
 setkey(MergedData, gameId, playId, nflId, frameId)
+MergedData <- MergedData %>% relocate("gameId", "playId", "nflId", "displayName", "frameId")
 
 # One last check for name discrepancies that slipped through
 # E.G. Kenneth Walker III and Kenneth Walker duplicate for one ID (similar to Robbie Chosen/Anderson)
