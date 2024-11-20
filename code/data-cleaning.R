@@ -628,4 +628,26 @@ MergedData <- merge(x = NFLVerse_Reduced, y = TrackingWithStats_PlayerNames,
 rm(TrackingWithStats_PlayerNames, NFLVerse_Reduced)
 
 # Arrange it by game ID, play ID, player ID, and frame ID
-MergedData <- MergedData %>% arrange(gameId, playId, nflId, frameId)
+# But turn it into a data table so that it takes up less memory space
+# MergedData <- MergedData %>% arrange(gameId, playId, nflId, frameId)
+setDT(MergedData)
+setkey(MergedData, gameId, playId, nflId, frameId)
+
+# One last check for name discrepancies that slipped through
+# E.G. Kenneth Walker III and Kenneth Walker duplicate for one ID (similar to Robbie Chosen/Anderson)
+NameDiscrepancies <- MergedData %>% 
+  group_by(nflId, displayName) %>%
+  summarize(n = n())
+NameRankings <- sort(table(NameDiscrepancies$displayName), decreasing = TRUE)
+NameDiscrepancy_Table <- as.data.frame(NameRankings)
+NameDiscrepancy_Table <- NameDiscrepancy_Table %>% filter(Freq > 1) 
+# The three instances are Jonah Williams, Michael Carter, and David Long, all of whom are legit doubles
+# Therefore, no need to make any adjustments
+rm(NameDiscrepancies, NameDiscrepancy_Table, NameRankings)
+
+# And check for duplicate cells, e.g. two separate frames on the same play where Aaron Rodgers has frameId == 4
+Duplicates_Merged <- MergedData %>% 
+  group_by(nflId, playId, gameId, frameId) %>%
+  summarize(Copies = n()) %>% arrange(desc(Copies))
+# It's clean now
+rm(Duplicates_Merged)
