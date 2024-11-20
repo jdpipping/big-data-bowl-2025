@@ -652,3 +652,26 @@ Duplicates_Merged <- MergedData %>%
   summarize(Copies = n()) %>% arrange(desc(Copies))
 # It's clean now
 rm(Duplicates_Merged)
+
+
+# Add a WP success column
+MergedData <- MergedData %>% 
+  mutate(WPSuccess = ifelse(wpa > 0, 1, 0))
+# Check for NAs: View(MergedData %>% filter(is.na(WPSuccess)))
+
+# And do the same for defensive WPA (just negative offensive WPA)
+MergedData <- MergedData %>% mutate(DefWPA = (-1) * wpa)
+
+# Add a column for "Is Ball Carrier"
+MergedData <- MergedData %>% mutate(IsBallCarrier = 
+   ifelse(!is.na(hadRushAttempt) & !is.na(hadPassReception) & (hadRushAttempt %in% 1 | hadPassReception %in% 1), TRUE, 
+          ifelse(!is.na(hadRushAttempt) & !is.na(hadPassReception) & hadRushAttempt %in% 0 & hadPassReception %in% 0, FALSE, NA)))
+
+# Diagnose if any plays have more than one "IsBallCarrier"
+Frame1_DF <- MergedData %>% filter(frameId == 1)
+BallCarriers_Snap <- Frame1_DF %>% 
+  group_by(playId, gameId) %>%
+  summarize(Players = n(), BallCarriers = sum(IsBallCarrier)) %>%
+  arrange(desc(BallCarriers), desc(Players))
+# No play has more than one
+rm(BallCarriers_Snap, Frame1_DF)
