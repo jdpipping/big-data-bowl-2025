@@ -675,3 +675,16 @@ BallCarriers_Snap <- Frame1_DF %>%
   arrange(desc(BallCarriers), desc(Players))
 # No play has more than one
 rm(BallCarriers_Snap, Frame1_DF)
+
+# This is NOT empty, but all penalties
+# View(MergedData %>% filter(is.na(pass_oe)))
+# This is empty
+# View(MergedData %>% filter(is.na(pass_oe) & is.na(penaltyYards)))
+
+# Success_NA_Label <- MergedData %>% filter(is.na(success))
+# it's empty, recall that this refers to EPA
+
+# Find other ways to filter down data, e.g. excluding garbage time
+# MergedData <- MergedData %>% filter(wp >= 0.05 & wp <= 0.95)
+# Here's how to filter in a data table
+MergedData <- MergedData[wp >= 0.05 & wp <= 0.95]
