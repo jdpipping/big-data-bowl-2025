@@ -688,3 +688,70 @@ rm(BallCarriers_Snap, Frame1_DF)
 # MergedData <- MergedData %>% filter(wp >= 0.05 & wp <= 0.95)
 # Here's how to filter in a data table
 MergedData <- MergedData[wp >= 0.05 & wp <= 0.95]
+
+# Turn weather into a numeric variable using str_extract
+# The given "temp" variable is all NAs
+MergedData <- MergedData %>% 
+  mutate(Temperature = (str_extract(MergedData$weather, "\\b\\d+")))
+class(MergedData$Temperature) <- "numeric"
+MergedData <- MergedData %>% select(-"weather")
+
+# Similarly, change height into inches, rather than feet-inches
+convert_to_inches <- function(height) {
+  parts <- strsplit(height, "-")[[1]]
+  feet <- as.numeric(parts[1])
+  inches <- as.numeric(parts[2])
+  total_inches <- feet * 12 + inches
+  return(total_inches)
+}
+
+MergedData <- MergedData %>% 
+  mutate(height_inches = sapply(height, convert_to_inches))
+MergedData <- MergedData %>% select(-"height")
+
+# Calculate player age by using birth date and game date
+# MergedData <- MergedData %>% 
+# mutate(NumericBirthDate = as.Date(birthDate, origin = "1970-01-01"))
+# MergedData <- MergedData %>% 
+#   mutate(NumericGameDate = as.Date(time, origin = "1970-01-01"))
+# MergedData <- MergedData %>% 
+#   mutate(Age_Days = NumericGameDate - NumericBirthDate)
+# MergedData <- MergedData %>% mutate(Age_Years = Age_Days / 365.25)
+# class(MergedData$Age_Years) <- "numeric"
+MergedData <- MergedData %>% select(-c("birthDate", "time")) # "Age_Days" if needed
+
+# Here's list of plays with any penalty yardage
+# View(MergedData %>% filter(!is.na(penaltyYards)))
+
+# View(MergedData %>% filter(!is.na(penaltyYards) & playNullifiedByPenalty == "N"))
+# These are cases where yardage was added after a play that counted
+# E.G. horse collar tackle, or unnecessary roughness after play was done
+
+# View(MergedData %>% filter(!is.na(penaltyYards) & playNullifiedByPenalty == "Y"))
+# These are cases where the yardage gained on a play didn't count b/c of penalty
+# E.G. big completion negated by holding or ineligible man downfield
+
+# View(MergedData %>% filter(is.na(penaltyYards) & playNullifiedByPenalty == "Y"))
+# This is empty, as it should be (can't have a penalty with no penalty yards)
+
+# Make sure we have both offensive and defensive players
+table(MergedData$position)
+
+# Make broader "PosGroup" label from there
+MergedData <- MergedData %>% mutate(PosGroup = ifelse(position %in% c("C", "G", "T"), "OL",
+                                                      ifelse(position %in% c("CB", "DB", "FS", "SS"), "DB",
+                                                             ifelse(position %in% c("DE", "DT", "NT"), "DL",
+                                                                    ifelse(position %in% c("FB", "RB"), "RB",
+                                                                           ifelse(position %in% c("ILB", "LB", "MLB", "OLB"), "LB",
+                                                                                  ifelse(position == "QB", "QB",
+                                                                                         ifelse(position == "TE", "TE", "WR"))))))))
+table(MergedData$PosGroup)
+
+MergedData <- MergedData %>%
+  mutate(PlayerSideOfBall = ifelse(((club == homeTeamAbbr) &
+                                      (posteam == homeTeamAbbr)) |
+                                     ((club == visitorTeamAbbr) &
+                                        (posteam == visitorTeamAbbr)),
+                                   "offense",
+                                   "defense"))
+# View(MergedData %>% filter(is.na(PlayerSideOfBall))) -- it's empty
