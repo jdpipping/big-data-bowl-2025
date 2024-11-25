@@ -44,7 +44,9 @@ standardize_tracking = function(tracking) {
       y = ifelse(playDirection == 'left', 160 / 3 - y, y),
       # flip player direction, orientation
       dir = ifelse(playDirection == 'left', (dir + 180) %% 360, dir %% 360),
-      o = ifelse(playDirection == 'left', (o + 180) %% 360, o %% 360)
+      o = ifelse(playDirection == 'left', (o + 180) %% 360, o %% 360),
+      # change play direction to right
+      playDirection = 'right'
     )
   # return standardized tracking
   return(tracking_std)
