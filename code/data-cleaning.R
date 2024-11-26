@@ -343,9 +343,30 @@ tracking_std <- tracking_std %>% filter(Unnecessary_Early == FALSE | is.na(Unnec
 rm(HuddleStart_DF)
 tracking_std <- tracking_std %>% select(-c("Unnecessary_Early", "FrameNumber_HuddleStart"))
 
-Tracking_PlaysWithHuddle_StartOrBreak <- tracking_combined %>% filter(HuddleStart_OnFullPlay == 1 | HuddleBreak_OnFullPlay == 1)
+Tracking_PlaysWithHuddle_StartOrBreak <- tracking_std %>% filter(HuddleStart_OnFullPlay == 1 | HuddleBreak_OnFullPlay == 1)
 # Can use this in place of the other two
 rm(Tracking_PlaysWithHuddleBreak, Tracking_PlaysWithHuddleStart)
+
+# Also mutate a variable for whether a play had a "line_set" event
+tracking_std <- tracking_std %>% mutate(LineSet_OnFrame = 
+                                                    ifelse(!is.na(event) & event %in% "line_set", 1, 
+                                                           ifelse(!is.na(event) & !event %in% "line_set", 0, NA)))
+
+tracking_std <- tracking_std %>%
+  group_by(gameId, playId, nflId, displayName) %>%
+  mutate(LineSet_OnFullPlay = sum(LineSet_OnFrame, na.rm = TRUE)) %>%
+  ungroup() 
+# View(tracking_std %>% filter(is.na(LineSet_OnFullPlay))) - it's empty
+table(tracking_std$LineSet_OnFullPlay)
+# View(tracking_std %>% filter(LineSet_OnFullPlay > 1))
+# Also see what the plays look like with none: View(tracking_std %>% filter(LineSet_OnFullPlay == 0))
+
+Tracking_PlaysWithLineSet <- tracking_std %>% filter(LineSet_OnFullPlay == 1)
+# If needed, we can get rid of the frames before this event later on
+
+# Remove these until if/when we decide one is worth pursuing
+rm(Tracking_PlaysWithHuddleBreak, Tracking_PlaysWithHuddleStart, Tracking_PlaysWithHuddle_StartOrBreak, Tracking_PlaysWithLineSet)
+
 
 # Then use rank() to retroactively fix frameId for all plays (i.e. make them start at 1)
 # This might not even really be necessary, but here's how to do it
@@ -578,14 +599,14 @@ PlaysAndGames_NFLVerse <- merge(x = PlaysAndGames, y = nflverse_pbp,
 rm(games, plays, nflverse_pbp, PlaysAndGames)
 
 # Use all.y = TRUE, to make sure all tracking data is included
-TrackingWithStats <- merge(x = player_play, y = tracking_combined,
+TrackingWithStats <- merge(x = player_play, y = tracking_std,
                              by = c("gameId", "playId", "nflId"), all.y = TRUE)
 
 TrackingWithStats_PlayerNames <- merge(x = TrackingWithStats, y = players,
                                          by = c("nflId"))
 # View(TrackingWithStats_PlayerNames %>% filter(is.na(club)))
 # If we wanted to keep club == "football", we could use all.x = TRUE here
-rm(players, player_play, tracking_combined, TrackingWithStats)
+rm(players, player_play, tracking_std, TrackingWithStats)
 
 # Check for name discrepancies besides Chosen/Robbie Anderson within this DF
 NameDiscrepancies <- TrackingWithStats_PlayerNames %>% filter(displayName.x != displayName.y)
