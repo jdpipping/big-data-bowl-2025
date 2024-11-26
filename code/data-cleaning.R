@@ -652,7 +652,7 @@ TrackingWithStats_PlayerNames <- TrackingWithStats_PlayerNames %>%
 TrackingWithStats_PlayerNames <- TrackingWithStats_PlayerNames %>%
   select(-"displayName.x", -"displayName.y")
 rm(NameDiscrepancies)
-TrackingWithStats_PlayerNames <- TrackingWithStats_PlayerNames %>% select(1, "displayName", 2:91)
+TrackingWithStats_PlayerNames <- TrackingWithStats_PlayerNames %>% relocate("displayName")
 
 # Check if any FGs are included in merged NFLVerse data
 # View(PlaysAndGames_NFLVerse %>% filter(!is.na(kick_distance))); it's empty
