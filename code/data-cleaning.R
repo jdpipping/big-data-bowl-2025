@@ -672,11 +672,11 @@ colnames(PlaysAndGames_NFLVerse)
 # Whereas total_home_score and total_away_score are entering that specific play
 # Also passLocationType refers to QB's location, pass_location refers to where ball was thrown
 NFLVerse_Reduced <- PlaysAndGames_NFLVerse %>% 
-  select(-c(7, 10:11, 15:19, 31, 43:44, 55:57, 60:62, 67, 69, 74, 77, 80:85, 88:90, 
-            98:105, 109:112, 119:135, 138:147, 149:151, 153:162, 165:175, 184, 186:195, 204:205,
+  select(-c(3, 7, 10:11, 15:19, 31, 43:44, 55:57, 60:63, 67, 69, 73:74, 77, 80:85, 88:90, 
+            98:105, 109:112, 119:135, 138:147, 149:151, 153:175, 184, 186:195, 204:205,
             214:218, 226:325, 329:331, 335:340, 347:348, 352, 355:377, 382, 385, 396:401,
-            405, 407:416, 418:419))
-TrackingWithStats_PlayerNames <- TrackingWithStats_PlayerNames %>% select(-"time", -"penaltyYards")
+            405, 407:416, 418:424))
+TrackingWithStats_PlayerNames <- TrackingWithStats_PlayerNames %>% select(-"time", -"penaltyYards", -"Frame1_Event")
 
 rm(PlaysAndGames_NFLVerse)
 MergedData <- merge(x = NFLVerse_Reduced, y = TrackingWithStats_PlayerNames,
