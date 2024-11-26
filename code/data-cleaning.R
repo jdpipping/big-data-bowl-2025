@@ -776,6 +776,20 @@ MergedData <- MergedData %>% select(-"height")
 # class(MergedData$Age_Years) <- "numeric"
 MergedData <- MergedData %>% select(-c("birthDate", "time")) # "Age_Days" if needed
 
+# Also code for each player's maximum speed ... could be useful b/c maybe defenses play 2-high against fastest WRs?
+TopSeasonSpeeds <- MergedData %>% 
+  group_by(nflId, displayName) %>%
+  mutate(Indiv_SpeedRank = rank(-s, ties.method = "first")) %>%
+  ungroup()
+TopSeasonSpeeds <- TopSeasonSpeeds %>% select(nflId, displayName, s, Indiv_SpeedRank)  
+TopSeasonSpeeds <- TopSeasonSpeeds %>% filter(Indiv_SpeedRank == 1)
+TopSeasonSpeeds <- TopSeasonSpeeds %>% select(-"Indiv_SpeedRank")
+TopSeasonSpeeds <- TopSeasonSpeeds %>% rename(Season_MaxSpeed = s)
+
+MergedData <- merge(x = MergedData, y = TopSeasonSpeeds,
+                    by = c("nflId", "displayName"))
+rm(TopSeasonSpeeds)
+
 # Here's list of plays with any penalty yardage
 # View(MergedData %>% filter(!is.na(penaltyYards)))
 
