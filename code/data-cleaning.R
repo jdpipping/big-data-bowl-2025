@@ -893,7 +893,7 @@ MergedData <- MergedData %>% select(-"Unnecessary_Late")
 # Create a Player_Role variable (i.e. defender, ball-carrier, or other offensive player)
 MergedData <- MergedData %>%
   mutate(Player_Role = case_when(
-    nflId == ballCarrierId ~ "Ball Carrier",
-    possessionTeam != club & displayName != "football"~ "Defense",
-    possessionTeam == club & ballCarrierId != nflId ~ "Offense",
+    IsBallCarrier == 1 ~ "Ball Carrier",
+    posteam != club & displayName != "football" ~ "Defense",
+    posteam == club & IsBallCarrier < 1 ~ "Offense",
     displayName == "football" ~ "Football")) 
