@@ -825,3 +825,75 @@ MergedData <- MergedData %>%
                                    "offense",
                                    "defense"))
 # View(MergedData %>% filter(is.na(PlayerSideOfBall))) -- it's empty
+
+# Get rid of some more columns not needed for our specific models (can add back later if desired)
+# View(MergedData %>% filter(playId != order_sequence)) ... order_sequence is almost always the same as playId
+colnames(MergedData)
+MergedData <- MergedData %>% 
+  select(-c("week", "gameDate", "collegeName", "rushLocationType", "pff_runConceptPrimary", 
+            "half_seconds_remaining", "game_seconds_remaining", "drive", "run_location", "run_gap",
+            "air_epa", "yac_epa", "rush_attempt", "order_sequence", "stadium", "stadium_id"))
+
+# Add distance ranks for each side of ball
+# E.G. who is closest to ball-carrier at any given point of the play
+MergedData <- MergedData %>%
+  group_by(gameId, playId, frameId, PlayerSideOfBall) %>%
+  mutate(TotDistFromBall_Rank_BySideOfBall = rank(TotDistFromBall, ties.method = "first"),
+         Y_AbsDistFromBall_Rank_BySide = rank(Y_AbsDistFromBall, ties.method = "first"),
+         X_AbsDistFromBall_Rank_BySide = rank(X_AbsDistFromBall, ties.method = "first"),
+         Y_NetDistFromBall_Rank_BySide = rank(Y_DistFromBall, ties.method = "first"),
+         X_NetDistFromBall_Rank_BySide = rank(X_DistFromBall, ties.method = "first")) %>%
+  ungroup()
+# table(MergedData$TotDistFromBall_Rank_BySideOfBall); rank is never higher than 11
+
+# And same idea for "overall" ranks (i.e., doesn't matter if player is on offense or defense)
+MergedData <- MergedData %>%
+  group_by(gameId, playId, frameId) %>%
+  mutate(TotDistFromBall_Rank_OVR = rank(TotDistFromBall, ties.method = "first"),
+         Y_AbsDistFromBall_Rank_OVR = rank(Y_AbsDistFromBall, ties.method = "first"),
+         X_AbsDistFromBall_Rank_OVR = rank(X_AbsDistFromBall, ties.method = "first"),
+         Y_NetDistFromBall_Rank_OVR = rank(Y_DistFromBall, ties.method = "first"),
+         X_NetDistFromBall_Rank_OVR = rank(X_DistFromBall, ties.method = "first")) %>%
+  ungroup()
+# table(MergedData$TotDistFromBall_Rank_OVR); rank is never higher than 22
+
+# Now we want to exclude "extra" frames, i.e. ones after the play ended
+table(MergedData$event)
+# QB slide example: View(MergedData %>% filter(playId == 4789))
+# Include fumbles, b/c anything after a defensive player recovers a fumble isn't relative to this analysis
+Frames_EndOfPlay <- MergedData %>%
+  filter(event %in% c("out_of_bounds", "safety", "qb_sack", "qb_slide", "tackle", "touchdown", "fumble", "fumble_defense_recovered")) %>%
+  select(gameId, playId, nflId, displayName, frameId) %>%
+  rename(FrameNumber_EndOfPlay = frameId)
+
+# Some plays have multiple of these events, e.g. View(MergedData %>% filter(playId == 3449))
+# Therefore, make it so that only the first relevant "play-ending" frame shows up
+Frames_EndOfPlay <- Frames_EndOfPlay %>%
+  group_by(gameId, playId, nflId, displayName) %>%
+  mutate(Frame_Rank = rank(FrameNumber_EndOfPlay, ties.method = "first")) %>%
+  ungroup() 
+Frames_EndOfPlay <- Frames_EndOfPlay %>% filter(Frame_Rank == 1)
+Frames_EndOfPlay <- Frames_EndOfPlay %>% select(-"Frame_Rank")
+
+MergedData <- merge(x = MergedData, y = Frames_EndOfPlay, 
+                    by = c("playId", "gameId", "nflId", "displayName"))
+# MergedData <- MergedData %>% arrange(gameId, playId, nflId, frameId)
+setDT(MergedData)
+setkey(MergedData, gameId, playId, nflId, frameId)
+MergedData <- MergedData %>% relocate("gameId", "playId", "nflId", "displayName", "frameId")
+
+MergedData <- MergedData %>% group_by(gameId, playId, nflId) %>% 
+  mutate(Unnecessary_Late = ifelse(frameId > FrameNumber_EndOfPlay, TRUE, FALSE)) %>% 
+  ungroup()
+
+MergedData <- MergedData %>% filter(Unnecessary_Late == FALSE)
+rm(Frames_EndOfPlay)
+MergedData <- MergedData %>% select(-"Unnecessary_Late")
+
+# Create a Player_Role variable (i.e. defender, ball-carrier, or other offensive player)
+MergedData <- MergedData %>%
+  mutate(Player_Role = case_when(
+    nflId == ballCarrierId ~ "Ball Carrier",
+    possessionTeam != club & displayName != "football"~ "Defense",
+    possessionTeam == club & ballCarrierId != nflId ~ "Offense",
+    displayName == "football" ~ "Football")) 
