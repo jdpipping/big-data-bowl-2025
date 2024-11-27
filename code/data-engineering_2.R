@@ -30,6 +30,7 @@ mofo = c("Cover-0", "Cover-2", "Quarters", "Cover-4", "2-Man", "Cover-6", "Cover
 mofc = c("Cover-1", "Cover-1 Double", "Cover-3", "Cover-3 Cloud Left", "Cover-3 Cloud Right", "Cover-3 Double Cloud", "Cover-3 Seam")
 
 # play info data
+# NOTE: If using the MergedData data table established in the data-cleaning GitHub file, much of this data already exists (e.g. quarter_seconds_remaining instead of time_left_quarter)
 play_info = games |> 
   # omit unnecessary game info
   select(-season, -week, -gameDate, -gameTimeEastern) |> 
