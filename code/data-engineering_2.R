@@ -86,37 +86,37 @@ los = tracking |>
   # drop unneded columns
   select(-displayName, -frameType)
 
-# safety on play
-safety_on_play = tracking |> 
-  # filter before snap
-  filter(frameType != 'AFTER_SNAP') |> 
+# pre-snap safety
+pre_snap_safety = tracking %>% 
+  # filter so that we only have frames before snap
+  filter(frameType != 'AFTER_SNAP') %>% 
   # join with line of scrimmage
-  left_join(los, by = c('gameId', 'playId')) |> 
+  left_join(los, by = c('gameId', 'playId')) %>% 
   # indicator for beyond 10 yards deep
-  mutate(beyond_10 = if_else(x >= los + 10, T, F)) |> 
+  mutate(beyond_10 = if_else(x >= los + 10, T, F)) %>% 
   # group by game, play, player
-  group_by(gameId, playId, nflId) |> 
-  # define safety on play
-  summarise(safety = any(beyond_10, na.rm = T)) |> 
+  group_by(gameId, playId, nflId) %>% 
+  # define pre-snap safety
+  summarise(safety = any(beyond_10, na.rm = T)) %>% 
   # ungroup players
-  ungroup(nflId) |> 
+  ungroup(nflId) %>% 
   # count number of safeties
-  mutate(num_safeties = sum(safety)) |> 
+  mutate(num_safeties = sum(safety)) %>% 
   # ungroup all columns
   ungroup()
 
 # ids of safeties on each play
-safety_ids_plays = safety_on_play |> 
+safety_ids_pre_snap = pre_snap_safety %>% 
   # filter out non-safeties
-  filter(safety) |> 
+  filter(safety) %>% 
   # drop safety column
-  select(-safety) |>
+  select(-safety) %>%
   # group by game and play
-  group_by(gameId, playId) |> 
+  group_by(gameId, playId) %>% 
   # sort by nfl id
-  arrange(nflId) |> 
+  arrange(nflId) %>% 
   # define safety id's
-  mutate(safety_id = row_number()) |>
+  mutate(safety_id = row_number()) %>%
   # pivot to wide
   pivot_wider(names_from = safety_id, values_from = nflId, names_prefix = 'safety_')
 
@@ -130,7 +130,7 @@ v1 = play_info |>
   # join qb ids
   left_join(qb_ids_plays, by = c('gameId', 'playId')) |>
   # join safety ids
-  left_join(safety_ids_plays, by = c('gameId', 'playId'))
+  left_join(safety_ids_pre_snap, by = c('gameId', 'playId'))
 # save to file
 write_csv(v1, 'processed-data/v1.csv')
 
