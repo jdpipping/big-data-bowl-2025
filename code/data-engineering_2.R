@@ -103,7 +103,7 @@ pre_snap_safety = tracking %>%
   # ungroup players
   ungroup(nflId) %>% 
   # count number of safeties
-  mutate(num_safeties = sum(safety)) %>% 
+  mutate(num_safeties_on_play = sum(safety)) %>% 
   # ungroup all columns
   ungroup()
 
