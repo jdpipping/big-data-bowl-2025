@@ -832,8 +832,10 @@ MergedData <- MergedData %>%
 colnames(MergedData)
 MergedData <- MergedData %>% 
   select(-c("week", "gameDate", "collegeName", "rushLocationType", "pff_runConceptPrimary", 
-            "half_seconds_remaining", "game_seconds_remaining", "drive", "run_location", "run_gap",
+            "drive", "run_location", "run_gap",
             "air_epa", "yac_epa", "rush_attempt", "order_sequence", "stadium", "stadium_id"))
+setDT(MergedData)
+setkey(MergedData, gameId, playId, nflId, frameId)
 
 # Add distance ranks for each side of ball
 # E.G. who is closest to ball-carrier at any given point of the play
