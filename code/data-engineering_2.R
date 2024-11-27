@@ -25,6 +25,7 @@ tracking = read_csv('processed-data/tracking_std.csv')
 ###################
 
 # define mofo / mofc
+# NOTE: If using the MergedData data table established in the data-cleaning GitHub file, this already exists as PostSnap_MOF
 mofo = c("Cover-0", "Cover-2", "Quarters", "Cover-4", "2-Man", "Cover-6", "Cover-6 Left", "Cover-6 Right")
 mofc = c("Cover-1", "Cover-1 Double", "Cover-3", "Cover-3 Cloud Left", "Cover-3 Cloud Right", "Cover-3 Double Cloud", "Cover-3 Seam")
 
