@@ -53,17 +53,17 @@ play_info = games |>
     time_left_game = if_else(quarter == 5, time_left_quarter, (4 - quarter) * 15 * 60 + time_left_quarter)
     )
 
-# pff position data
-pff_positions = players |>
+# GSIS position data
+gsis_positions = players |>
   # filter for assigned positions
-  select(nflId, pff_position = position)
+  select(nflId, gsis_position = position)
 
 # ids of qbs on each play
 qb_ids_plays = tracking |> 
-  # join with pff positions
-  left_join(pff_positions, by = 'nflId') |> 
+  # join with GSIS positions
+  left_join(gsis_positions, by = 'nflId') |> 
   # filter for qbs
-  filter(pff_position == 'QB') |> 
+  filter(gsis_position == 'QB') |> 
   # select needed columns
   select(gameId, playId, nflId) |> 
   # get distinct qb ids
