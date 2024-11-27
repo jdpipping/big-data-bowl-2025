@@ -730,6 +730,7 @@ BallCarriers_Snap <- Frame1_DF %>%
   summarize(Players = n(), BallCarriers = sum(IsBallCarrier)) %>%
   arrange(desc(BallCarriers), desc(Players))
 # No play has more than one
+# But some plays do have zero, such as incompletions: View(MergedData %>% filter(gameId == 2022091101, playId == 63))
 rm(BallCarriers_Snap, Frame1_DF)
 
 # This is NOT empty, but all penalties
