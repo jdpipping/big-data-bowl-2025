@@ -17,6 +17,8 @@ games = read_csv('raw-data/games.csv')
 players = read_csv('raw-data/players.csv')
 # plays
 plays = read_csv('raw-data/plays.csv')
+# individual player roles
+player_play = read_csv('raw-data/player_play.csv')
 # tracking data
 tracking = read_csv('processed-data/tracking_std.csv')
 
@@ -105,7 +107,7 @@ pre_snap_safety = tracking %>%
   # ungroup all columns
   ungroup()
 
-# ids of safeties on each play
+# ids of pre-snap safeties on each play
 safety_ids_pre_snap = pre_snap_safety %>% 
   # filter out non-safeties
   filter(safety) %>% 
@@ -118,10 +120,38 @@ safety_ids_pre_snap = pre_snap_safety %>%
   # define safety id's
   mutate(safety_id = row_number()) %>%
   # pivot to wide
-  pivot_wider(names_from = safety_id, values_from = nflId, names_prefix = 'safety_')
+  pivot_wider(names_from = safety_id, values_from = nflId, names_prefix = 'pre_snap_safety_')
 
 # increase max vector size to 64 GB
 mem.maxVSize(vsize = 49152 * 1.5)
+
+# Now, create a variable for whether a player had safety responsibilities on the play
+# Even if that person wasn't aligned as a safety before the snap
+# Do it for both MergedData (from data-cleaning file) and for player_play CSV directly
+MergedData <- MergedData %>% mutate(post_snap_safety =
+   ifelse(!is.na(pff_defensiveCoverageAssignment) & pff_defensiveCoverageAssignment %in% c("2R", "2L", "3M", "4IL", "4IR", "DF", "PRE"), TRUE,
+          ifelse(!is.na(pff_defensiveCoverageAssignment) & !pff_defensiveCoverageAssignment %in% c("2R", "2L", "3M", "4IL", "4IR", "DF", "PRE"), FALSE, 
+                 ifelse(is.na(pff_defensiveCoverageAssignment) & PlayerSideOfBall %in% "defense", FALSE, NA))))
+
+player_play <- player_play %>% mutate(post_snap_safety =
+   ifelse(!is.na(pff_defensiveCoverageAssignment) & pff_defensiveCoverageAssignment %in% c("2R", "2L", "3M", "4IL", "4IR", "DF", "PRE"), TRUE,
+          ifelse(!is.na(pff_defensiveCoverageAssignment) & !pff_defensiveCoverageAssignment %in% c("2R", "2L", "3M", "4IL", "4IR", "DF", "PRE"), FALSE, 
+                 ifelse(is.na(pff_defensiveCoverageAssignment) & PlayerSideOfBall %in% "defense", FALSE, NA))))
+
+# ids of post-snap safeties on each play
+safety_ids_post_snap = player_play %>% 
+  # filter out non-safeties
+  filter(post_snap_safety == TRUE) %>% 
+  # drop safety column
+  select(-"post_snap_safety") %>%
+  # group by game and play
+  group_by(gameId, playId) %>% 
+  # sort by nfl id
+  arrange(nflId) %>% 
+  # define safety id's
+  mutate(safety_id = row_number()) %>%
+  # pivot to wide
+  pivot_wider(names_from = safety_id, values_from = nflId, names_prefix = 'post_snap_safety_')
    
 # merge to create v1
 v1 = play_info |> 
@@ -129,8 +159,10 @@ v1 = play_info |>
   left_join(tracking, by = c('gameId', 'playId')) |> 
   # join qb ids
   left_join(qb_ids_plays, by = c('gameId', 'playId')) |>
-  # join safety ids
+  # join pre-snap safety ids
   left_join(safety_ids_pre_snap, by = c('gameId', 'playId'))
+# join post-snap safety ids
+  left_join(safety_ids_post_snap, by = c('gameId', 'playId'))
 # save to file
 write_csv(v1, 'processed-data/v1.csv')
 
