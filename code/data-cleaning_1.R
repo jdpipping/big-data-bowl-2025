@@ -832,7 +832,7 @@ MergedData <- MergedData %>%
 colnames(MergedData)
 MergedData <- MergedData %>% 
   select(-c("week", "gameDate", "collegeName", "rushLocationType", "pff_runConceptPrimary", 
-            "drive", "run_location", "run_gap",
+            "drive", "run_location", "run_gap", "home_coach", "away_coach",
             "air_epa", "yac_epa", "rush_attempt", "order_sequence", "stadium", "stadium_id"))
 setDT(MergedData)
 setkey(MergedData, gameId, playId, nflId, frameId)
