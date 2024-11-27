@@ -898,3 +898,59 @@ MergedData <- MergedData %>%
     posteam != club & displayName != "football" ~ "Defense",
     posteam == club & IsBallCarrier < 1 ~ "Offense",
     displayName == "football" ~ "Football")) 
+
+# Now, add ball-carrier traits to all frames
+# This was more relevant in 2023-24, but still can be useful for defenders' orientation similarity to QB
+# Start by writing a function for calculating distance
+calc_distance <- function(x, y, x_baseline = 0, y_baseline = 0) {
+  sqrt((x-x_baseline)^2 + (y - y_baseline)^2)
+}
+
+# Each player's distance to the ball carrier
+# ball_x won't be exact same as X_ball_carrier (e.g. arm extended with ball)
+# And recall that not every play does have a ball-carrier (e.g. incompletions), must account for that
+MergedData <- MergedData %>%
+  group_by(gameId, playId, frameId) %>%
+  mutate(X_ball_carrier = ifelse(!is.na(IsBallCarrier), x[which(IsBallCarrier == 1)], NA),
+         Y_ball_carrier = ifelse(!is.na(IsBallCarrier), y[which(IsBallCarrier == 1)], NA),
+         dist_to_ball_carrier = ifelse(!is.na(IsBallCarrier), 
+            calc_distance(x, y, x_baseline = X_ball_carrier, y_baseline = Y_ball_carrier), NA)) %>%
+  ungroup()
+
+BallCarrier_Traits <- MergedData %>% 
+  filter(IsBallCarrier > 0) %>% 
+  select(gameId, playId, frameId, s, a, dis, o, dir, Season_MaxSpeed) %>% 
+  rename(ball_carrier_speed = s, ball_carrier_acc = a, ball_carrier_dist_ran = dis,
+         ball_carrier_orient = o, ball_carrier_direction = dir,
+         # ball_carrier_weight = weight, ball_carrier_height = height_inches, 
+         BC_Season_MaxSpeed = Season_MaxSpeed)
+# BallCarrier_Traits <- BallCarrier_Traits %>% mutate(ball_carrier_momentum = ball_carrier_speed * ball_carrier_weight)
+
+MergedData <- MergedData %>% 
+  left_join(BallCarrier_Traits, by = c("playId", "gameId", "frameId"))
+
+MergedData <- MergedData %>% 
+  mutate(Rel_Speed_ToBC = s - ball_carrier_speed, Rel_Acc_ToBC = a - ball_carrier_acc,
+         # Rel_Weight_ToBC = weight - ball_carrier_weight, Rel_Height_ToBC = height_inches - ball_carrier_height,
+         Rel_Orient_ToBC = o - ball_carrier_orient, Rel_Dir_ToBC = dir - ball_carrier_direction,
+         Rel_SeasonMaxSpeed_ToBC = Season_MaxSpeed - BC_Season_MaxSpeed) 
+         # Momentum = s * weight, Rel_Momentum_ToBC = Momentum - ball_carrier_momentum)
+rm(BallCarrier_Traits)
+
+# Now get cosine similarity for the direction and orientation
+# This gives 1 if you're in same direction, -1 if opposite direction, 0 if perpendicular
+MergedData <- MergedData %>% 
+  mutate(CosSimilarity_Orient_ToBC = cos(Rel_Orient_ToBC*pi/180),
+         CosSimilarity_Dir_ToBC = cos(Rel_Dir_ToBC*pi/180))
+MergedData <- MergedData %>% select(-c("Rel_Orient_ToBC", "Rel_Dir_ToBC"))
+
+# Relative velocity accounts for direction, relative speed does NOT
+# E.G., if Players X and Y are moving 10 yds/sec in opposite directions, relative speed is 0
+# But, relative velocity is 10 - (-1 * 10), or 20
+MergedData <- MergedData %>%
+  mutate(Rel_Velocity_ToBC = s - (ball_carrier_speed * CosSimilarity_Dir_ToBC))
+
+# Writing function for cosine similarity, if needed
+# cosine_similarity_raw <- function(x, y) {
+#   cos((x*pi/180) - (y*pi/180))
+# }
