@@ -145,12 +145,26 @@ table(DesignedRuns_Merged$pff_defensiveCoverageAssignment)
 # They typically are NAs, with some exceptions on RPOs that are handed off
 rm(DesignedRuns_Merged)
 
+# Repeat the process with post-snap safeties
+post_snap_safety <- player_play %>% 
+filter(frameType == 'AFTER_SNAP') %>%
+  # group by game, play, player
+  group_by(gameId, playId, nflId) %>% 
+  # use the previously established definition of post_snap_safety (i.e. based on coverage responsibility)
+  summarize(safety = any(post_snap_safety, na.rm = TRUE)) %>% 
+  # ungroup players
+  ungroup(nflId) %>% 
+  # count number of safeties
+  mutate(num_safeties_on_play = sum(safety)) %>% 
+  # ungroup all columns
+  ungroup()
+
 # ids of post-snap safeties on each play
-safety_ids_post_snap = player_play %>% 
+safety_ids_post_snap = post_snap_safety %>% 
   # filter out non-safeties
-  filter(post_snap_safety == TRUE) %>% 
+  filter(safety == TRUE) %>% 
   # drop safety column
-  select(-"post_snap_safety") %>%
+  select(-"safety") %>%
   # group by game and play
   group_by(gameId, playId) %>% 
   # sort by nfl id
