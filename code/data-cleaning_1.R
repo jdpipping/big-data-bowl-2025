@@ -671,6 +671,7 @@ colnames(PlaysAndGames_NFLVerse)
 # Note that home_score and away_score in NFLVerse refer to final scores
 # Whereas total_home_score and total_away_score are entering that specific play
 # Also passLocationType refers to QB's location, pass_location refers to where ball was thrown
+# time includes game date for the tracking version, but only game clock for NFLVerse version
 NFLVerse_Reduced <- PlaysAndGames_NFLVerse %>% 
   select(-c(3, 7, 10:11, 15:19, 31, 43:44, 54:55, 60:63, 67, 69, 73:74, 77, 79:85, 88:90, 
             98:105, 109:112, 119:135, 138:147, 149:151, 153:175, 184, 186:195, 204:205,
@@ -708,7 +709,6 @@ Duplicates_Merged <- MergedData %>%
   summarize(Copies = n()) %>% arrange(desc(Copies))
 # It's clean now
 rm(Duplicates_Merged)
-
 
 # Add a WP success column
 MergedData <- MergedData %>% 
@@ -770,12 +770,12 @@ MergedData <- MergedData %>% select(-"height")
 # MergedData <- MergedData %>% 
 # mutate(NumericBirthDate = as.Date(birthDate, origin = "1970-01-01"))
 # MergedData <- MergedData %>% 
-#   mutate(NumericGameDate = as.Date(time, origin = "1970-01-01"))
+#   mutate(NumericGameDate = as.Date(gameDate, origin = "1970-01-01"))
 # MergedData <- MergedData %>% 
 #   mutate(Age_Days = NumericGameDate - NumericBirthDate)
 # MergedData <- MergedData %>% mutate(Age_Years = Age_Days / 365.25)
 # class(MergedData$Age_Years) <- "numeric"
-MergedData <- MergedData %>% select(-c("birthDate", "time")) # "Age_Days" if needed
+MergedData <- MergedData %>% select(-c("birthDate", "gameDate")) # "Age_Days" if needed
 
 # Also code for each player's maximum speed ... could be useful b/c maybe defenses play 2-high against fastest WRs?
 TopSeasonSpeeds <- MergedData %>% 
@@ -831,7 +831,7 @@ MergedData <- MergedData %>%
 # View(MergedData %>% filter(playId != order_sequence)) ... order_sequence is almost always the same as playId
 colnames(MergedData)
 MergedData <- MergedData %>% 
-  select(-c("week", "gameDate", "collegeName", "rushLocationType", "pff_runConceptPrimary", 
+  select(-c("week", "collegeName", "rushLocationType", "pff_runConceptPrimary", 
             "drive", "run_location", "run_gap", "home_coach", "away_coach",
             "air_epa", "yac_epa", "rush_attempt", "order_sequence", "stadium", "stadium_id"))
 setDT(MergedData)
