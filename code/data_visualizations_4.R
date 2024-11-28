@@ -62,6 +62,7 @@ plot_title <- str_trim(gsub("\\s*\\([^\\)]+\\)","",as.character(example_play$pla
 
 # NOTE: if we wanted to include the football, we could adjust the data cleaning file
 # Specifically, would adjust when we created TrackingWithStats_PlayerNames
+# Or we could use a mutate(color) approach with the original tracking data, like the Gabe Davis example
 
 xmin <- 0
 xmax <- 53.3
