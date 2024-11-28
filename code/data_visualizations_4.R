@@ -31,7 +31,7 @@ play_animation_Davis_TD = example_play_Davis_TD |>
 # show animation
 animate(play_animation_Davis_TD, nframes = max(example_play_Davis_TD$frameId), fps = 10, renderer = gifski_renderer())
 
-  # With a different method, here's code for the all-22 moving dots of an Isaiah McKenzie reception
+# With a different method, here's code for the all-22 moving dots of an Isaiah McKenzie reception
 # Sample plays and corresponding visualizations
 set.seed(1128)
 
