@@ -138,6 +138,13 @@ player_play <- player_play %>% mutate(post_snap_safety =
           ifelse(!is.na(pff_defensiveCoverageAssignment) & !pff_defensiveCoverageAssignment %in% c("2R", "2L", "3M", "4IL", "4IR", "DF", "PRE"), FALSE, 
                  ifelse(is.na(pff_defensiveCoverageAssignment) & PlayerSideOfBall %in% "defense", FALSE, NA))))
 
+# Out of curiosity, glance at whether coverage assignments are assigned by PFF on designed runs
+DesignedRuns_Merged <- MergedData %>% filter(isDropback == 0)
+table(DesignedRuns_Merged$pff_defensiveCoverageAssignment)
+# View(DesignedRuns_Merged %>% filter(PlayerSideOfBall == "defense" & is.na(pff_defensiveCoverageAssignment)))
+# They typically are NAs, with some exceptions on RPOs that are handed off
+rm(DesignedRuns_Merged)
+
 # ids of post-snap safeties on each play
 safety_ids_post_snap = player_play %>% 
   # filter out non-safeties
