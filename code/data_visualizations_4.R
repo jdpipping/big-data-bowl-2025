@@ -89,7 +89,7 @@ ggplot() +
   scale_shape_manual(values = c(21, 21, 21), guide = FALSE) +
   scale_fill_manual(values = c("red", 'blue', "black"), guide = TRUE) +
   # COMMENT OUT THIS guides() function if plot isn't displaying
-  # guides(fill = guide_legend(override.aes = list(shape=21))) +
+  guides(fill = guide_legend(override.aes = list(shape=21))) +
   # scale_colour_manual(values = c("red", 'blue', "pink"), guide = FALSE) +
   
   # adding hash marks
