@@ -153,7 +153,7 @@ safety_ids_post_snap = player_play %>%
   # pivot to wide
   pivot_wider(names_from = safety_id, values_from = nflId, names_prefix = 'post_snap_safety_')
    
-# merge to create v1
+# merge to create v1, which is a frame-by-frame data set rather than play-by-play
 v1 = play_info |> 
   # join tracking
   left_join(tracking, by = c('gameId', 'playId')) |> 
