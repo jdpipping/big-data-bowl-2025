@@ -69,44 +69,6 @@ standardize_tracking = function(tracking) {
 # read cleaned data
 tracking_std = read_csv('processed-data/tracking_std.csv')
 
-##########################
-### DATA VISUALIZATION ###
-##########################
-
-# extract example play: https://www.youtube.com/watch?v=2mPxPOjnAg0
-example_play_Davis_TD = tracking_std |> 
-  filter(gameId == 2022100901, playId == 117) |> 
-  mutate(color = case_when(club == 'PIT' ~ 'gold',
-                           club == 'BUF' ~ 'blue',
-                           club == 'football' ~ 'brown'))
-
-# play visualization
-play_animation_Davis_TD = example_play_Davis_TD |> 
-  ggplot() +
-  geom_point(aes(x = x, y = y, color = color, size = 3)) +
-  # ensure colors display as assigned
-  scale_color_identity() +
-  # omit size from legend ... COMMENT OUT THE guides() LINE IF ANIMATE() FUNCTION DOESN'T WORK
-  guides(size = FALSE) +
-  theme_minimal() +
-  transition_time(frameId) +
-#   scale_x_continuous(breaks = seq(0, 120, 20)) +
-#   scale_y_continuous(breaks = seq(0, 60, 10)) +
-  labs(x = " ", y = " ",
-       title = "Josh Allen 98-Yard TD Pass to Gabe Davis",
-       subtitle = "First Quarter of Bills' 38-3 win over Steelers in Week 5, 2022",
-       caption = "Data provided by Kaggle") +
-  theme(plot.title = element_text(size = 14, hjust = 0.5),
-        plot.subtitle = element_text(size = 12, hjust = 0.5)) 
-# Could add geom_abline() for each team's goal line, LOS, etc. if/when we want to
-
-# show animation
-animate(play_animation_Davis_TD, nframes = max(example_play_Davis_TD$frameId), fps = 10, renderer = gifski_renderer())
-
-#############################
-### BACK TO CLEANING DATA ###
-#############################
-
 # These plays (among others) have multiple "first_contact" events, but we want only first instance
 # View(tracking_std %>% filter(gameId == 2022100209, playId == 1581, event == "first_contact"))
 # View(tracking_std %>% filter(gameId == 2022103100, playId == 1689, event == "first_contact"))
