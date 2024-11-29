@@ -335,7 +335,7 @@ LineSet_DF <- LineSet_DF %>% filter(Frame_Rank == 1)
 LineSet_DF <- LineSet_DF %>% select(-"Frame_Rank")
 
 # Do a quick confirmation that there are no plays left with more than one
-# None of these should have more than 23 (i.e. one huddle start event per player, and the ball)
+# None of these should have more than 23 (i.e. one line set event per player, and the ball)
 LineSet_Multiples <- LineSet_DF %>%
   group_by(gameId, playId) %>%
   summarize(n = n()) %>% arrange(desc(n))
