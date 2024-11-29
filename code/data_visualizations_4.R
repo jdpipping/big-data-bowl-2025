@@ -38,7 +38,19 @@ set.seed(1128)
 
 # This could be replaced by whichever play you want to look into
 # This example is an Isaiah McKenzie 12-yard reception from Josh Allen against Bills in Week 1, 2022
-example_play <- MergedData %>% filter(gameId == 2022090800 & playId == 617)
+
+# We could use MergedData, like this, but then the football wouldn't be included
+# This is b/c we got rid of the football when making TrackingWithStats_PlayerNames in data cleaning file
+# example_play <- MergedData %>% filter(gameId == 2022090800 & playId == 617)
+
+# But here's how to do it from the original tracking data CSV
+# Recall that tracking data has Rams' tricode as LA, not LAR (for some reason)
+example_play = tracking_week_1 %>%
+  filter(gameId == 2022090800 & playId == 617) %>%
+  mutate(team_color = case_when(club == 'LA' ~ 'goldenrod',
+                           club == 'BUF' & displayName %in% "Isaiah McKenzie" ~ 'green',
+                           club == 'BUF' & !displayName %in% "Isaiah McKenzie" ~ 'blue',
+                           club == 'football' ~ 'brown'))
 
 example_game_id <- unique(example_play$gameId)
 example_play_id <- unique(example_play$playId)
@@ -46,24 +58,22 @@ example_play_id <- unique(example_play$playId)
 # players <- read_csv("players.csv")
 # plays <- read_csv("plays.csv")
 #
-# #merging games data to play
+# merging games data to play
 # example_play <- inner_join(example_play,
 #                            games,
 #                            by = c("gameId" = "gameId")) #gets teams involved, using gameID as an index
 #
-# #merging tracking data to play
+# merging tracking data to play
 # example_play <- inner_join(example_play,
 #                            MergedData,
 #                            by = c("gameId" = "gameId",
 #                                   "playId" = "playId"))
 
-example_play <- MergedData %>%
-  filter(gameId == example_game_id & playId == example_play_id)
-plot_title <- str_trim(gsub("\\s*\\([^\\)]+\\)","",as.character(example_play$playDescription[1])))
+# If we were operating from MergedData, here's how we would get the plot_title
+# plot_title <- str_trim(gsub("\\s*\\([^\\)]+\\)","",as.character(example_play$playDescription[1])))
 
-# NOTE: if we wanted to include the football, we could adjust the data cleaning file
-# Specifically, would adjust when we created TrackingWithStats_PlayerNames
-# Or we could use a mutate(color) approach with the original tracking data, like the Gabe Davis example
+# If we aren't operating from MergedData, we can simply type the title manually
+plot_title <- "J. Allen 12-yard completion to I. McKenzie in Week 1, 2022 at Rams"
 
 xmin <- 0
 xmax <- 53.3
@@ -80,19 +90,16 @@ df.hash <- expand.grid(x = c(0, 23.36667, 29.96667, xmax), y = (10:110))
 df.hash <- df.hash %>% filter(!(floor(y %% 5) == 0))
 df.hash <- df.hash %>% filter(y < ymax, y > ymin)
 
-cols_fill <- c("#FB4F14", "#663300", "#A5ACAF")
-cols_col <- c("#000000", "#663300", "#000000")
-
 # plotting
 ggplot() +
   
   #setting size and color parameters
-  scale_size_manual(values = c(6, 6, 6), guide = FALSE) +
-  scale_shape_manual(values = c(21, 21, 21), guide = FALSE) +
-  scale_fill_manual(values = c("red", 'blue', "black"), guide = TRUE) +
-  # scale_colour_manual(values = c("red", 'blue', "pink"), guide = FALSE) +
+  scale_size_manual(values = c(6, 6, 6, 6), guide = FALSE) +
+  scale_shape_manual(values = c(21, 21, 21, 21), guide = FALSE) +
+  scale_fill_manual(values = c("goldenrod" = "goldenrod", "green" = "green", "blue" = "blue", "brown" = "brown"), guide = TRUE) +
+  # scale_colour_manual(values = c("goldenrod" = "goldenrod", "green" = "green", "blue" = "blue", "brown" = "brown"), guide = FALSE) +
   # COMMENT OUT THIS guides() function if plot isn't displaying
-  guides(fill = guide_legend(override.aes = list(shape=21))) +
+  # guides(fill = guide_legend(override.aes = list(shape = 21))) +
   
   # adding hash marks
   annotate("text", x = df.hash$x[df.hash$x < 55/2],
@@ -124,8 +131,8 @@ ggplot() +
   geom_point(data = example_play, aes(x = (xmax-y),
                                       y = x,
                                       shape = club,
-                                      fill = Player_Role,
-                                      group = Player_Role,
+                                      fill = team_color, # if we used MergedData, this would say Player_Role
+                                      group = team_color, # if we used MergedData, this would say Player_Role
                                       size = club),
              alpha = 0.7) +  
   # ggforce::geom_circle(data = example_play, aes(x0=X_ball_carrier, y0=Y_ball_carrier, r=10)) +
