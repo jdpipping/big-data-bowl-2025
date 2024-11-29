@@ -363,3 +363,11 @@ MergedData <- MergedData %>%
     )
   ) %>%
   ungroup()
+
+# And create a data table for just dropbacks as well
+Dropbacks_Merged <- MergedData %>% filter(isDropback == 1)
+Dropbacks_Merged <- Dropbacks_Merged %>% select(-"isDropback")
+setDT(Dropbacks_Merged)
+setkey(Dropbacks_Merged, gameId, playId, nflId, frameId)
+Dropbacks_Merged <- Dropbacks_Merged %>% relocate("gameId", "playId", "nflId", "displayName", "frameId")
+
