@@ -5,7 +5,8 @@ tracking_std = read_csv('processed-data/tracking_std.csv')
 example_play_Davis_TD = tracking_std |> 
   filter(gameId == 2022100901, playId == 117) |> 
   mutate(color = case_when(club == 'PIT' ~ 'gold',
-                           club == 'BUF' ~ 'blue',
+                           club == 'BUF' & !displayName %in% "Gabe Davis" ~ 'blue',
+                           club == 'BUF' & displayName %in% "Gabe Davis" ~ 'blue',
                            club == 'football' ~ 'brown'))
 
 # play visualization
@@ -89,9 +90,9 @@ ggplot() +
   scale_size_manual(values = c(6, 6, 6), guide = FALSE) +
   scale_shape_manual(values = c(21, 21, 21), guide = FALSE) +
   scale_fill_manual(values = c("red", 'blue', "black"), guide = TRUE) +
+  # scale_colour_manual(values = c("red", 'blue', "pink"), guide = FALSE) +
   # COMMENT OUT THIS guides() function if plot isn't displaying
   guides(fill = guide_legend(override.aes = list(shape=21))) +
-  # scale_colour_manual(values = c("red", 'blue', "pink"), guide = FALSE) +
   
   # adding hash marks
   annotate("text", x = df.hash$x[df.hash$x < 55/2],
