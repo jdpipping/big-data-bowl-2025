@@ -157,6 +157,6 @@ ggplot() +
        fill = 'Player Role') +
   
   # setting animation parameters
-  transition_time(frameId)  +
+  transition_time(frameId, time = 0.1)  +
   ease_aes('linear') +
   NULL
