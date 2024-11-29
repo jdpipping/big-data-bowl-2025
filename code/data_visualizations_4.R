@@ -5,8 +5,8 @@ tracking_std = read_csv('processed-data/tracking_std.csv')
 example_play_Davis_TD = tracking_std |> 
   filter(gameId == 2022100901, playId == 117) |> 
   mutate(color = case_when(club == 'PIT' ~ 'gold',
+                           club == 'BUF' & displayName %in% "Gabe Davis" ~ 'green',
                            club == 'BUF' & !displayName %in% "Gabe Davis" ~ 'blue',
-                           club == 'BUF' & displayName %in% "Gabe Davis" ~ 'blue',
                            club == 'football' ~ 'brown'))
 
 # play visualization
