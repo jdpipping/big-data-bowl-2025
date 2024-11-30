@@ -99,7 +99,7 @@ ggplot() +
   scale_fill_manual(values = c("goldenrod" = "goldenrod", "green" = "green", "blue" = "blue", "brown" = "brown"), guide = TRUE) +
   # scale_colour_manual(values = c("goldenrod" = "goldenrod", "green" = "green", "blue" = "blue", "brown" = "brown"), guide = FALSE) +
   # COMMENT OUT THIS guides() function if plot isn't displaying
-  # guides(fill = guide_legend(override.aes = list(shape = 21))) +
+  guides(fill = guide_legend(override.aes = list(shape = 21))) +
   
   # adding hash marks
   annotate("text", x = df.hash$x[df.hash$x < 55/2],
