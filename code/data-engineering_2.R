@@ -217,32 +217,32 @@ safety_ids_post_snap = post_snap_safety %>%
 # Likewise, on defense, the person with rank 1 would be the defense's left CB (i.e. offense's right)
 LeftMost_Receivers <- MergedData %>% 
   filter(PlayerSideOfBall == "offense", Y_NetDistFromBall_Rank_BySide == 11, event %in% c("ball_snap", "snap_direct")) 
-LeftMost_Receivers <- LeftMostReceivers %>% select("gameId", "playId", "nflId", "displayName", "x", "y")
-LeftMost_Receivers <- LeftMostReceivers %>% rename(LeftMost_Receiver_ID = `nflId`,
+LeftMost_Receivers <- LeftMost_Receivers %>% select("gameId", "playId", "nflId", "displayName", "x", "y")
+LeftMost_Receivers <- LeftMost_Receivers %>% rename(LeftMost_Receiver_ID = `nflId`,
                                        LeftMost_Receiver_Name = `displayName`,
                                        LeftMost_Receiver_X_AtSnap = `x`, LeftMost_Receiver_Y_AtSnap = 'y')
 MergedData <- MergedData %>% left_join(LeftMost_Receivers, by = c("gameId", "playId"))
 
 RightMost_Receivers <- MergedData %>% 
   filter(PlayerSideOfBall == "offense", Y_NetDistFromBall_Rank_BySide == 1, event %in% c("ball_snap", "snap_direct")) 
-RightMost_Receivers <- RightMostReceivers %>% select("gameId", "playId", "nflId", "displayName", "x", "y")
-RightMost_Receivers <- RightMostReceivers %>% rename(RightMost_Receiver_ID = `nflId`,
+RightMost_Receivers <- RightMost_Receivers %>% select("gameId", "playId", "nflId", "displayName", "x", "y")
+RightMost_Receivers <- RightMost_Receivers %>% rename(RightMost_Receiver_ID = `nflId`,
                                        RightMost_Receiver_Name = `displayName`,
                                        RightMost_Receiver_X_AtSnap = `x`, RightMost_Receiver_Y_AtSnap = 'y')
 MergedData <- MergedData %>% left_join(RightMost_Receivers, by = c("gameId", "playId"))
 
 LeftMost_Defenders <- MergedData %>% 
   filter(PlayerSideOfBall == "defense", Y_NetDistFromBall_Rank_BySide == 1, event %in% c("ball_snap", "snap_direct")) 
-LeftMost_Defenders <- LeftMostDefenders %>% select("gameId", "playId", "nflId", "displayName", "x", "y")
-LeftMost_Defenders <- LeftMostDefenders %>% rename(LeftMost_Defender_ID = `nflId`,
+LeftMost_Defenders <- LeftMost_Defenders %>% select("gameId", "playId", "nflId", "displayName", "x", "y")
+LeftMost_Defenders <- LeftMost_Defenders %>% rename(LeftMost_Defender_ID = `nflId`,
                                        LeftMost_Defender_Name = `displayName`,
                                        LeftMost_Defender_X_AtSnap = `x`, LeftMost_Defender_Y_AtSnap = 'y')
 MergedData <- MergedData %>% left_join(LeftMost_Defenders, by = c("gameId", "playId"))
 
 RightMost_Defenders <- MergedData %>% 
   filter(PlayerSideOfBall == "defense", Y_NetDistFromBall_Rank_BySide == 11, event %in% c("ball_snap", "snap_direct")) 
-RightMost_Defenders <- RightMostDefenders %>% select("gameId", "playId", "nflId", "displayName", "x", "y")
-RightMost_Defenders <- RightMostDefenders %>% rename(RightMost_Defender_ID = `nflId`,
+RightMost_Defenders <- RightMost_Defenders %>% select("gameId", "playId", "nflId", "displayName", "x", "y")
+RightMost_Defenders <- RightMost_Defenders %>% rename(RightMost_Defender_ID = `nflId`,
                                          RightMost_Defender_Name = `displayName`,
                                          RightMost_Defender_X_AtSnap = `x`, RightMost_Defender_Y_AtSnap = 'y')
 MergedData <- MergedData %>% left_join(RightMost_Defenders, by = c("gameId", "playId"))
