@@ -247,6 +247,9 @@ RightMost_Defenders <- RightMostDefenders %>% rename(RightMost_Defender_ID = `nf
                                          RightMost_Defender_X_AtSnap = `x`, RightMost_Defender_Y_AtSnap = 'y')
 MergedData <- MergedData %>% left_join(RightMost_Defenders, by = c("gameId", "playId"))
 
+setDT(MergedData)
+setkey(MergedData, gameId, playId, nflId, frameId)
+MergedData <- MergedData %>% relocate("gameId", "playId", "nflId", "displayName", "frameId")
 rm(LeftMost_Receivers, RightMost_Receivers, LeftMost_Defenders, RightMost_Defenders)
    
 # merge to create v1, which is a frame-by-frame data set rather than play-by-play
