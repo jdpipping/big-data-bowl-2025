@@ -362,7 +362,6 @@ tracking_std <- tracking_std %>% select(-c("Unnecessary_Early", "FrameNumber_Lin
 
 Tracking_PlaysWithLineSet <- tracking_std %>% filter(LineSet_OnFullPlay == 1)
 
-
 # Then use rank() to retroactively fix frameId for all plays (i.e. make them start at 1)
 # This might not even really be necessary, but here's how to do it
 # Probably helpful for incorporating video/dots, i.e. having any play start at Frame 1
@@ -483,7 +482,7 @@ plays <- plays %>% rename(visitorTeamWinProbabilityAdded = `visitorTeamWinProbil
 # View(plays %>% filter(is.na(expectedPointsAdded)))
 # One play to fix here, a David Montgomery run on 10/09/22
 # Since it's only one play, just find the right answer from nflverse
-# View(nflverse_pbp %>% filter(old_game_id == 2022100904, qtr == 2) %>% select(1:35, 73, 74))
+# View(nflverse_pbp %>% filter(old_game_id == 2022100904, qtr == 2))
 plays <- plays %>% mutate(expectedPointsAdded =
                             ifelse(is.na(expectedPointsAdded), -0.29447450, expectedPointsAdded)) 
 
