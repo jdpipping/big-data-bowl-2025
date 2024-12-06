@@ -146,7 +146,7 @@ los = tracking |>
 # get time of snap for each play
 snap_frames = tracking |> 
   group_by(playId) |> 
-  filter(event == 'ball_snap') |> 
+  filter(frameType == 'SNAP') |> 
   # omit duplicates (players)
   distinct(gameId, playId, frameId) |> # LOOK AT THIS
   # rename frameId
