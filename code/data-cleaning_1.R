@@ -126,8 +126,18 @@ tracking_std <- tracking_std %>% mutate(event =
                                                     ifelse(is.na(BallSnap_rank), event,
                                                            ifelse(BallSnap_rank > 1 & event == "first_contact", NA, event)))
 
-rm(BallSnap_Events, MultiBallSnap_Plays)
-tracking_std <- tracking_std %>% select(-"BallSnap_rank")
+# Let's also make sure no plays have more than 23 "players" during ball snap (i.e. one snap event per player, and the ball)
+BallSnap_Multiples <- BallSnap_Events %>%
+  group_by(gameId, playId) %>%
+  summarize(n = n()) %>% arrange(desc(n))
+# If any have less than 23, get rid of those (10 men on the field leads to iffy data)
+BallSnap_All22_OnField <- BallSnap_Multiples %>% filter(n == 23)
+tracking_combined <- merge(x = tracking_combined, y = BallSnap_All22_OnField,
+                           by = c("gameId", "playId"))
+tracking_combined <- tracking_combined %>% select(-"n")
+
+rm(BallSnap_Events, MultiBallSnap_Plays, BallSnap_Multiples, BallSnap_All22_OnField)
+tracking_combined <- tracking_combined %>% select(-"BallSnap_rank")
 
 # Note that the first frame is typically, but not always, huddle_break_offense
 FirstFrame_NotHuddleBreak <- tracking_std %>% filter(frameId == 1 & !event %in% "huddle_break_offense")
