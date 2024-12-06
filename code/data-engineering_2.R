@@ -125,6 +125,41 @@ safety_ids_pre_snap = pre_snap_safety %>%
 # increase max vector size to 64 GB
 mem.maxVSize(vsize = 49152 * 1.5)
 
+# Some plays have multiple players listed at QB, such as Taysom Hill plays: View(MergedData %>% filter(gameId == 2022091100, playId == 301, PlayerSideOfBall == "offense", frameId == 1))
+# To account for those, look into whichever QB was closest horizontally (i.e. Y coordinate) to the ball during snap
+# Here's how to account for that using the previously defined MergedData data table (from the data cleaning file)
+QBs_AtSnap <- MergedData %>% filter(position %in% "QB", event %in% c("ball_snap", "snap_direct")) %>%
+  group_by(gameId, playId) %>%
+  mutate(QB_DistFromBall_Rank_AtSnap = rank(Y_AbsDistFromBall, ties.method = "first")) %>%
+  ungroup()
+QBs_AtSnap <- QBs_AtSnap %>% 
+  select(c("gameId", "playId", "nflId", "displayName", "QB_DistFromBall_Rank_AtSnap"))
+MultiQB_Plays <- QBs_AtSnap %>% 
+  group_by(gameId, playId) %>% 
+  summarize(n = n()) %>% arrange(desc(n))
+MergedData <- MergedData %>%
+  left_join(QBs_AtSnap, by = c("gameId", "playId", "nflId", "displayName"))
+
+table(MergedData$position)
+# For any "QB_DistFromBall_Rank_AtSnap" bigger than 1, change the position name to RB
+# This isn't always exactly right, e.g. Taysom could be lined up wide instead of RB, but the point is to avoid multiple QBs
+MergedData <- MergedData %>% mutate(position =
+     ifelse(is.na(QB_DistFromBall_Rank_AtSnap), position,
+        ifelse(!is.na(QB_DistFromBall_Rank_AtSnap) & QB_DistFromBall_Rank_AtSnap > 1 & position == "QB", "RB", position)))
+
+rm(QBs_AtSnap, MultiQB_Plays)
+MergedData <- MergedData %>% select(-"QB_DistFromBall_Rank_AtSnap")
+# And use arrange() again, but with the data table format
+setDT(MergedData)
+setkey(MergedData, gameId, playId, nflId, frameId)
+MergedData <- MergedData %>% relocate("gameId", "playId", "nflId", "displayName", "frameId")
+
+# Quick test that there are no plays left with multiple
+QB_Multiples <- MergedData %>% filter(position %in% "QB", frameId == 1) %>%
+  group_by(gameId, playId) %>%
+  summarize(n = n()) %>% arrange(desc(n))
+rm(QB_Multiples)
+
 # Now, create a variable for whether a player had safety responsibilities on the play
 # Even if that person wasn't aligned as a safety before the snap
 # Do it for both MergedData (from data-cleaning file) and for player_play CSV directly
