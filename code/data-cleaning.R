@@ -56,15 +56,15 @@ standardize_tracking = function(tracking) {
 ### CLEAN TRACKING DATA ###
 ###########################
 
-# # read in data
-# tracking_all = read_tracking(weeks = 1:9)
-# # write to file
-# write_csv(tracking_all, 'raw-data/tracking_all.csv')
-# 
-# # standardize tracking data
-# tracking_std = standardize_tracking(tracking_all)
-# # save to file
-# write_csv(tracking_std, 'processed-data/tracking_std.csv')
+# read in data
+tracking_all = read_tracking(weeks = 1:9)
+# write to file
+write_csv(tracking_all, 'raw-data/tracking_all.csv')
+
+# standardize tracking data
+tracking_std = standardize_tracking(tracking_all)
+# save to file
+write_csv(tracking_std, 'processed-data/tracking_std.csv')
 
 # read cleaned data
 tracking_std = read_csv('processed-data/tracking_std.csv')
