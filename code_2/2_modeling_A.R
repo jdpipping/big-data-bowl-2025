@@ -205,6 +205,7 @@ for (fold in 1:NUM_FOLDS) {
   df_preds_0 = 
     df_test %>%
     mutate(
+      pred_fairCoin = 0.5,
       pred_overallMean = predict(fit_overallMean, ., type = "response"),
       pred_numSafeties = predict(fit_numSafeties, ., type = "response"),
       pred_defteam = predict(fit_defteam, ., type = "response"),
@@ -228,13 +229,13 @@ for (fold in 1:NUM_FOLDS) {
     reframe(logloss = mean(logloss)) %>%
     arrange(logloss) %>%
     mutate(fold = fold)
-  logloss_overallMean = (df_losses_f %>% filter(str_detect(model, "overallMean")))$logloss
+  logloss_ref = (df_losses_f %>% filter(str_detect(model, "fairCoin")))$logloss
   df_losses_f = 
     df_losses_f %>% 
     mutate(
-      logloss_overallMean = logloss_overallMean,
+      logloss_ref = logloss_ref,
       # reduction in error 
-      RIE = - (logloss - logloss_overallMean) / logloss_overallMean,
+      RIE = - (logloss - logloss_ref) / logloss_ref,
     )
   df_losses_f
   
@@ -254,8 +255,19 @@ df_losses
 # plot results
 df_losses %>%
   ggplot(aes(y = reorder(model, mean_logloss), x = logloss)) +
+  geom_vline(xintercept = -log(1/2), color="gray60", linetype="dashed", linewidth=0.5) +
   geom_boxplot() +
   xlab("out-of-sample logloss") +
+  ylab("model")
+
+df_losses %>%
+  mutate(p1 = exp(-logloss)) %>%
+  ggplot(aes(y = reorder(model, mean_logloss), x = p1)) +
+  geom_vline(xintercept = 1/2, color="gray60", linetype="dashed", linewidth=0.5) +
+  geom_boxplot() +
+  xlab("p = exp(-logloss)\non average, predict the correct outcome with prob. p") +
+  # on average, you attributed to the right class the probability 𝑝≈0.61 across samples.
+  # xlab("p=P(MOFO|x) that produces the given out-of-sample logloss\nwhen MOFO is observed") +
   ylab("model")
 
 df_losses %>%
