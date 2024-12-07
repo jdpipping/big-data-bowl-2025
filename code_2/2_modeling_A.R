@@ -31,7 +31,18 @@ object.size(df_tracking_A) / 10**9
 # pre-snap tracking data for prediction/modeling exercise
 df_tracking_presnap = 
   df_tracking_A |>
-  filter(-10 < t_after_snap & t_after_snap < 0)
+  filter(-10 < t_after_snap & t_after_snap < 0) |>
+  # make y coordinate relative to the center of the field
+  mutate(
+    y1 = y - 53.3/2,
+    y1_postsnap = y_postsnap - 53.3/2
+  ) |>
+  relocate(y1, .after=y) |>
+  relocate(y1_postsnap, .after=y_postsnap) |>
+  # min safety distance to center
+  group_by(gameId, playId) |>
+  mutate(minSafetyDistToCenter = min(abs( ifelse(is_pre_safety, y1, Inf) ))) |>
+  ungroup()
 df_tracking_presnap
 table(df_tracking_presnap$t_after_snap)
 
@@ -77,6 +88,16 @@ fit_model_defTeamNumSafeties <- function(df_tracking) {
 }
 # # example
 # temp = fit_model_defTeamNumSafeties(df_tracking_presnap)
+# temp
+
+# min distance to center of field
+fit_model_minSafetyDistToCenter <- function(df_tracking) {
+  df_plays = df_tracking %>% distinct(gameId,playId,minSafetyDistToCenter,mofo_postsnap) 
+  df_plays
+  glm(mofo_postsnap ~ minSafetyDistToCenter, data = df_plays, family = "binomial")
+}
+# # example
+# temp = fit_model_minSafetyDistToCenter(df_tracking_presnap)
 # temp
 
 #################################################
@@ -161,6 +182,7 @@ for (fold in 1:NUM_FOLDS) {
   fit_numSafeties = fit_model_numSafeties(df_train)
   fit_defteam = fit_model_defteam(df_train)
   fit_defTeamNumSafeties = fit_model_defTeamNumSafeties(df_train)
+  fit_minSafetyDistToCenter = fit_model_minSafetyDistToCenter(df_train)
   
   # predictions
   #FIXME
@@ -171,6 +193,7 @@ for (fold in 1:NUM_FOLDS) {
       pred_numSafeties = predict(fit_numSafeties, ., type = "response"),
       pred_defteam = predict(fit_defteam, ., type = "response"),
       pred_defTeamNumSafeties = predict(fit_defTeamNumSafeties, ., type = "response"),
+      pred_minSafetyDistToCenter = predict(fit_minSafetyDistToCenter, ., type = "response"),
     ) %>%
     select(gameId, playId, mofo_postsnap, all_of(starts_with("pred"))) %>%
     distinct()
@@ -216,6 +239,7 @@ df_losses
 df_losses %>%
   ggplot(aes(y = reorder(model, mean_logloss), x = logloss)) +
   geom_boxplot() +
+  xlab("out-of-sample logloss") +
   ylab("model")
 
 df_losses %>%
@@ -223,6 +247,6 @@ df_losses %>%
   geom_boxplot() +
   scale_x_continuous(labels = scales::percent) +
   ylab("model") +
-  xlab("reduction in error\n(above the overall mean predictor)")
+  xlab("out-of-sample reduction in error\n(above the overall mean predictor)")
 
 
