@@ -218,7 +218,7 @@ write_csv('processed-data/brill.csv')
 # read in data (can be whatever file you're using)
 tracking = read_csv('processed-data/tracking_std.csv')
 
-# function to change tracking angle from clock to polar
+# function to change tracking angles from clock to polar
 polarize = function(data) {
   data_polar = data |> 
     # change angles to reflect polar
