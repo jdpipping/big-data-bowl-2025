@@ -82,7 +82,7 @@ table(df_tracking_presnap$t_after_snap)
 
 # # check velo,accel components
 # temp = df_tracking_presnap %>% filter(pos_official == "RB") %>% filter(s > 1)
-# View(temp[1:2000,])
+# View(temp[1:2000,]) 
 
 #######################
 ### BASELINE MODELS ###
