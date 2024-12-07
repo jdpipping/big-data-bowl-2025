@@ -242,16 +242,16 @@ df_tracking_1 =
   # merge to tracking data
   left_join(tracking_adj) |> 
   relocate(t_after_snap, .after = playId) |>
-  rename(postsnap_mofo = mofo) |>
-  mutate(postsnap_mofo = as.numeric(postsnap_mofo)) |>
-  relocate(postsnap_mofo, .after = t_after_snap) |>
+  rename(mofo_postsnap = mofo) |>
+  mutate(mofo_postsnap = as.numeric(mofo_postsnap)) |>
   # merge safety indicators
   left_join(pre_snap_safeties) |>
   relocate(is_pre_safety, .after = pos_official) |>
   relocate(num_safeties, .after = is_pre_safety) |>
   select(-c(club, playDirection, dis, o, event)) |>
   # get post-snap locations
-  left_join(df_postsnap_locs)
+  left_join(df_postsnap_locs) |>
+  relocate(mofo_postsnap, .after = y_postsnap) 
 df_tracking_1
 # View(df_tracking_1[1:1000,])
 # quick bug check: na's arising from missing snap indicator on some plays
@@ -287,7 +287,7 @@ df_tracking_2
 nrow(df_tracking_2 %>% distinct(gameId, playId))
 # View(df_tracking_2[1:2000,])
 table(df_tracking_2$t_after_snap)
-table(df_tracking_2$postsnap_mofo)
+table(df_tracking_2$mofo_postsnap)
 
 # final tracking dataset to save
 df_tracking_F = df_tracking_2
