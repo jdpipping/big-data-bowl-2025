@@ -1,4 +1,8 @@
 
+#################
+### LIBRARIES ###
+#################
+
 ### SET YOUR WORKING DIRECTORY TO THIS FILE (IN `code_2`)
 library(tidyverse)
 library(cvTools)
@@ -28,17 +32,29 @@ df_tracking_A = read_csv('../processed-data/df_tracking_A.csv', show_col_types =
 df_tracking_A
 object.size(df_tracking_A) / 10**9
 
+##############################
+### MODIFIED TRACKING DATA ###
+##############################
+
 # pre-snap tracking data for prediction/modeling exercise
 df_tracking_presnap = 
   df_tracking_A |>
+  # keep just pre-snap data, and don't go too far into the past
   filter(-10 < t_after_snap & t_after_snap < 0) |>
+  # make x coordinate relative to the line of scrimmage
+  mutate(
+    x1 = x - los,
+    x1_postsnap = x_postsnap - los,
+  )  |>
+  relocate(x1, .after=y) |>
+  relocate(x1_postsnap, .after=y_postsnap) |>
   # make y coordinate relative to the center of the field
   mutate(
     y1 = y - 53.3/2,
-    y1_postsnap = y_postsnap - 53.3/2
+    y1_postsnap = y_postsnap - 53.3/2,
   ) |>
-  relocate(y1, .after=y) |>
-  relocate(y1_postsnap, .after=y_postsnap) |>
+  relocate(y1, .after=x1) |>
+  relocate(y1_postsnap, .after=x1_postsnap) |>
   # min safety distance to center
   group_by(gameId, playId) |>
   mutate(minSafetyDistToCenter = min(abs( ifelse(is_pre_safety, y1, Inf) ))) |>

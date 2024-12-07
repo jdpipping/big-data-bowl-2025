@@ -275,6 +275,9 @@ for (week in WEEKS) {
     relocate(t_after_snap, .after = playId) |>
     rename(mofo_postsnap = mofo) |>
     mutate(mofo_postsnap = as.numeric(mofo_postsnap)) |>
+    # merge line of scrimmage
+    left_join(los) |>
+    relocate(los, .before = x) |>
     # merge safety indicators
     left_join(pre_snap_safeties) |>
     relocate(is_pre_safety, .after = pos_official) |>
@@ -326,6 +329,7 @@ for (week in WEEKS) {
 object.size(df_tracking_A) / 10**9
 sapply(df_tracking_A, function(col) sum(is.na(col))) # NA counts -- I think it's fine cuz the football itself is NA
 nrow(df_tracking_A %>% distinct(gameId, playId)) # num plays
+dim(df_tracking_A)
 df_tracking_A %>% 
   select(gameId, playId, num_safeties, mofo_postsnap) %>%
   group_by(num_safeties, mofo_postsnap) %>%
