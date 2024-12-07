@@ -210,3 +210,36 @@ brill = play_info |>
 summary(brill)
 # write brill.csv
 write_csv('processed-data/brill.csv')
+
+##############################
+### DIRECTIONAL VELO/ACCEL ###
+##############################
+
+# read in data (can be whatever file you're using)
+tracking = read_csv('processed-data/tracking_std.csv')
+
+# function to change tracking angle from clock to polar
+polarize = function(data) {
+  data_polar = data |> 
+    # change angles to reflect polar
+    mutate(o = (90 - o) %% 360,
+           dir = (90 - dir) %% 360)
+  return(data_polar)
+}
+# function to decompose velo/accel
+vector_decomp = function(data) {
+  # polarize
+  polar_data = polarize(data)
+  # decompose
+  data_decomp = polar_data |> 
+    mutate(v_x = s * cos(dir * pi / 180),
+           v_y = s * sin(dir * pi / 180),
+           a_x = a * cos(dir * pi / 180),
+           a_y = a * sin(dir * pi / 180))
+  return(data_decomp)
+}
+
+# transform data
+decomposed_tracking = vector_decomp(tracking)
+# save to file
+write_csv(decomposed_tracking, 'processed-data/decomposed_tracking.csv')
