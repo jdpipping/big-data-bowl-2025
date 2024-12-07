@@ -280,12 +280,13 @@ df_tracking_2 =
   df_tracking_1 |>
   # keep just the pre-snap safeties (for now)
   filter(is_pre_safety) |>
+  select(-c(pos_official, is_pre_safety)) |>
   # filter frames between (0, 7] seconds
   filter(-t_pre_snap_max <= t_after_snap & t_after_snap < 0) 
 df_tracking_2
+nrow(df_tracking_2 %>% distinct(gameId, playId))
 # View(df_tracking_2[1:2000,])
 table(df_tracking_2$t_after_snap)
-nrow(df_tracking_2 %>% distinct(gameId, playId))
 table(df_tracking_2$postsnap_mofo)
 
 # final tracking dataset to save
