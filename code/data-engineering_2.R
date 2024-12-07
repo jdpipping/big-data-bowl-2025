@@ -53,7 +53,7 @@ play_info = games |>
     time_left_quarter = as.numeric(str_sub(gameClock, 1, 2)) * 60 + as.numeric(str_sub(gameClock, 4, 5)),
     # time remaining in game (seconds)
     time_left_game = if_else(quarter == 5, time_left_quarter, (4 - quarter) * 15 * 60 + time_left_quarter)
-    )
+  )
 
 # GSIS position data
 gsis_positions = players |>
@@ -78,7 +78,7 @@ qb_ids_plays = tracking |>
   mutate(qb_id = row_number()) |>
   # pivot to wide
   pivot_wider(names_from = qb_id, values_from = nflId, names_prefix = 'qb_')
-  
+
 # define line of scrimmage
 los = tracking |> 
   # select needed columns
@@ -144,8 +144,8 @@ table(MergedData$position)
 # For any "QB_DistFromBall_Rank_AtSnap" bigger than 1, change the position name to RB
 # This isn't always exactly right, e.g. Taysom could be lined up wide instead of RB, but the point is to avoid multiple QBs
 MergedData <- MergedData %>% mutate(position =
-     ifelse(is.na(QB_DistFromBall_Rank_AtSnap), position,
-        ifelse(!is.na(QB_DistFromBall_Rank_AtSnap) & QB_DistFromBall_Rank_AtSnap > 1 & position == "QB", "RB", position)))
+                                      ifelse(is.na(QB_DistFromBall_Rank_AtSnap), position,
+                                             ifelse(!is.na(QB_DistFromBall_Rank_AtSnap) & QB_DistFromBall_Rank_AtSnap > 1 & position == "QB", "RB", position)))
 
 rm(QBs_AtSnap, MultiQB_Plays)
 MergedData <- MergedData %>% select(-"QB_DistFromBall_Rank_AtSnap")
@@ -164,14 +164,14 @@ rm(QB_Multiples)
 # Even if that person wasn't aligned as a safety before the snap
 # Do it for both MergedData (from data-cleaning file) and for player_play CSV directly
 MergedData <- MergedData %>% mutate(post_snap_safety =
-   ifelse(!is.na(pff_defensiveCoverageAssignment) & pff_defensiveCoverageAssignment %in% c("2R", "2L", "3M", "4IL", "4IR", "DF", "PRE"), TRUE,
-          ifelse(!is.na(pff_defensiveCoverageAssignment) & !pff_defensiveCoverageAssignment %in% c("2R", "2L", "3M", "4IL", "4IR", "DF", "PRE"), FALSE, 
-                 ifelse(is.na(pff_defensiveCoverageAssignment) & PlayerSideOfBall %in% "defense", FALSE, NA))))
+                                      ifelse(!is.na(pff_defensiveCoverageAssignment) & pff_defensiveCoverageAssignment %in% c("2R", "2L", "3M", "4IL", "4IR", "DF", "PRE"), TRUE,
+                                             ifelse(!is.na(pff_defensiveCoverageAssignment) & !pff_defensiveCoverageAssignment %in% c("2R", "2L", "3M", "4IL", "4IR", "DF", "PRE"), FALSE, 
+                                                    ifelse(is.na(pff_defensiveCoverageAssignment) & PlayerSideOfBall %in% "defense", FALSE, NA))))
 
 player_play <- player_play %>% mutate(post_snap_safety =
-   ifelse(!is.na(pff_defensiveCoverageAssignment) & pff_defensiveCoverageAssignment %in% c("2R", "2L", "3M", "4IL", "4IR", "DF", "PRE"), TRUE,
-          ifelse(!is.na(pff_defensiveCoverageAssignment) & !pff_defensiveCoverageAssignment %in% c("2R", "2L", "3M", "4IL", "4IR", "DF", "PRE"), FALSE, 
-                 ifelse(is.na(pff_defensiveCoverageAssignment) & PlayerSideOfBall %in% "defense", FALSE, NA))))
+                                        ifelse(!is.na(pff_defensiveCoverageAssignment) & pff_defensiveCoverageAssignment %in% c("2R", "2L", "3M", "4IL", "4IR", "DF", "PRE"), TRUE,
+                                               ifelse(!is.na(pff_defensiveCoverageAssignment) & !pff_defensiveCoverageAssignment %in% c("2R", "2L", "3M", "4IL", "4IR", "DF", "PRE"), FALSE, 
+                                                      ifelse(is.na(pff_defensiveCoverageAssignment) & PlayerSideOfBall %in% "defense", FALSE, NA))))
 
 # Out of curiosity, glance at whether coverage assignments are assigned by PFF on designed runs
 DesignedRuns_Merged <- MergedData %>% filter(isDropback == 0)
@@ -182,7 +182,7 @@ rm(DesignedRuns_Merged)
 
 # Repeat the process with post-snap safeties
 post_snap_safety <- player_play %>% 
-filter(frameType == 'AFTER_SNAP') %>%
+  filter(frameType == 'AFTER_SNAP') %>%
   # group by game, play, player
   group_by(gameId, playId, nflId) %>% 
   # use the previously established definition of post_snap_safety (i.e. based on coverage responsibility)
@@ -219,39 +219,39 @@ LeftMost_Receivers <- MergedData %>%
   filter(PlayerSideOfBall == "offense", Y_NetDistFromBall_Rank_BySide == 11, event %in% c("ball_snap", "snap_direct")) 
 LeftMost_Receivers <- LeftMost_Receivers %>% select("gameId", "playId", "nflId", "displayName", "x", "y")
 LeftMost_Receivers <- LeftMost_Receivers %>% rename(LeftMost_Receiver_ID = `nflId`,
-                                       LeftMost_Receiver_Name = `displayName`,
-                                       LeftMost_Receiver_X_AtSnap = `x`, LeftMost_Receiver_Y_AtSnap = 'y')
+                                                    LeftMost_Receiver_Name = `displayName`,
+                                                    LeftMost_Receiver_X_AtSnap = `x`, LeftMost_Receiver_Y_AtSnap = 'y')
 MergedData <- MergedData %>% left_join(LeftMost_Receivers, by = c("gameId", "playId"))
 
 RightMost_Receivers <- MergedData %>% 
   filter(PlayerSideOfBall == "offense", Y_NetDistFromBall_Rank_BySide == 1, event %in% c("ball_snap", "snap_direct")) 
 RightMost_Receivers <- RightMost_Receivers %>% select("gameId", "playId", "nflId", "displayName", "x", "y")
 RightMost_Receivers <- RightMost_Receivers %>% rename(RightMost_Receiver_ID = `nflId`,
-                                       RightMost_Receiver_Name = `displayName`,
-                                       RightMost_Receiver_X_AtSnap = `x`, RightMost_Receiver_Y_AtSnap = 'y')
+                                                      RightMost_Receiver_Name = `displayName`,
+                                                      RightMost_Receiver_X_AtSnap = `x`, RightMost_Receiver_Y_AtSnap = 'y')
 MergedData <- MergedData %>% left_join(RightMost_Receivers, by = c("gameId", "playId"))
 
 LeftMost_Defenders <- MergedData %>% 
   filter(PlayerSideOfBall == "defense", Y_NetDistFromBall_Rank_BySide == 1, event %in% c("ball_snap", "snap_direct")) 
 LeftMost_Defenders <- LeftMost_Defenders %>% select("gameId", "playId", "nflId", "displayName", "x", "y")
 LeftMost_Defenders <- LeftMost_Defenders %>% rename(LeftMost_Defender_ID = `nflId`,
-                                       LeftMost_Defender_Name = `displayName`,
-                                       LeftMost_Defender_X_AtSnap = `x`, LeftMost_Defender_Y_AtSnap = 'y')
+                                                    LeftMost_Defender_Name = `displayName`,
+                                                    LeftMost_Defender_X_AtSnap = `x`, LeftMost_Defender_Y_AtSnap = 'y')
 MergedData <- MergedData %>% left_join(LeftMost_Defenders, by = c("gameId", "playId"))
 
 RightMost_Defenders <- MergedData %>% 
   filter(PlayerSideOfBall == "defense", Y_NetDistFromBall_Rank_BySide == 11, event %in% c("ball_snap", "snap_direct")) 
 RightMost_Defenders <- RightMost_Defenders %>% select("gameId", "playId", "nflId", "displayName", "x", "y")
 RightMost_Defenders <- RightMost_Defenders %>% rename(RightMost_Defender_ID = `nflId`,
-                                         RightMost_Defender_Name = `displayName`,
-                                         RightMost_Defender_X_AtSnap = `x`, RightMost_Defender_Y_AtSnap = 'y')
+                                                      RightMost_Defender_Name = `displayName`,
+                                                      RightMost_Defender_X_AtSnap = `x`, RightMost_Defender_Y_AtSnap = 'y')
 MergedData <- MergedData %>% left_join(RightMost_Defenders, by = c("gameId", "playId"))
 
 setDT(MergedData)
 setkey(MergedData, gameId, playId, nflId, frameId)
 MergedData <- MergedData %>% relocate("gameId", "playId", "nflId", "displayName", "frameId")
 rm(LeftMost_Receivers, RightMost_Receivers, LeftMost_Defenders, RightMost_Defenders)
-   
+
 # merge to create v1, which is a frame-by-frame data set rather than play-by-play
 v1 = play_info |> 
   # join tracking
@@ -261,7 +261,7 @@ v1 = play_info |>
   # join pre-snap safety ids
   left_join(safety_ids_pre_snap, by = c('gameId', 'playId'))
 # join post-snap safety ids
-  left_join(safety_ids_post_snap, by = c('gameId', 'playId'))
+left_join(safety_ids_post_snap, by = c('gameId', 'playId'))
 # save to file
 write_csv(v1, 'processed-data/v1.csv')
 
