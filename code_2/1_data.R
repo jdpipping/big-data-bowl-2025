@@ -282,7 +282,7 @@ for (week in WEEKS) {
     left_join(pre_snap_safeties) |>
     relocate(is_pre_safety, .after = pos_official) |>
     relocate(num_safeties, .after = is_pre_safety) |>
-    select(-c(club, playDirection, dis, o, event)) |>
+    select(-c(club, playDirection, dis, event)) |>
     # get post-snap locations
     left_join(df_postsnap_locs) |>
     relocate(mofo_postsnap, .after = y_postsnap) 

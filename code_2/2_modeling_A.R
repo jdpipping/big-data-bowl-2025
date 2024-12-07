@@ -58,9 +58,31 @@ df_tracking_presnap =
   # min safety distance to center
   group_by(gameId, playId) |>
   mutate(minSafetyDistToCenter = min(abs( ifelse(is_pre_safety, y1, Inf) ))) |>
-  ungroup()
+  ungroup() |>
+  # polar coordinates for the angles o and dir
+  mutate(
+    o_polar = (90 - o) %% 360,
+    dir_polar = (90 - dir) %% 360,
+  ) |>
+  relocate(o_polar, .after = dir) |>
+  relocate(dir_polar, .after = o_polar) |>
+  # decompose velo/accel into (x,y) components
+  mutate(
+    v_x = s * cos(dir_polar * pi / 180),
+    v_y = s * sin(dir_polar * pi / 180),
+    a_x = a * cos(dir_polar * pi / 180),
+    a_y = a * sin(dir_polar * pi / 180)
+  ) |>
+  relocate(v_x, .after = dir_polar) |>
+  relocate(v_y, .after = v_x) |>
+  relocate(a_x, .after = v_y) |>
+  relocate(a_y, .after = a_x) 
 df_tracking_presnap
 table(df_tracking_presnap$t_after_snap)
+
+# # check velo,accel components
+# temp = df_tracking_presnap %>% filter(pos_official == "RB") %>% filter(s > 1)
+# View(temp[1:2000,])
 
 #######################
 ### BASELINE MODELS ###
@@ -162,9 +184,9 @@ df_tracking_safeties
 
 
 
-############################
-### DPREDICTION CONTEST ###
-############################
+##########################
+### PREDICTION CONTEST ###
+##########################
 
 df_all = df_tracking_safeties #FIXME
 df_all
