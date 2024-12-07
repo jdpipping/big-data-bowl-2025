@@ -1,5 +1,4 @@
 
-### code here is the first 70 lines of `code/data-cleaning.R` on 12/6/24
 ### SET YOUR WORKING DIRECTORY TO THIS FILE (IN `code_2`)
 
 #################
