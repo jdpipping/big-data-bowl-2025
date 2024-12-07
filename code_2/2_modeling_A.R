@@ -1,6 +1,23 @@
 
 ### SET YOUR WORKING DIRECTORY TO THIS FILE (IN `code_2`)
 library(tidyverse)
+library(cvTools)
+library(Metrics)
+library(scales)
+
+### plotting pre-sets
+theme_set(theme_bw())
+theme_update(
+  text = element_text(size=20),
+  plot.title = element_text(hjust = 0.5, size=20),
+  plot.subtitle = element_text(size=15),
+  axis.title = element_text(size=20),
+  axis.text = element_text(size=18),
+  axis.text.x = element_text(size=18),
+  legend.text = element_text(size=20),
+  legend.title = element_text(size=20),
+  panel.spacing = unit(2, "lines")
+) 
 
 #################
 ### READ DATA ###
@@ -62,9 +79,9 @@ fit_model_defTeamNumSafeties <- function(df_tracking) {
 # temp = fit_model_defTeamNumSafeties(df_tracking_presnap)
 # temp
 
-###############################
-### DATAFRAME FOR MODELING  ###
-###############################
+#################################################
+### DATAFRAME FOR MODELING WITH TRACKING DATA ###
+#################################################
 
 # defensive positions
 table(df_tracking_presnap$pos_official) 
@@ -95,28 +112,117 @@ nrow(df_tracking_safeties %>% distinct(gameId, playId))
 table(df_tracking_safeties$t_after_snap)
 # View(df_tracking_safeties[1:2000,])
 
+#########################################################
+### TRACKING DATA MODELING - FUNCTIONAL DATA ANALYSIS ###
+#########################################################
+
+#FIXME
+# from the safety movement data
+df_tracking_safeties
+# predict post_snap mofo
+# using functional data analysis,
+# which accounts for the paths/movements that safeties take
 
 
 
-# # read data
-# WEEKS = 1:9 ### forreal dogg
-# # WEEKS = 1:2 ## fo-shizzle just to make things faster & not crash me R
-# weeks_str = paste0("_w",min(WEEKS),"-",max(WEEKS))
-# df_tracking_2 = read_csv(paste0('../processed-data/df_ryan_tracking_2',weeks_str,'.csv'))
-# 
-# # tracking data, but just the safeties
-# df_tracking_safeties = 
-#   df_tracking_2 |>
-#   # keep just the pre-snap safeties (for now)
-#   filter(is_pre_safety) |>
-#   select(-c(pos_official, is_pre_safety))
-# df_tracking_safeties
-# nrow(df_tracking_safeties %>% distinct(gameId, playId))
-# table(df_tracking_safeties$t_after_snap)
-# table(df_tracking_safeties$mofo_postsnap)
-# # View(df_tracking_safeties[1:2000,])
-# 
-# # # final tracking dataset to save
-# # write_csv(df_tracking_safeties, paste0('../processed-data/df_df_tracking_safeties',weeks_str,'.csv'))
-# 
-# 
+############################
+### DPREDICTION CONTEST ###
+############################
+
+df_all = df_tracking_safeties #FIXME
+df_all
+
+# K-fold cross validation
+NUM_FOLDS = 20 #FIXME
+plays_all = df_all %>% distinct(gameId, playId) %>% mutate(i = 1:n())
+plays_all
+set.seed(98247) # for reproducibility
+folds <- cvFolds(n = nrow(plays_all), K = NUM_FOLDS, type = "random")
+plays_all_f = 
+  tibble(i = tibble(folds$subsets)[[1]][,1], FOLD = folds$which) %>% 
+  arrange(i) %>%
+  left_join(plays_all)
+plays_all_f
+table(plays_all_f$FOLD)
+
+# cross validation prediction contest
+df_losses = tibble()
+for (fold in 1:NUM_FOLDS) {
+  print(paste0("fold=",fold))
+  
+  # train-test split
+  plays_train = plays_all_f %>% filter(FOLD != fold)
+  plays_test  = plays_all_f %>% filter(FOLD == fold)
+  df_train = plays_train %>% left_join(df_all) 
+  df_test = plays_test %>% left_join(df_all) 
+  
+  # fit baseline models
+  fit_overallMean = fit_model_overallMean(df_train)
+  fit_numSafeties = fit_model_numSafeties(df_train)
+  fit_defteam = fit_model_defteam(df_train)
+  fit_defTeamNumSafeties = fit_model_defTeamNumSafeties(df_train)
+  
+  # predictions
+  #FIXME
+  df_preds_0 = 
+    df_test %>%
+    mutate(
+      pred_overallMean = predict(fit_overallMean, ., type = "response"),
+      pred_numSafeties = predict(fit_numSafeties, ., type = "response"),
+      pred_defteam = predict(fit_defteam, ., type = "response"),
+      pred_defTeamNumSafeties = predict(fit_defTeamNumSafeties, ., type = "response"),
+    ) %>%
+    select(gameId, playId, mofo_postsnap, all_of(starts_with("pred"))) %>%
+    distinct()
+  df_preds_0
+  
+  df_preds_1 = 
+    df_preds_0 %>%
+    pivot_longer(-c(gameId, playId, mofo_postsnap), names_to="model", values_to = "pred") %>%
+    mutate(logloss = ll(actual = mofo_postsnap, predicted = pred))
+  df_preds_1
+  
+  # losses results for this fold
+  df_losses_f = 
+    df_preds_1 %>%
+    group_by(model) %>%
+    reframe(logloss = mean(logloss)) %>%
+    arrange(logloss) %>%
+    mutate(fold = fold)
+  logloss_overallMean = (df_losses_f %>% filter(str_detect(model, "overallMean")))$logloss
+  df_losses_f = 
+    df_losses_f %>% 
+    mutate(
+      logloss_overallMean = logloss_overallMean,
+      # reduction in error 
+      RIE = - (logloss - logloss_overallMean) / logloss_overallMean,
+    )
+  df_losses_f
+  
+  # save losses
+  df_losses = bind_rows(df_losses, df_losses_f)
+}
+df_losses = 
+  df_losses %>% 
+  group_by(model) %>%
+  mutate(
+    mean_logloss = mean(logloss),
+    mean_RIE = mean(RIE)
+  ) %>%
+  ungroup()
+df_losses
+
+# plot results
+df_losses %>%
+  ggplot(aes(y = reorder(model, mean_logloss), x = logloss)) +
+  geom_boxplot() +
+  ylab("model")
+
+df_losses %>%
+  ggplot(aes(y = reorder(model, mean_logloss), x = RIE)) +
+  geom_boxplot() +
+  scale_x_continuous(labels = scales::percent) +
+  ylab("model") +
+  xlab("reduction in error\n(above the overall mean predictor)")
+
+
