@@ -309,6 +309,6 @@ df_losses %>%
   geom_boxplot() +
   scale_x_continuous(labels = scales::percent) +
   ylab("model") +
-  xlab("out-of-sample reduction in error\n(above the overall mean predictor)")
+  xlab("out-of-sample reduction in error")
 
 ##########################
