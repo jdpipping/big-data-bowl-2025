@@ -132,12 +132,12 @@ BallSnap_Multiples <- BallSnap_Events %>%
   summarize(n = n()) %>% arrange(desc(n))
 # If any have less than 23, get rid of those (10 men on the field leads to iffy data)
 BallSnap_All22_OnField <- BallSnap_Multiples %>% filter(n == 23)
-tracking_combined <- merge(x = tracking_combined, y = BallSnap_All22_OnField,
+tracking_std <- merge(x = tracking_std, y = BallSnap_All22_OnField,
                            by = c("gameId", "playId"))
-tracking_combined <- tracking_combined %>% select(-"n")
+tracking_std <- tracking_std %>% select(-"n")
 
 rm(BallSnap_Events, MultiBallSnap_Plays, BallSnap_Multiples, BallSnap_All22_OnField)
-tracking_combined <- tracking_combined %>% select(-"BallSnap_rank")
+tracking_std <- tracking_std %>% select(-"BallSnap_rank")
 
 # Note that the first frame is typically, but not always, huddle_break_offense
 FirstFrame_NotHuddleBreak <- tracking_std %>% filter(frameId == 1 & !event %in% "huddle_break_offense")
@@ -331,12 +331,13 @@ tracking_std <- tracking_std %>%
 # View(tracking_std %>% filter(is.na(LineSet_OnFullPlay))) - it's empty
 table(tracking_std$LineSet_OnFullPlay)
 
-# Account for plays that could have multiple of these events ... we want to keep only the most recent
+# For any play w/ multiple "line_set" events, get rid of any frames before the most recent such event
 LineSet_DF <- tracking_std %>%
   filter(event %in% "line_set") %>%
   select(gameId, playId, nflId, displayName, frameId) %>%
   rename(FrameNumber_LineSet = frameId)
 
+# Account for plays that could have multiple of these events ... we want to keep only the most recent
 LineSet_DF <- LineSet_DF %>%
   group_by(gameId, playId, nflId, displayName) %>%
   mutate(Frame_Rank = rank(-FrameNumber_LineSet, ties.method = "first")) %>%
@@ -359,18 +360,19 @@ tracking_std <- tracking_std %>% group_by(gameId, playId, nflId) %>%
   mutate(Unnecessary_Early = ifelse(!is.na(FrameNumber_LineSet) & frameId < FrameNumber_LineSet & LineSet_OnFullPlay > 1, TRUE, FALSE)) %>% 
   ungroup()
 
-# This time, don't get rid of the frames before the final line_set (at least not yet)
-# Just change the event to NA if it's Unnecessary_Early and the event currently is "line_set"
-# If needed, it will be easy to get rid of all frames before line_set though, using above format for huddles
-tracking_std <- tracking_std %>% 
-  mutate(event = ifelse(Unnecessary_Early == TRUE & !is.na(event) & event %in% "line_set", NA, event))
+tracking_std <- tracking_std %>% filter(Unnecessary_Early == FALSE | is.na(Unnecessary_Early))
 rm(LineSet_DF)
 tracking_std <- tracking_std %>% select(-c("Unnecessary_Early", "FrameNumber_LineSet"))
 
-# Also see what the plays look like with none: View(tracking_std %>% filter(LineSet_OnFullPlay == 0))
+# Here's what the plays look like with no line_set: View(tracking_std %>% filter(LineSet_OnFullPlay == 0))
 # Typically it's just huddle start or huddle break, then ball snap, maybe w/ motion in between
 
-Tracking_PlaysWithLineSet <- tracking_std %>% filter(LineSet_OnFullPlay == 1)
+# Now get rid of all plays with no line_set
+tracking_std <- tracking_std %>% filter(LineSet_OnFullPlay == 1)
+tracking_std <- tracking_std %>% select(-"LineSet_OnFullPlay")
+
+# Remove these unless there's a reason we need them
+rm(Tracking_PlaysWithHuddleBreak, Tracking_PlaysWithHuddleStart, Tracking_PlaysWithHuddle_StartOrBreak)
 
 # Then use rank() to retroactively fix frameId for all plays (i.e. make them start at 1)
 # This might not even really be necessary, but here's how to do it
