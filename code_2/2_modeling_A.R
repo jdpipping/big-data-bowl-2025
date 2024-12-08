@@ -138,6 +138,17 @@ fit_model_minSafetyDistToCenter <- function(df_tracking) {
 # temp = fit_model_minSafetyDistToCenter(df_tracking_presnap)
 # temp
 
+# multivariable baseline model
+fit_model_best_baseline <- function(df_tracking) {
+  df_plays = df_tracking %>% distinct(gameId,playId,mofo_postsnap,
+    minSafetyDistToCenter,defensiveTeam,num_safeties) 
+  df_plays
+  glm(mofo_postsnap ~ minSafetyDistToCenter + defensiveTeam:factor(num_safeties), data = df_plays, family = "binomial")
+}
+# # example
+# temp = fit_model_best_baseline(df_tracking_presnap)
+# temp
+
 #################################################
 ### DATAFRAME FOR MODELING WITH TRACKING DATA ###
 #################################################
@@ -221,6 +232,7 @@ for (fold in 1:NUM_FOLDS) {
   fit_defteam = fit_model_defteam(df_train)
   fit_defTeamNumSafeties = fit_model_defTeamNumSafeties(df_train)
   fit_minSafetyDistToCenter = fit_model_minSafetyDistToCenter(df_train)
+  fit_best_baseline = fit_model_best_baseline(df_train)
   
   # predictions
   #FIXME
@@ -233,6 +245,7 @@ for (fold in 1:NUM_FOLDS) {
       pred_defteam = predict(fit_defteam, ., type = "response"),
       pred_defTeamNumSafeties = predict(fit_defTeamNumSafeties, ., type = "response"),
       pred_minSafetyDistToCenter = predict(fit_minSafetyDistToCenter, ., type = "response"),
+      pred_best_baseline = predict(fit_best_baseline, ., type = "response"),
     ) %>%
     select(gameId, playId, mofo_postsnap, all_of(starts_with("pred"))) %>%
     distinct()
@@ -299,4 +312,4 @@ df_losses %>%
   ylab("model") +
   xlab("out-of-sample reduction in error\n(above the overall mean predictor)")
 
-
+##########################
