@@ -118,6 +118,16 @@ fit_model_defteam <- function(df_tracking) {
 # temp = fit_model_defteam(df_tracking_presnap)
 # temp
 
+# estimate MOFO probability given just the defensive team
+fit_model_offteam <- function(df_tracking) {
+  df_plays = df_tracking %>% distinct(gameId,playId,possessionTeam,mofo_postsnap) 
+  df_plays
+  glm(mofo_postsnap ~ possessionTeam, data = df_plays, family = "binomial")
+}
+# # example
+# temp = fit_model_offteam(df_tracking_presnap)
+# temp
+
 # estimate MOFO probability given just the defensive team and number of safeties
 fit_model_defTeamNumSafeties <- function(df_tracking) {
   df_plays = df_tracking %>% distinct(gameId,playId,defensiveTeam,num_safeties,mofo_postsnap) 
@@ -126,6 +136,16 @@ fit_model_defTeamNumSafeties <- function(df_tracking) {
 }
 # # example
 # temp = fit_model_defTeamNumSafeties(df_tracking_presnap)
+# temp
+
+# estimate MOFO probability given just the defensive team and number of safeties
+fit_model_defTeamNumSafetiesOffTeam <- function(df_tracking) {
+  df_plays = df_tracking %>% distinct(gameId,playId,possessionTeam,defensiveTeam,num_safeties,mofo_postsnap) 
+  df_plays
+  glm(mofo_postsnap ~ defensiveTeam:factor(num_safeties) + possessionTeam, data = df_plays, family = "binomial")
+}
+# # example
+# temp = fit_model_defTeamNumSafetiesOffTeam(df_tracking_presnap)
 # temp
 
 # min distance to center of field
@@ -141,9 +161,12 @@ fit_model_minSafetyDistToCenter <- function(df_tracking) {
 # multivariable baseline model
 fit_model_best_baseline <- function(df_tracking) {
   df_plays = df_tracking %>% distinct(gameId,playId,mofo_postsnap,
+                                      possessionTeam,
     minSafetyDistToCenter,defensiveTeam,num_safeties) 
   df_plays
-  glm(mofo_postsnap ~ minSafetyDistToCenter + defensiveTeam:factor(num_safeties), data = df_plays, family = "binomial")
+  glm(mofo_postsnap ~ minSafetyDistToCenter + defensiveTeam:factor(num_safeties) + possessionTeam,
+      data = df_plays, family = "binomial")
+  # glm(mofo_postsnap ~ minSafetyDistToCenter + defensiveTeam:factor(num_safeties), data = df_plays, family = "binomial")
 }
 # # example
 # temp = fit_model_best_baseline(df_tracking_presnap)
@@ -230,7 +253,9 @@ for (fold in 1:NUM_FOLDS) {
   fit_overallMean = fit_model_overallMean(df_train)
   fit_numSafeties = fit_model_numSafeties(df_train)
   fit_defteam = fit_model_defteam(df_train)
+  fit_offteam = fit_model_offteam(df_train)
   fit_defTeamNumSafeties = fit_model_defTeamNumSafeties(df_train)
+  fit_defTeamNumSafetiesOffTeam = fit_model_defTeamNumSafetiesOffTeam(df_train)
   fit_minSafetyDistToCenter = fit_model_minSafetyDistToCenter(df_train)
   fit_best_baseline = fit_model_best_baseline(df_train)
   
@@ -243,7 +268,9 @@ for (fold in 1:NUM_FOLDS) {
       pred_overallMean = predict(fit_overallMean, ., type = "response"),
       pred_numSafeties = predict(fit_numSafeties, ., type = "response"),
       pred_defteam = predict(fit_defteam, ., type = "response"),
+      pred_offteam = predict(fit_offteam, ., type = "response"),
       pred_defTeamNumSafeties = predict(fit_defTeamNumSafeties, ., type = "response"),
+      pred_defTeamNumSafetiesOffTeam = predict(fit_defTeamNumSafetiesOffTeam, ., type = "response"),
       pred_minSafetyDistToCenter = predict(fit_minSafetyDistToCenter, ., type = "response"),
       pred_best_baseline = predict(fit_best_baseline, ., type = "response"),
     ) %>%

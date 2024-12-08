@@ -90,6 +90,8 @@ play_info = games |>
     # mofo
     mofo = case_when(pff_passCoverage %in% mofo ~ T,
                      pff_passCoverage %in% mofc ~ F),
+    # WP
+    winProbability = ifelse(homeTeamAbbr == possessionTeam, preSnapHomeTeamWinProbability, preSnapVisitorTeamWinProbability),
     # number of receivers on play
     num_receivers = as.numeric(gsub('x', '', receiverAlignment)) %% 10 + floor(as.numeric(gsub('x', '', receiverAlignment)) / 10),
     # pre-play score differential (w.r.t. offense)
@@ -264,7 +266,7 @@ for (week in WEEKS) {
   df_tracking_4 = 
     play_info |> 
     # select relevant columns (can change)
-    select(gameId, playId, defensiveTeam, mofo) |>
+    select(gameId, playId, defensiveTeam, possessionTeam, expectedPoints, winProbability, mofo) |>
     # remove plays where mofo is NA
     filter(!is.na(mofo)) |>
     # keep only the plays that have 1 or 2 safeties and aren't run plays
@@ -324,6 +326,10 @@ for (week in WEEKS) {
   df_w = read_csv(filename, show_col_types = F)
   df_tracking_A = bind_rows(df_tracking_A, df_w)
 }
+# delete the intermediate files - DANGEROUS 
+filenames_to_delete = sapply(WEEKS, FUN = get_filename)
+filenames_to_delete
+unlink(filenames_to_delete) 
 
 # check
 object.size(df_tracking_A) / 10**9
