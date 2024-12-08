@@ -300,9 +300,8 @@ df_losses %>%
   ggplot(aes(y = reorder(model, mean_logloss), x = p1)) +
   geom_vline(xintercept = 1/2, color="gray60", linetype="dashed", linewidth=0.5) +
   geom_boxplot() +
-  xlab("p = exp(-logloss)\non average, predict the correct outcome with prob. p") +
-  # on average, you attributed to the right class the probability 𝑝≈0.61 across samples.
-  # xlab("p=P(MOFO|x) that produces the given out-of-sample logloss\nwhen MOFO is observed") +
+  xlab("p = exp(-logloss)") +
+  labs(caption = "the predictor has the same predictive power (logloss), over average,\nas always predicting the correct outcome with prob. p") +
   ylab("model")
 
 df_losses %>%
