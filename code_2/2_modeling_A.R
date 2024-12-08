@@ -301,7 +301,7 @@ df_losses %>%
   geom_vline(xintercept = 1/2, color="gray60", linetype="dashed", linewidth=0.5) +
   geom_boxplot() +
   xlab("p = exp(-logloss)") +
-  labs(caption = "the predictor has the same predictive power (logloss), over average,\nas always predicting the correct outcome with prob. p") +
+  labs(caption = "the predictor has the same predictive power (out-of-sample logloss),\n over average, as always predicting the correct outcome with prob. p") +
   ylab("model")
 
 df_losses %>%
