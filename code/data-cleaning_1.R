@@ -364,6 +364,25 @@ tracking_std <- tracking_std %>% filter(Unnecessary_Early == FALSE | is.na(Unnec
 rm(LineSet_DF)
 tracking_std <- tracking_std %>% select(-c("Unnecessary_Early", "FrameNumber_LineSet"))
 
+# And now do the same thing for all plays, i.e. NOT just the ones with multiple line_set events
+# Get rid of any frames that came before the line_set event, IF THE PLAY HAD ONE
+LineSet_DF <- tracking_std %>%
+  filter(event %in% c("line_set")) %>%
+  select(gameId, playId, nflId, displayName, frameId) %>%
+  rename(FrameNumber_LineSet = frameId)
+
+tracking_std <- merge(x = tracking_std, y = LineSet_DF, 
+                           by = c("playId", "gameId", "nflId", "displayName"), all.x = TRUE)
+tracking_std <- tracking_std %>% arrange(gameId, playId, nflId, frameId)
+
+tracking_std <- tracking_std %>% group_by(gameId, playId, nflId) %>% 
+  mutate(Unnecessary_Early = ifelse(!is.na(FrameNumber_LineSet) & frameId < FrameNumber_LineSet, TRUE, FALSE)) %>% 
+  ungroup()
+
+tracking_std <- tracking_std %>% filter(Unnecessary_Early == FALSE | is.na(Unnecessary_Early))
+rm(LineSet_DF)
+tracking_std <- tracking_std %>% select(-c("Unnecessary_Early", "FrameNumber_LineSet"))
+
 # Here's what the plays look like with no line_set: View(tracking_std %>% filter(LineSet_OnFullPlay == 0))
 # Typically it's just huddle start or huddle break, then ball snap, maybe w/ motion in between
 
