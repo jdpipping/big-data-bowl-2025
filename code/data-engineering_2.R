@@ -88,6 +88,49 @@ los = tracking |>
   # drop unneded columns
   select(-displayName, -frameType)
 
+# Also mutate variables for the #1 receivers for the offense (i.e. the furthest outside) at the time of snap, using MergedData (defined in data cleaning file)
+# Recall that Y_NetDistFromBall_Rank_BySide exists already, so whoever ranks 1 and 11 there are the closest to sideline
+# And we established that going to offense's left is always positive Y, but the rank goes by SMALLEST distance
+# In other words, the person with rank 1 (on offense) is the RIGHT WR, b/c that'll have the smallest/most negative distance
+# Whereas if we were using Y_AbsDistFromBall_Rank_BySide, then the person with rank 1 would be closest to the ball, i.e. the center
+# Likewise, on defense, the person with rank 1 would be the defense's left CB (i.e. offense's right)
+LeftMost_Receivers <- MergedData %>% 
+  filter(PlayerSideOfBall == "offense", Y_NetDistFromBall_Rank_BySide == 11, event %in% c("ball_snap", "snap_direct")) 
+LeftMost_Receivers <- LeftMost_Receivers %>% select("gameId", "playId", "nflId", "displayName", "x", "y")
+LeftMost_Receivers <- LeftMost_Receivers %>% rename(LeftMost_Receiver_ID = `nflId`,
+                                                    LeftMost_Receiver_Name = `displayName`,
+                                                    LeftMost_Receiver_X_AtSnap = `x`, LeftMost_Receiver_Y_AtSnap = 'y')
+MergedData <- MergedData %>% left_join(LeftMost_Receivers, by = c("gameId", "playId"))
+
+RightMost_Receivers <- MergedData %>% 
+  filter(PlayerSideOfBall == "offense", Y_NetDistFromBall_Rank_BySide == 1, event %in% c("ball_snap", "snap_direct")) 
+RightMost_Receivers <- RightMost_Receivers %>% select("gameId", "playId", "nflId", "displayName", "x", "y")
+RightMost_Receivers <- RightMost_Receivers %>% rename(RightMost_Receiver_ID = `nflId`,
+                                                      RightMost_Receiver_Name = `displayName`,
+                                                      RightMost_Receiver_X_AtSnap = `x`, RightMost_Receiver_Y_AtSnap = 'y')
+MergedData <- MergedData %>% left_join(RightMost_Receivers, by = c("gameId", "playId"))
+
+LeftMost_Defenders <- MergedData %>% 
+  filter(PlayerSideOfBall == "defense", Y_NetDistFromBall_Rank_BySide == 1, event %in% c("ball_snap", "snap_direct")) 
+LeftMost_Defenders <- LeftMost_Defenders %>% select("gameId", "playId", "nflId", "displayName", "x", "y")
+LeftMost_Defenders <- LeftMost_Defenders %>% rename(LeftMost_Defender_ID = `nflId`,
+                                                    LeftMost_Defender_Name = `displayName`,
+                                                    LeftMost_Defender_X_AtSnap = `x`, LeftMost_Defender_Y_AtSnap = 'y')
+MergedData <- MergedData %>% left_join(LeftMost_Defenders, by = c("gameId", "playId"))
+
+RightMost_Defenders <- MergedData %>% 
+  filter(PlayerSideOfBall == "defense", Y_NetDistFromBall_Rank_BySide == 11, event %in% c("ball_snap", "snap_direct")) 
+RightMost_Defenders <- RightMost_Defenders %>% select("gameId", "playId", "nflId", "displayName", "x", "y")
+RightMost_Defenders <- RightMost_Defenders %>% rename(RightMost_Defender_ID = `nflId`,
+                                                      RightMost_Defender_Name = `displayName`,
+                                                      RightMost_Defender_X_AtSnap = `x`, RightMost_Defender_Y_AtSnap = 'y')
+MergedData <- MergedData %>% left_join(RightMost_Defenders, by = c("gameId", "playId"))
+
+setDT(MergedData)
+setkey(MergedData, gameId, playId, nflId, frameId)
+MergedData <- MergedData %>% relocate("gameId", "playId", "nflId", "displayName", "frameId")
+rm(LeftMost_Receivers, RightMost_Receivers, LeftMost_Defenders, RightMost_Defenders)
+
 # pre-snap safety
 pre_snap_safety = tracking %>% 
   # filter so that we only have frames before snap
@@ -180,7 +223,7 @@ table(DesignedRuns_Merged$pff_defensiveCoverageAssignment)
 # They typically are NAs, with some exceptions on RPOs that are handed off
 rm(DesignedRuns_Merged)
 
-# Repeat the process with post-snap safeties
+# Repeat the safety diagnosing process with post-snap safeties
 post_snap_safety <- player_play %>% 
   filter(frameType == 'AFTER_SNAP') %>%
   # group by game, play, player
@@ -208,49 +251,6 @@ safety_ids_post_snap = post_snap_safety %>%
   mutate(safety_id = row_number()) %>%
   # pivot to wide
   pivot_wider(names_from = safety_id, values_from = nflId, names_prefix = 'post_snap_safety_')
-
-# Also mutate variables for the #1 receivers for the offense (i.e. the furthest outside) at the time of snap ... or line set?
-# Recall that Y_NetDistFromBall_Rank_BySide exists already, so whoever ranks 1 and 11 there are the closest to sideline
-# And we established that going to offense's left is always positive Y, but the rank goes by SMALLEST distance
-# In other words, the person with rank 1 (on offense) is the RIGHT WR, b/c that'll have the smallest/most negative distance
-# Whereas if we were using Y_AbsDistFromBall_Rank_BySide, then the person with rank 1 would be closest to the ball, i.e. the center
-# Likewise, on defense, the person with rank 1 would be the defense's left CB (i.e. offense's right)
-LeftMost_Receivers <- MergedData %>% 
-  filter(PlayerSideOfBall == "offense", Y_NetDistFromBall_Rank_BySide == 11, event %in% c("ball_snap", "snap_direct")) 
-LeftMost_Receivers <- LeftMost_Receivers %>% select("gameId", "playId", "nflId", "displayName", "x", "y")
-LeftMost_Receivers <- LeftMost_Receivers %>% rename(LeftMost_Receiver_ID = `nflId`,
-                                                    LeftMost_Receiver_Name = `displayName`,
-                                                    LeftMost_Receiver_X_AtSnap = `x`, LeftMost_Receiver_Y_AtSnap = 'y')
-MergedData <- MergedData %>% left_join(LeftMost_Receivers, by = c("gameId", "playId"))
-
-RightMost_Receivers <- MergedData %>% 
-  filter(PlayerSideOfBall == "offense", Y_NetDistFromBall_Rank_BySide == 1, event %in% c("ball_snap", "snap_direct")) 
-RightMost_Receivers <- RightMost_Receivers %>% select("gameId", "playId", "nflId", "displayName", "x", "y")
-RightMost_Receivers <- RightMost_Receivers %>% rename(RightMost_Receiver_ID = `nflId`,
-                                                      RightMost_Receiver_Name = `displayName`,
-                                                      RightMost_Receiver_X_AtSnap = `x`, RightMost_Receiver_Y_AtSnap = 'y')
-MergedData <- MergedData %>% left_join(RightMost_Receivers, by = c("gameId", "playId"))
-
-LeftMost_Defenders <- MergedData %>% 
-  filter(PlayerSideOfBall == "defense", Y_NetDistFromBall_Rank_BySide == 1, event %in% c("ball_snap", "snap_direct")) 
-LeftMost_Defenders <- LeftMost_Defenders %>% select("gameId", "playId", "nflId", "displayName", "x", "y")
-LeftMost_Defenders <- LeftMost_Defenders %>% rename(LeftMost_Defender_ID = `nflId`,
-                                                    LeftMost_Defender_Name = `displayName`,
-                                                    LeftMost_Defender_X_AtSnap = `x`, LeftMost_Defender_Y_AtSnap = 'y')
-MergedData <- MergedData %>% left_join(LeftMost_Defenders, by = c("gameId", "playId"))
-
-RightMost_Defenders <- MergedData %>% 
-  filter(PlayerSideOfBall == "defense", Y_NetDistFromBall_Rank_BySide == 11, event %in% c("ball_snap", "snap_direct")) 
-RightMost_Defenders <- RightMost_Defenders %>% select("gameId", "playId", "nflId", "displayName", "x", "y")
-RightMost_Defenders <- RightMost_Defenders %>% rename(RightMost_Defender_ID = `nflId`,
-                                                      RightMost_Defender_Name = `displayName`,
-                                                      RightMost_Defender_X_AtSnap = `x`, RightMost_Defender_Y_AtSnap = 'y')
-MergedData <- MergedData %>% left_join(RightMost_Defenders, by = c("gameId", "playId"))
-
-setDT(MergedData)
-setkey(MergedData, gameId, playId, nflId, frameId)
-MergedData <- MergedData %>% relocate("gameId", "playId", "nflId", "displayName", "frameId")
-rm(LeftMost_Receivers, RightMost_Receivers, LeftMost_Defenders, RightMost_Defenders)
 
 # merge to create v1, which is a frame-by-frame data set rather than play-by-play
 v1 = play_info |> 
