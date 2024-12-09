@@ -206,12 +206,12 @@ rm(QB_Multiples)
 # Now, create a variable for whether a player had safety responsibilities on the play
 # Even if that person wasn't aligned as a safety before the snap
 # Do it for both MergedData (from data-cleaning file) and for player_play CSV directly
-MergedData <- MergedData %>% mutate(post_snap_safety =
+MergedData <- MergedData %>% mutate(is_post_snap_safety =
                                       ifelse(!is.na(pff_defensiveCoverageAssignment) & pff_defensiveCoverageAssignment %in% c("2R", "2L", "3M", "4IL", "4IR", "DF", "PRE"), TRUE,
                                              ifelse(!is.na(pff_defensiveCoverageAssignment) & !pff_defensiveCoverageAssignment %in% c("2R", "2L", "3M", "4IL", "4IR", "DF", "PRE"), FALSE, 
                                                     ifelse(is.na(pff_defensiveCoverageAssignment) & PlayerSideOfBall %in% "defense", FALSE, NA))))
 
-player_play <- player_play %>% mutate(post_snap_safety =
+player_play <- player_play %>% mutate(is_post_snap_safety =
                                         ifelse(!is.na(pff_defensiveCoverageAssignment) & pff_defensiveCoverageAssignment %in% c("2R", "2L", "3M", "4IL", "4IR", "DF", "PRE"), TRUE,
                                                ifelse(!is.na(pff_defensiveCoverageAssignment) & !pff_defensiveCoverageAssignment %in% c("2R", "2L", "3M", "4IL", "4IR", "DF", "PRE"), FALSE, 
                                                       ifelse(is.na(pff_defensiveCoverageAssignment) & PlayerSideOfBall %in% "defense", FALSE, NA))))
@@ -228,8 +228,8 @@ post_snap_safety <- player_play %>%
   filter(frameType == 'AFTER_SNAP') %>%
   # group by game, play, player
   group_by(gameId, playId, nflId) %>% 
-  # use the previously established definition of post_snap_safety (i.e. based on coverage responsibility)
-  summarize(safety = any(post_snap_safety, na.rm = TRUE)) %>% 
+  # use the previously established definition of is_post_snap_safety (i.e. based on coverage responsibility)
+  summarize(safety = any(is_post_snap_safety, na.rm = TRUE)) %>% 
   # ungroup players
   ungroup(nflId) %>% 
   # count number of safeties
