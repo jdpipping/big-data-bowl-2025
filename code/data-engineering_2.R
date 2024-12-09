@@ -131,39 +131,70 @@ setkey(MergedData, gameId, playId, nflId, frameId)
 MergedData <- MergedData %>% relocate("gameId", "playId", "nflId", "displayName", "frameId")
 rm(LeftMost_Receivers, RightMost_Receivers, LeftMost_Defenders, RightMost_Defenders)
 
-# pre-snap safety
-pre_snap_safety = tracking %>% 
-  # filter so that we only have frames before snap
-  filter(frameType != 'AFTER_SNAP') %>% 
-  # join with line of scrimmage
-  left_join(los, by = c('gameId', 'playId')) %>% 
-  # indicator for beyond 10 yards deep
-  mutate(beyond_10 = if_else(x >= los + 10, T, F)) %>% 
+# Here is code for determining a pre-snap safety, using previously defined MergedData table
+# Recall that we've already eliminated all frames before the "line_set" event of each play
+pre_snap_safety <- MergedData %>% filter(frameType != 'AFTER_SNAP') %>%
+  # indicator for whether the player was a pre-snap safety, based on location
+  mutate(safety_location = if_else(x >= Ball_X_Snap + 8 & PlayerSideOfBall == "defense" & displayName != RightMost_Defender_Name & displayName != LeftMost_Defender_Name, TRUE, FALSE)) %>% 
   # group by game, play, player
   group_by(gameId, playId, nflId) %>% 
-  # define pre-snap safety
-  summarise(safety = any(beyond_10, na.rm = T)) %>% 
+  # define pre-snap safeties
+  summarize(is_pre_snap_safety = any(safety_location, na.rm = TRUE)) %>% 
   # ungroup players
   ungroup(nflId) %>% 
   # count number of safeties
-  mutate(num_safeties_pre_snap = sum(safety)) %>% 
+  mutate(num_safeties_pre_snap = sum(is_pre_snap_safety)) %>% 
   # ungroup all columns
   ungroup()
 
-# ids of pre-snap safeties on each play
+# Get the ids of pre-snap safeties on each play
 safety_ids_pre_snap = pre_snap_safety %>% 
   # filter out non-safeties
-  filter(safety) %>% 
-  # drop safety column
-  select(-safety) %>%
+  filter(is_pre_snap_safety == TRUE) %>% 
+  # drop is_pre_snap_safety column (will be accounted for later)
+  select(-is_pre_snap_safety) %>%
   # group by game and play
   group_by(gameId, playId) %>% 
   # sort by nfl id
   arrange(nflId) %>% 
   # define safety id's
-  mutate(safety_id = row_number()) %>%
+  mutate(pre_snap_safety_id = row_number()) %>%
   # pivot to wide
-  pivot_wider(names_from = safety_id, values_from = nflId, names_prefix = 'pre_snap_safety_')
+  pivot_wider(names_from = pre_snap_safety_id, values_from = nflId, names_prefix = 'pre_snap_safety_')
+
+# Now join each of those two DFs into MergedData, to help us ID which individual players were pre-snap safeties
+pre_snap_safety <- pre_snap_safety %>% select(-"num_safeties_pre_snap")
+MergedData <- MergedData %>% left_join(pre_snap_safety, by = c("gameId", "playId", "nflId"))
+# MergedData <- MergedData %>% arrange(gameId, playId, nflId, frameId)
+setDT(MergedData)
+setkey(MergedData, gameId, playId, nflId, frameId)
+MergedData <- MergedData %>% relocate("gameId", "playId", "nflId", "displayName", "frameId")
+
+MergedData <- MergedData %>% left_join(safety_ids_pre_snap, by = c("gameId", "playId"))
+# MergedData <- MergedData %>% arrange(gameId, playId, nflId, frameId)
+setDT(MergedData)
+setkey(MergedData, gameId, playId, nflId, frameId)
+MergedData <- MergedData %>% relocate("gameId", "playId", "nflId", "displayName", "frameId")
+
+# To briefly check data, see the maximum number of pre-snap safeties using this method
+# View(MergedData %>% filter(frameId == 1) %>% arrange(desc(num_safeties_pre_snap)))
+# Example of play that has a lot of pre-snap safeties show up: View(MergedData %>% filter(gameId == 2022091105, playId == 4308))
+# 3rd-and-22, makes sense 
+
+# More thorough safety quality check
+df_safety_quality_check <- MergedData %>%
+  filter(position %in% c("SS","FS") | is_pre_snap_safety) %>%
+  distinct(gameId, playId, nflId, displayName, position, is_pre_snap_safety)
+# View(df_safety_quality_check)
+# examine the players we assigned to pre-snap-safety who aren't officially safeties
+table(
+  (df_safety_quality_check %>% filter(is_pre_snap_safety))$position
+)
+# examine the official safeties who we did not assign to pre-snap-safety
+table(
+  (df_safety_quality_check %>% filter(position %in% c("SS","FS")))$is_pre_snap_safety
+)
+rm(df_safety_quality_check)
 
 # increase max vector size to 64 GB
 mem.maxVSize(vsize = 49152 * 1.5)
@@ -224,11 +255,10 @@ table(DesignedRuns_Merged$pff_defensiveCoverageAssignment)
 rm(DesignedRuns_Merged)
 
 # Repeat the safety diagnosing process with post-snap safeties
-post_snap_safety <- player_play %>% 
-  filter(frameType == 'AFTER_SNAP') %>%
+post_snap_safety <- MergedData %>% filter(frameType == 'AFTER_SNAP') %>%
   # group by game, play, player
   group_by(gameId, playId, nflId) %>% 
-  # use the previously established definition of is_post_snap_safety (i.e. based on coverage responsibility)
+  # use the previously established definition of post_snap_safety (i.e. based on coverage responsibility)
   summarize(safety = any(is_post_snap_safety, na.rm = TRUE)) %>% 
   # ungroup players
   ungroup(nflId) %>% 
@@ -241,21 +271,33 @@ post_snap_safety <- player_play %>%
 safety_ids_post_snap = post_snap_safety %>% 
   # filter out non-safeties
   filter(safety == TRUE) %>% 
-  # drop safety column
+  # drop safety column, b/c bigger data set already has is_post_snap_safety_column
   select(-"safety") %>%
   # group by game and play
   group_by(gameId, playId) %>% 
   # sort by nfl id
   arrange(nflId) %>% 
   # define safety id's
-  mutate(safety_id = row_number()) %>%
+  mutate(post_snap_safety_id = row_number()) %>%
   # pivot to wide
-  pivot_wider(names_from = safety_id, values_from = nflId, names_prefix = 'post_snap_safety_')
+  pivot_wider(names_from = post_snap_safety_id, values_from = nflId, names_prefix = 'post_snap_safety_')
+
+# Now add that info to MergedData
+MergedData <- MergedData %>% left_join(safety_ids_post_snap, by = c("gameId", "playId"))
+# MergedData <- MergedData %>% arrange(gameId, playId, nflId, frameId)
+setDT(MergedData)
+setkey(MergedData, gameId, playId, nflId, frameId)
+MergedData <- MergedData %>% relocate("gameId", "playId", "nflId", "displayName", "frameId")
+
+# Check to make sure we have FALSE values ... any defensive players who aren't safeties should have FALSE
+# But any offensive players should have NA
+table(MergedData$is_pre_snap_safety)
+table(MergedData$is_post_snap_safety)
+MergedData <- MergedData %>% mutate(is_pre_snap_safety = ifelse(PlayerSideOfBall == "offense", NA, is_pre_snap_safety))
+MergedData <- MergedData %>% mutate(is_post_snap_safety = ifelse(PlayerSideOfBall == "offense", NA, is_post_snap_safety))
 
 # merge to create v1, which is a frame-by-frame data set rather than play-by-play
-v1 = play_info |> 
-  # join tracking
-  left_join(tracking, by = c('gameId', 'playId')) |> 
+v1 = MergedData|> 
   # join qb ids
   left_join(qb_ids_plays, by = c('gameId', 'playId')) |>
   # join pre-snap safety ids
