@@ -1,0 +1,24 @@
+setwd("C:/Users/justi/OneDrive/Penn/BDB(2025)")
+library(tidyverse)
+
+modeling_df <- data.table::fread('df_tracking_A.csv')
+
+wagner <- modeling_df %>%
+  filter(gameId==2022090800 &
+           playId==692 &
+           displayName=='Bobby Wagner')
+
+#plotting Bobby Wagner's movements on this play
+plotly::ggplotly(wagner %>%
+  ggplot(aes(x = x,
+             y = y,
+             color = as.factor(t_after_snap))) +
+  geom_point())
+
+#set frame length to be however many seconds we want to project forward
+frame_length <- 1 # seconds forward
+wagner <- wagner %>%
+  mutate(x_vel_component = (s*frame_length*cos((90-dir)*pi/180)),
+         y_vel_component = (s*frame_length*sin((90-dir*pi)/180)),
+         x_acc_component = (a*frame_length*cos((90-dir)*pi/180)),
+         y_acc_component = (a*frame_length*sin((90-dir*pi)/180)))
