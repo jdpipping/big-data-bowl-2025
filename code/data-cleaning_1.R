@@ -540,12 +540,11 @@ plays <- plays %>%
 class(plays$aligned_left_receivers) <- "numeric"
 class(plays$aligned_right_receivers) <- "numeric"
 plays <- plays %>% mutate(aligned_total_receivers = aligned_left_receivers + aligned_right_receivers)
-plays <- plays %>% select(1:17, "aligned_left_receivers", "aligned_right_receivers", "aligned_total_receivers", 18:48)
+plays <- plays %>% relocate(aligned_left_receivers, aligned_right_receivers, aligned_total_receivers, .after = offenseFormation)
 
 # For the sake of simplicity, let's get rid of weird plays with more than 5
 # View(plays %>% filter(receiverAlignment %in% "4x2")) ... direct snap to RB can make numbers show up
 plays <- plays %>% filter(aligned_total_receivers <= 5)
-
 
 # These are all empty
 # View(plays %>% filter(is.na(playNullifiedByPenalty)))
