@@ -135,7 +135,7 @@ rm(LeftMost_Receivers, RightMost_Receivers, LeftMost_Defenders, RightMost_Defend
 # Recall that we've already eliminated all frames before the "line_set" event of each play
 pre_snap_safety <- MergedData %>% filter(frameType != 'AFTER_SNAP') %>%
   # indicator for whether the player was a pre-snap safety, based on location
-  mutate(safety_location = if_else(x >= Ball_X_Snap + 8 & PlayerSideOfBall == "defense" & displayName != RightMost_Defender_Name & displayName != LeftMost_Defender_Name, TRUE, FALSE)) %>% 
+  mutate(safety_location = if_else(x >= Ball_X_Snap + 8.5 & PlayerSideOfBall == "defense" & displayName != RightMost_Defender_Name & displayName != LeftMost_Defender_Name, TRUE, FALSE)) %>% 
   # group by game, play, player
   group_by(gameId, playId, nflId) %>% 
   # define pre-snap safeties
