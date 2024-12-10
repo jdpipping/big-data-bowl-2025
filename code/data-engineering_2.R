@@ -187,7 +187,7 @@ MergedData <- MergedData %>% relocate("gameId", "playId", "nflId", "displayName"
 # On that one, it says ball_x at the snap was roughly 94.4, but film shows ball was at the +12, should've been around 98 in tracking data
 # Even some offensive players have higher "x" than ball at the snap: View(tracking_week_1 %>% filter(gameId == 2022091101, playId == 3125, frameType == "SNAP"))
 # Similar situation here, some of offense has lower "x" value than ball even though they shouldn't: View(MergedData %>% filter(gameId == 2022091101, playId == 1744, is_pre_snap_safety == TRUE, frameType != "AFTER_SNAP"))
-# View(tracking_week_1 %>% filter(gameId == 2022091101, playId == 1744, frameType == "SNAP"))
+# View(tracking_week_1 %>% filter(gameId == 2022091101, playId == 1744, frameType == "SNAP")) ... ball_x is around 65, should be around 62
 
 # More thorough safety quality check
 df_safety_quality_check <- MergedData %>%
