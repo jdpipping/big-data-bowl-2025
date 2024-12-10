@@ -53,3 +53,6 @@ rsconnect/
 *.csv
 
 *.DS_Store
+
+# do not ignore these select files
+!code_2/results_df_preds_outOfSample.csv

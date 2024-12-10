@@ -436,18 +436,54 @@ fit_movement_NN <- function(df_train, num_safeties, val_split=0) {
   
   # model
   model <- keras_model_sequential()
-  # Add layers to the model
+  # Add layers to the model. Make sure h is a power of 2.
   if (num_safeties == 1) {
     h = 32
   } else if (num_safeties == 2) {
     h = 64
   }
-  
+
   model %>%
     layer_dense(units = h, activation = 'silu', input_shape = ncol(X_train)) %>%
     layer_dense(units = 1, activation = 'sigmoid')
   model
   
+  {
+    # Using a neural network with 1 dense hidden layer of size 64 and a sigmoid output layer 
+    # can make sense depending on the complexity of your data and the task at hand. 
+    # Here’s a breakdown:
+    #  • Pros of Using a Single Hidden Layer with 64 Units:
+    #     • Flexible Complexity: A single hidden layer with sufficient units (like 64) 
+    #       is a universal approximator and can model reasonably complex relationships.
+    #     • Reduced Risk of Overfitting (Compared to Larger Models):
+    #       With fewer layers and moderate size, you can limit overfitting, 
+    #       especially if regularization is applied.
+    #  • When This Architecture Makes Sense:
+    #     • Simple Relationships: If the relationship between the input and output
+    #       is straightforward or mildly nonlinear.
+    #     • Small Dataset: If your dataset is relatively small, 
+    #       this compact architecture might perform well without requiring 
+    #       too much data to generalize.
+    
+    # # dropout and regularization did slightly worse:
+    # model %>%
+    #   layer_dense(units = h, activation = "silu", input_shape = ncol(X_train),
+    #               kernel_regularizer = regularizer_l2(0.001)) %>% # L2 regularization
+    #   layer_dropout(rate = 0.3) %>%  # Dropout to reduce overfitting
+    #   layer_dense(units = 1, activation = "sigmoid")  # Output layer for binary classification
+    
+    # # this larger network did slightly worse:
+    # model %>%
+    #   layer_dense(units = h, activation = "silu", input_shape = ncol(X_train),
+    #               kernel_regularizer = regularizer_l2(0.001)) %>%  # First hidden layer
+    #   layer_dropout(rate = 0.3) %>%  # Dropout for regularization
+    #   layer_dense(units = h/2, activation = "silu",
+    #               kernel_regularizer = regularizer_l2(0.001)) %>%  # Second hidden layer
+    #   layer_dropout(rate = 0.3) %>%  # Dropout for regularization
+    #   layer_dense(units = 1, activation = "sigmoid")  # Output layer for binary classification
+  }
+  
+  # train the neural network
   model %>% compile(optimizer = 'adam', loss = 'binary_crossentropy')
   set.seed(529735)
   tensorflow::tf$random$set_seed(711883)
@@ -671,7 +707,7 @@ plot_results_logloss =
   geom_boxplot() +
   xlab("out-of-sample logloss") +
   ylab("model")
-ggsave("plot_results_logloss.png", width=12, height=4)
+ggsave("results_plot_logloss.png", width=12, height=4)
 
 plot_results_RIE = 
   df_losses %>%
@@ -680,7 +716,7 @@ plot_results_RIE =
   scale_x_continuous(labels = scales::percent) +
   ylab("model") +
   xlab("out-of-sample reduction in error")
-ggsave("plot_results_RIE.png", width=12, height=4)
+ggsave("results_plot_RIE.png", width=12, height=4)
 
 plot_results_logloss_pScale = 
   df_losses %>%
@@ -691,6 +727,9 @@ plot_results_logloss_pScale =
   xlab("p = exp(-logloss)") +
   labs(caption = "the predictor has the same predictive power (out-of-sample logloss),\n over average, as always predicting the correct outcome with prob. p") +
   ylab("model")
-ggsave("plot_results_logloss_pScale.png", width=12, height=4)
+ggsave("results_plot_logloss_pScale.png", width=12, height=4)
+
+# save out-of-sample predictions for each play
+write_csv(df_preds_outOfSample, "results_df_preds_outOfSample.csv")
 
 ##########################
