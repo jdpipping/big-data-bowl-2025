@@ -308,6 +308,9 @@ MergedData <- MergedData %>% mutate(is_post_snap_safety = ifelse(PlayerSideOfBal
 table((MergedData %>% filter(frameId == 1, position %in% "QB"))$num_safeties_pre_snap)
 table((MergedData %>% filter(frameId == 1, position %in% "QB"))$num_safeties_post_snap)
 
+# Here, limit to plays with <= 2 pre-snap safeties? Getting rid of "3rd-and-forever" situations
+MergedData <- MergedData %>% filter(num_safeties_pre_snap <= 2)
+
 # merge to create v1, which is a frame-by-frame data set rather than play-by-play
 v1 = MergedData|> 
   # join qb ids
