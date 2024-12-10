@@ -730,6 +730,11 @@ rm(BallCarriers_Snap, Frame1_DF)
 # Here's how to filter in a data table
 MergedData <- MergedData[wp >= 0.05 & wp <= 0.95]
 
+# Other possible modifications for this specific project:
+# MergedData <- MergedData[xpass <= 0.95]
+# MergedData <- MergedData[half_seconds_remaining >= 30]
+# MergedData <- MergedData[half_seconds_remaining >= 45 | yardline_100 <= 50]
+
 # Turn weather into a numeric variable using str_extract
 # The given "temp" variable is all NAs
 MergedData <- MergedData %>% 
