@@ -296,6 +296,10 @@ table(MergedData$is_post_snap_safety)
 MergedData <- MergedData %>% mutate(is_pre_snap_safety = ifelse(PlayerSideOfBall == "offense", NA, is_pre_snap_safety))
 MergedData <- MergedData %>% mutate(is_post_snap_safety = ifelse(PlayerSideOfBall == "offense", NA, is_post_snap_safety))
 
+# And here's how to see how many pre-snap/post-snap safeties exist on any given play using these definitions
+table((MergedData %>% filter(frameId == 1, position %in% "QB"))$num_safeties_pre_snap)
+table((MergedData %>% filter(frameId == 1, position %in% "QB"))$num_safeties_post_snap)
+
 # merge to create v1, which is a frame-by-frame data set rather than play-by-play
 v1 = MergedData|> 
   # join qb ids
