@@ -178,8 +178,14 @@ MergedData <- MergedData %>% relocate("gameId", "playId", "nflId", "displayName"
 
 # To briefly check data, see the maximum number of pre-snap safeties using this method
 # View(MergedData %>% filter(frameId == 1) %>% arrange(desc(num_safeties_pre_snap)))
+
+# View(MergedData %>% filter(frameId == 1, num_safeties_pre_snap > 2))
 # Example of play that has a lot of pre-snap safeties show up: View(MergedData %>% filter(gameId == 2022091105, playId == 4308))
 # 3rd-and-22, makes sense 
+# Another: View(MergedData %>% filter(gameId == 2022091100, playId == 1928)) ... this one has 0:15 left in first half
+# But there also instances where tracking data is just faulty, e.g. View(MergedData %>% filter(gameId == 2022091101, playId == 3125, is_pre_snap_safety == TRUE, frameType != "AFTER_SNAP"))
+# On that one, it says ball_x at the snap was roughly 94.4, but film shows ball was at the +12, should've been around 98 in tracking data
+# Even some offensive players have higher "x" than ball at the snap: View(tracking_week_1 %>% filter(gameId == 2022091101, playId == 3125, frameType == "SNAP"))
 
 # More thorough safety quality check
 df_safety_quality_check <- MergedData %>%
