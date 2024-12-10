@@ -51,8 +51,18 @@ rsconnect/
 
 # omit data
 *.csv
+*.rds
 
 *.DS_Store
 
-# do not ignore these select files
+# do not ignore these files
+!code_2/results_df_preds_outOfSample_0.csv
 !code_2/results_df_preds_outOfSample.csv
+!code_2/team_effects_fit.rds
+!code_2/team_effects.rds
+!code_2/player_effects.rds
+!code_2/player_effects_fit.rds
+
+
+
+
