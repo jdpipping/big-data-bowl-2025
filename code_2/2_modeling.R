@@ -551,7 +551,7 @@ predict_movement_NN <- function(df_test, model) {
 
 # dataframes with tracking data features
 df_safety_movement_1
-df_safety_movement_2
+df_safety_movement_2 
 
 # save movement features
 write_csv(df_safety_movement_1, "df_safety_movement_1.csv")
