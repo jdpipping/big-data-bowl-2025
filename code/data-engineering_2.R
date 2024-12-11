@@ -88,12 +88,33 @@ los = tracking |>
   # drop unneded columns
   select(-displayName, -frameType)
 
+# Let's start with adding each player's "x" and "y" pre-snap rank for each side of ball (e.g. who is closest to opposing end zone)
+# Same concept as previously established X_NetDistFromBall_Rank_BySide within MergedData (see data cleaning file), but this refers to only at the time of the snap
+MergedData_AtSnap <- MergedData %>%
+  group_by(gameId, playId, PlayerSideOfBall) %>%
+  filter(event %in% c("ball_snap", "snap_direct")) %>% 
+  mutate(X_PreSnap_Rank_BySide = rank(-x, ties.method = "first"),
+         Y_PreSnap_Rank_BySide = rank(-y, ties.method = "first")) %>%
+  ungroup() %>%
+  select(gameId, playId, nflId, displayName, PlayerSideOfBall, X_PreSnap_Rank_BySide, Y_PreSnap_Rank_BySide, 
+         PreSnap_x = x, PreSnap_y = y)
+# table(FirstFrameOfPlay_DesignedRuns$X_PreSnap_Rank_BySide); rank is never higher than 11
+
+# Note that the highest "x" rank pre-snap is NOT always the center
+# View(MergedData_AtSnap %>% filter(X_PreSnap_Rank_BySide == 1, PlayerSideOfBall == "offense"))
+
+MergedData <- MergedData %>%
+  merge(MergedData_AtSnap, by = c("gameId", "playId", "nflId", "displayName", "PlayerSideOfBall"))
+MergedData <- MergedData %>% arrange(gameId, playId, nflId, frameId)
+rm(MergedData_AtSnap)
+
 # Also mutate variables for the #1 receivers for the offense (i.e. the furthest outside) at the time of snap, using MergedData (defined in data cleaning file)
 # Recall that Y_NetDistFromBall_Rank_BySide exists already, so whoever ranks 1 and 11 there are the closest to sideline
 # And we established that going to offense's left is always positive Y, but the rank goes by SMALLEST distance
 # In other words, the person with rank 1 (on offense) is the RIGHT WR, b/c that'll have the smallest/most negative distance
 # Whereas if we were using Y_AbsDistFromBall_Rank_BySide, then the person with rank 1 would be closest to the ball, i.e. the center
 # Likewise, on defense, the person with rank 1 would be the defense's left CB (i.e. offense's right)
+# The reason we don't use X_PreSnap_Rank_BySide here is that we want to use the "event" so we get each person's actual X and Y values at the snap
 LeftMost_Receivers <- MergedData %>% 
   filter(PlayerSideOfBall == "offense", Y_NetDistFromBall_Rank_BySide == 11, event %in% c("ball_snap", "snap_direct")) 
 LeftMost_Receivers <- LeftMost_Receivers %>% select("gameId", "playId", "nflId", "displayName", "x", "y")
