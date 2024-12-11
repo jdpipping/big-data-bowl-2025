@@ -9,6 +9,9 @@ library(cvTools)
 library(Metrics)
 library(scales)
 library(splines)
+
+# need to set random seet BEFORE importing NN librariers to make it reproducible
+set.seed(529735)
 library(keras)
 library(tensorflow)
 
@@ -450,6 +453,30 @@ df_safety_movement_2
 ### NEURAL NETWORK MODEL FOR FUNCTIONAL DATA ANALYSIS ###
 #########################################################
 
+# make the NN training reproducible - DIDN'T WORK...
+# # Disable Multithreading and Parallelism
+# Sys.setenv(OMP_NUM_THREADS = "1")  # Control OpenMP threads
+# Sys.setenv(MKL_NUM_THREADS = "1") # Control MKL threads
+# Sys.setenv(TF_DETERMINISTIC_OPS = "1")  # Enable deterministic ops
+# # Configure TensorFlow
+# # # If using GPU:
+# # config <- tf$compat$v1$ConfigProto(
+# #   gpu_options = tf$compat$v1$GPUOptions(allow_growth = TRUE),
+# #   allow_soft_placement = TRUE
+# # )
+# # sess <- tf$compat$v1$Session(config = config)
+# # tf$compat$v1$keras$backend$set_session(sess)
+# # If using CPU only:
+# Sys.setenv("CUDA_VISIBLE_DEVICES" = "-1")  # Force TensorFlow to use CPU
+# # 2. Force Full Determinism (Even for GPU)
+# tf$config$experimental$enable_op_determinism()
+# # contrl=ol multithrrading 
+# Sys.setenv(OMP_NUM_THREADS = "1")
+# Sys.setenv(MKL_NUM_THREADS = "1")
+# # Enable verbose logging to track if nondeterministic ops are sneaking in:
+# tf$debugging$set_log_device_placement(TRUE)
+
+
 get_movement_X <- function(df) {
   X = df %>%
     select(
@@ -466,6 +493,11 @@ fit_movement_NN <- function(df_train, num_safeties, val_split=0) {
   X_train
   y_train = df_train$mofo_postsnap
   y_train
+  
+  # make the NN training reproducible - DIDN'T WORK...
+  set.seed(711883)
+  tf$random$set_seed(711883)
+  reticulate::py_run_string("import numpy as np; np.random.seed(42)")
   
   # model
   model <- keras_model_sequential()
@@ -518,8 +550,6 @@ fit_movement_NN <- function(df_train, num_safeties, val_split=0) {
   
   # train the neural network
   model %>% compile(optimizer = 'adam', loss = 'binary_crossentropy')
-  set.seed(529735)
-  tensorflow::tf$random$set_seed(711883)
   training_history <- 
     model %>%
     fit(
