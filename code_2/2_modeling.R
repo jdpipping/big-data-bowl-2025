@@ -31,9 +31,19 @@ theme_update(
 #################
 
 # read data
-df_tracking_A = read_csv('../processed-data/df_tracking_A.csv', show_col_types = F)
-df_tracking_A
-object.size(df_tracking_A) / 10**9
+df_tracking_B = read_csv("../processed-data/df_B_tracking.csv", show_col_types = F)
+df_players_B = read_csv("../processed-data/df_B_players.csv", show_col_types = F)
+df_plays_B = read_csv("../processed-data/df_B_plays.csv", show_col_types = F)
+
+# join data into one big dataframe
+df_tracking_OG = 
+  df_players_B %>%
+  left_join(df_tracking_B) %>% 
+  left_join(df_plays_B) %>%
+  relocate(num_safeties, .after = is_pre_safety)
+dim(df_tracking_B)
+dim(df_tracking_OG)
+# View(df_tracking_OG[1:1000,])
 
 ##############################
 ### MODIFIED TRACKING DATA ###
@@ -41,7 +51,7 @@ object.size(df_tracking_A) / 10**9
 
 # pre-snap tracking data for prediction/modeling exercise
 df_tracking_presnap = 
-  df_tracking_A |>
+  df_tracking_OG |>
   # keep just pre-snap data, and don't go too far into the past
   filter(-10 < t_after_snap & t_after_snap < 0) |>
   # make x coordinate relative to the line of scrimmage
@@ -49,6 +59,8 @@ df_tracking_presnap =
     x1 = x - los,
     x1_postsnap = x_postsnap - los,
   )  |>
+  relocate(x_postsnap, .after = dir) |>
+  relocate(y_postsnap, .after = x_postsnap) |>
   relocate(x1, .after=y) |>
   relocate(x1_postsnap, .after=y_postsnap) |>
   # make y coordinate relative to the center of the field
@@ -62,28 +74,36 @@ df_tracking_presnap =
   group_by(gameId, playId) |>
   mutate(minSafetyDistToCenter = min(abs( ifelse(is_pre_safety, y1, Inf) ))) |>
   ungroup() |>
-  # polar coordinates for the angles o and dir
-  mutate(
-    o_polar = (90 - o) %% 360,
-    dir_polar = (90 - dir) %% 360,
-  ) |>
-  relocate(o_polar, .after = dir) |>
-  relocate(dir_polar, .after = o_polar) |>
-  # decompose velo/accel into (x,y) components
-  mutate(
-    v_x = s * cos(dir_polar * pi / 180),
-    v_y = s * sin(dir_polar * pi / 180),
-    a_x = a * cos(dir_polar * pi / 180),
-    a_y = a * sin(dir_polar * pi / 180)
-  ) |>
-  relocate(v_x, .after = dir_polar) |>
-  relocate(v_y, .after = v_x) |>
-  relocate(a_x, .after = v_y) |>
-  relocate(a_y, .after = a_x) 
+  # min safety distance to ball line
+  group_by(gameId, playId) |>
+  mutate(minSafetyDistToBallLine = min(abs( ifelse(is_pre_safety, y - ball_y_snap, Inf) ))) |>
+  ungroup() 
 df_tracking_presnap
 table(df_tracking_presnap$t_after_snap)
 
-# # check velo,accel components
+# df_tracking_presnap = 
+#   df_tracking_presnap |>
+#   # polar coordinates for the angles o and dir
+#   mutate(
+#     o_polar = (90 - o) %% 360,
+#     dir_polar = (90 - dir) %% 360,
+#   ) |>
+#   relocate(o_polar, .after = dir) |>
+#   relocate(dir_polar, .after = o_polar) |>
+#   # decompose velo/accel into (x,y) components
+#   mutate(
+#     v_x = s * cos(dir_polar * pi / 180),
+#     v_y = s * sin(dir_polar * pi / 180),
+#     a_x = a * cos(dir_polar * pi / 180),
+#     a_y = a * sin(dir_polar * pi / 180)
+#   ) |>
+#   relocate(v_x, .after = dir_polar) |>
+#   relocate(v_y, .after = v_x) |>
+#   relocate(a_x, .after = v_y) |>
+#   relocate(a_y, .after = a_x)
+# df_tracking_presnap
+# table(df_tracking_presnap$t_after_snap)
+# # check
 # temp = df_tracking_presnap %>% filter(pos_official == "RB") %>% filter(s > 1)
 # View(temp[1:2000,]) 
 
@@ -161,6 +181,16 @@ fit_model_minSafetyDistToCenter <- function(df_tracking) {
 # temp = fit_model_minSafetyDistToCenter(df_tracking_presnap)
 # temp
 
+# min distance to center of field
+fit_model_minSafetyDistToBallLine <- function(df_tracking) {
+  df_plays = df_tracking %>% distinct(gameId,playId,minSafetyDistToBallLine,mofo_postsnap)
+  df_plays
+  glm(mofo_postsnap ~ minSafetyDistToBallLine, data = df_plays, family = "binomial")
+}
+# # example
+# temp = fit_model_minSafetyDistToBallLine(df_tracking_presnap)
+# temp
+
 # # multivariable baseline model
 # fit_model_best_baseline <- function(df_tracking) {
 #   df_plays = df_tracking %>% distinct(
@@ -175,20 +205,13 @@ fit_model_minSafetyDistToCenter <- function(df_tracking) {
 # # temp = fit_model_best_baseline(df_tracking_presnap)
 # # temp
 
-#####################################################
-### FILTERED TRACKING DATA - MOVEMENT OF SAFETIES ###
-#####################################################
-
-# defensive positions
-table(df_tracking_presnap$pos_official) 
-length(table(df_tracking_presnap$pos_official)) # num positions
-defensive_positions = c(
-  "CB", "DB", "DE", "DT","FS","ILB","LB","MLB","OLB","SS"
-)
-defensive_positions
+#####################################
+### TRACKING DATA - JUST SAFETIES ###
+#####################################
 
 # keep just the defensive players 
-df_tracking_def = df_tracking_presnap %>% filter(pos_official %in% defensive_positions)
+df_tracking_presnap %>% distinct(pos_official, posGroup) %>% arrange(posGroup) # defensive positions
+df_tracking_def = df_tracking_presnap %>% filter(posGroup == "defense")
 dim(df_tracking_presnap)
 dim(df_tracking_def)
 num_def_players_per_play = 
@@ -198,11 +221,13 @@ num_def_players_per_play =
   reframe(num_def_players = n()) 
 table(num_def_players_per_play$num_def_players) # good enough I guess...
 
-# keep just the pre-snap safeties
 df_tracking_safeties = 
+  # keep just the pre-snap safeties
   df_tracking_def |>
   filter(is_pre_safety) |>
-  select(-c(pos_official, is_pre_safety))
+  select(-c(pos_official, posGroup, is_pre_safety)) #|>
+  # # keep early downs -- LREADY DID THIS IN THE PREVIOUS FILE!!
+  # filter(down == 1 | (down == 2 & yardsToGo >= 5))
 df_tracking_safeties
 nrow(df_tracking_safeties %>% distinct(gameId, playId))
 table(df_tracking_safeties$t_after_snap)
@@ -218,7 +243,7 @@ df_min_t_after_snap =
   group_by(gameId, playId) %>%
   reframe(min_t_after_snap = min(t_after_snap)) %>%
   arrange(min_t_after_snap)
-df_min_t_after_snap %>% ggplot(aes(x = min_t_after_snap)) + geom_histogram()
+# df_min_t_after_snap %>% ggplot(aes(x = min_t_after_snap)) + geom_histogram()
 # earliest time t
 min_min_t_after_snap = min(df_min_t_after_snap$min_t_after_snap)
 min_min_t_after_snap
@@ -253,64 +278,71 @@ compute_spline_coeffs <- function(t, values, spline_DF) {
   return(list(coeffs = coeffs, basis = spline_basis))
 }
 
-# parameters
-extrapolateEarlierTrajectories = TRUE
-use_time_cutoff = TRUE
-cutoff_time = -3.0
-
-# Example trajectory data
-# ex_traj = df_tracking_safeties %>% filter(gameId == 2022090800, playId == 692, nflId == 47844)
-# ex_traj = df_tracking_safeties %>% filter(gameId == 2022090800, playId == 692, nflId == 48026)
-# ex_traj = df_tracking_safeties %>% filter(gameId == 2022110602, playId == 3557, nflId == 46123)
-ex_traj = df_tracking_safeties %>% filter(gameId == 2022092503, playId == 1286, nflId == 53641)
-ex_traj
-
-# trajectory data
-t = ex_traj$t_after_snap
-x_t = ex_traj$x1
-y_t = ex_traj$y1
-if (extrapolateEarlierTrajectories) {
-  etx = extrapolateEarlierTrajectory(t, x_t)
-  ety = extrapolateEarlierTrajectory(t, y_t)
-  t = etx$t
-  x_t = etx$values
-  y_t = ety$values
+# SHOW_EXAMPLE = TRUE
+SHOW_EXAMPLE = FALSE
+if (SHOW_EXAMPLE) {
+  # parameters
+  extrapolateEarlierTrajectories = TRUE
+  use_time_cutoff = TRUE
+  cutoff_time = -3.0
+  
+  # Example trajectory data
+  # ex_traj = df_tracking_safeties %>% filter(gameId == 2022090800, playId == 692, nflId == 47844)
+  # ex_traj = df_tracking_safeties %>% filter(gameId == 2022090800, playId == 692, nflId == 48026)
+  # ex_traj = df_tracking_safeties %>% filter(gameId == 2022110602, playId == 3557, nflId == 46123)
+  ex_traj = df_tracking_safeties %>% filter(gameId == 2022092503, playId == 1286, nflId == 53641)
+  ex_traj
+  
+  # trajectory data
+  t = ex_traj$t_after_snap
+  x_t = ex_traj$x1
+  y_t = ex_traj$y1
+  if (extrapolateEarlierTrajectories) {
+    etx = extrapolateEarlierTrajectory(t, x_t)
+    ety = extrapolateEarlierTrajectory(t, y_t)
+    t = etx$t
+    x_t = etx$values
+    y_t = ety$values
+  }
+  if (use_time_cutoff) {
+    x_t = x_t[t >= cutoff_time]
+    y_t = y_t[t >= cutoff_time]
+    t = t[t >= cutoff_time]
+  }
+  t
+  x_t
+  y_t
+  
+  # Compute spline coefficients for x_t and y_t
+  spline_DF <- 10  # Number of spline basis functions (degrees of freedom)
+  x_spline <- compute_spline_coeffs(t, x_t, spline_DF)
+  y_spline <- compute_spline_coeffs(t, y_t, spline_DF)
+  
+  # Combine coefficients into a feature vector
+  feature_vector <- c(x_spline$coeffs, y_spline$coeffs)
+  
+  # Print results
+  cat("Spline coefficients for x_t:", x_spline$coeffs, "\n")
+  cat("Spline coefficients for y_t:", y_spline$coeffs, "\n")
+  cat("Combined feature vector:", feature_vector, "\n")
+  
+  # Optional: Reconstruct trajectory for validation
+  reconstruct_trajectory <- function(t, coeffs, basis) {
+    reconstructed <- as.vector(basis %*% coeffs)
+    return(reconstructed)
+  }
+  
+  # Reconstruct x_t and y_t
+  reconstructed_x_t <- reconstruct_trajectory(t, x_spline$coeffs, x_spline$basis)
+  reconstructed_y_t <- reconstruct_trajectory(t, y_spline$coeffs, y_spline$basis)
+  
+  # Plot original and reconstructed trajectories
+  plot(t, x_t, type = "l", col = "blue", lwd = 2, main = "Original vs. Reconstructed Trajectories (Splines)",
+       xlab = "Time", ylab = "Value")
+  lines(t, reconstructed_x_t, col = "red", lwd = 2, lty = 2)
+  # legend("topright", legend = c("Original x_t", "Reconstructed x_t"),
+  #        col = c("blue", "red"), lty = c(1, 2), lwd = 2)
 }
-if (use_time_cutoff) {
-  x_t = x_t[t >= cutoff_time]
-  y_t = y_t[t >= cutoff_time]
-  t = t[t >= cutoff_time]
-}
-
-# Compute spline coefficients for x_t and y_t
-spline_DF <- 10  # Number of spline basis functions (degrees of freedom)
-x_spline <- compute_spline_coeffs(t, x_t, spline_DF)
-y_spline <- compute_spline_coeffs(t, y_t, spline_DF)
-
-# Combine coefficients into a feature vector
-feature_vector <- c(x_spline$coeffs, y_spline$coeffs)
-
-# Print results
-cat("Spline coefficients for x_t:", x_spline$coeffs, "\n")
-cat("Spline coefficients for y_t:", y_spline$coeffs, "\n")
-cat("Combined feature vector:", feature_vector, "\n")
-
-# Optional: Reconstruct trajectory for validation
-reconstruct_trajectory <- function(t, coeffs, basis) {
-  reconstructed <- as.vector(basis %*% coeffs)
-  return(reconstructed)
-}
-
-# Reconstruct x_t and y_t
-reconstructed_x_t <- reconstruct_trajectory(t, x_spline$coeffs, x_spline$basis)
-reconstructed_y_t <- reconstruct_trajectory(t, y_spline$coeffs, y_spline$basis)
-
-# Plot original and reconstructed trajectories
-plot(t, x_t, type = "l", col = "blue", lwd = 2, main = "Original vs. Reconstructed Trajectories (Splines)",
-     xlab = "Time", ylab = "Value")
-lines(t, reconstructed_x_t, col = "red", lwd = 2, lty = 2)
-# legend("topright", legend = c("Original x_t", "Reconstructed x_t"),
-#        col = c("blue", "red"), lty = c(1, 2), lwd = 2)
 
 ##################################################
 ### FUNCTIONAL DATA ANALYSIS MOVEMENT FEATURES ###
@@ -376,7 +408,8 @@ df_movement_features_A =
   df_tracking_safeties %>% 
   distinct(
     gameId, playId, nflId, 
-    displayName, num_safeties, mofo_postsnap, minSafetyDistToCenter, 
+    displayName, num_safeties, mofo_postsnap,
+    minSafetyDistToCenter, minSafetyDistToBallLine,
     defensiveTeam, possessionTeam, los
   ) %>% 
   left_join(df_movement_features) %>%
@@ -520,6 +553,10 @@ predict_movement_NN <- function(df_test, model) {
 df_safety_movement_1
 df_safety_movement_2
 
+# save movement features
+write_csv(df_safety_movement_1, "df_safety_movement_1.csv")
+write_csv(df_safety_movement_2, "df_safety_movement_2.csv")
+
 # play indices
 plays_all = 
   bind_rows(
@@ -560,7 +597,7 @@ for (fold in 1:NUM_FOLDS) {
   nrow(plays_train)
   vars_for_12 = c(
     "i","FOLD","gameId","playId","num_safeties","mofo_postsnap",
-    "minSafetyDistToCenter","defensiveTeam","possessionTeam","los"
+    "minSafetyDistToBallLine","minSafetyDistToCenter","defensiveTeam","possessionTeam","los"
   )
   df_train_12 = bind_rows(
     df_train_1 %>% select(all_of(vars_for_12)),
@@ -587,6 +624,7 @@ for (fold in 1:NUM_FOLDS) {
   fit_defTeamNumSafeties = fit_model_defTeamNumSafeties(df_train_12)
   fit_defTeamNumSafetiesOffTeam = fit_model_defTeamNumSafetiesOffTeam(df_train_12)
   fit_minSafetyDistToCenter = fit_model_minSafetyDistToCenter(df_train_12)
+  fit_minSafetyDistToBallLine = fit_model_minSafetyDistToBallLine(df_train_12)
   # fit_best_baseline = fit_model_best_baseline(df_train_12)
   
   # fit NN models
@@ -607,6 +645,7 @@ for (fold in 1:NUM_FOLDS) {
       pred_defteamNumSafeties = predict(fit_defTeamNumSafeties, ., type = "response"),
       pred_defteamNumSafetiesOffteam = predict(fit_defTeamNumSafetiesOffTeam, ., type = "response"),
       pred_minSafetyDistToCenter = predict(fit_minSafetyDistToCenter, ., type = "response"),
+      pred_minSafetyDistToBallLine = predict(fit_minSafetyDistToBallLine, ., type = "response"),
       # pred_best_baseline = predict(fit_best_baseline, ., type = "response"),
     ) %>%
     select(gameId, playId, mofo_postsnap, all_of(starts_with("pred"))) %>%
@@ -624,6 +663,7 @@ for (fold in 1:NUM_FOLDS) {
       pred_defteamNumSafeties = predict(fit_defTeamNumSafeties, ., type = "response"),
       pred_defteamNumSafetiesOffteam = predict(fit_defTeamNumSafetiesOffTeam, ., type = "response"),
       pred_minSafetyDistToCenter = predict(fit_minSafetyDistToCenter, ., type = "response"),
+      pred_minSafetyDistToBallLine = predict(fit_minSafetyDistToBallLine, ., type = "response"),
       # pred_best_baseline = predict(fit_best_baseline, ., type = "response"),
     ) %>%
     select(gameId, playId, mofo_postsnap, all_of(starts_with("pred"))) %>%
@@ -707,7 +747,7 @@ plot_results_logloss =
   geom_boxplot() +
   xlab("out-of-sample logloss") +
   ylab("model")
-ggsave("results_plot_logloss.png", width=12, height=4)
+ggsave("results_loss_plot_logloss.png", width=12, height=4)
 
 plot_results_RIE = 
   df_losses %>%
@@ -716,7 +756,7 @@ plot_results_RIE =
   scale_x_continuous(labels = scales::percent) +
   ylab("model") +
   xlab("out-of-sample reduction in error")
-ggsave("results_plot_RIE.png", width=12, height=4)
+ggsave("results_loss_plot_RIE.png", width=12, height=4)
 
 plot_results_logloss_pScale = 
   df_losses %>%
@@ -727,7 +767,7 @@ plot_results_logloss_pScale =
   xlab("p = exp(-logloss)") +
   labs(caption = "the predictor has the same predictive power (out-of-sample logloss),\n over average, as always predicting the correct outcome with prob. p") +
   ylab("model")
-ggsave("results_plot_logloss_pScale.png", width=12, height=4)
+ggsave("results_loss_plot_logloss_pScale.png", width=12, height=4)
 
 # save out-of-sample predictions for each play
 df_preds_outOfSample_A = df_preds_outOfSample %>% 
