@@ -364,9 +364,8 @@ MergedData <- MergedData %>%
   ) %>%
   ungroup()
 
-setwd("C:/Users/justi/OneDrive/Penn/BDB(2025)")
-library(tidyverse)
-
+# Now, here's code that gives each player's directional speed and acceleration
+# This example is from the df_tracking_A DF, defined in the code_2 GitHub folder
 modeling_df <- data.table::fread('df_tracking_A.csv')
 
 wagner <- modeling_df %>%
@@ -381,13 +380,18 @@ plotly::ggplotly(wagner %>%
              color = as.factor(t_after_snap))) +
   geom_point())
 
-#set frame length to be however many seconds we want to project forward
-frame_length <- 1 # seconds forward
 wagner <- wagner %>%
-  mutate(x_vel_component = (s*frame_length*cos((90-dir)*pi/180)),
-         y_vel_component = (s*frame_length*sin((90-dir*pi)/180)),
-         x_acc_component = (a*frame_length*cos((90-dir)*pi/180)),
-         y_acc_component = (a*frame_length*sin((90-dir*pi)/180)))
+  mutate(x_vel_component = (s*cos((90-dir)*pi/180)),
+         y_vel_component = (s*sin((90-dir*pi)/180)),
+         x_acc_component = (a*cos((90-dir)*pi/180)),
+         y_acc_component = (a*sin((90-dir*pi)/180)))
+
+# However, here it is with the MergedData set, originally defined in data cleaning file
+MergedData <- MergedData %>%
+  mutate(x_vel_component = (s*cos((90-dir)*pi/180)),
+         y_vel_component = (s*sin((90-dir*pi)/180)),
+         x_acc_component = (a*cos((90-dir)*pi/180)),
+         y_acc_component = (a*sin((90-dir*pi)/180)))
 
 # And create a data table for just dropbacks as well
 Dropbacks_Merged <- MergedData %>% filter(isDropback == 1)
