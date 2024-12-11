@@ -382,16 +382,16 @@ plotly::ggplotly(wagner %>%
 
 wagner <- wagner %>%
   mutate(x_vel_component = (s*cos((90-dir)*pi/180)),
-         y_vel_component = (s*sin((90-dir*pi)/180)),
+         y_vel_component = (s*sin((90-dir)*pi/180)),
          x_acc_component = (a*cos((90-dir)*pi/180)),
-         y_acc_component = (a*sin((90-dir*pi)/180)))
+         y_acc_component = (a*sin((90-dir)*pi/180)))
 
 # However, here it is with the MergedData set, originally defined in data cleaning file
 MergedData <- MergedData %>%
   mutate(x_vel_component = (s*cos((90-dir)*pi/180)),
-         y_vel_component = (s*sin((90-dir*pi)/180)),
+         y_vel_component = (s*sin((90-dir)*pi/180)),
          x_acc_component = (a*cos((90-dir)*pi/180)),
-         y_acc_component = (a*sin((90-dir*pi)/180)))
+         y_acc_component = (a*sin((90-dir)*pi/180)))
 
 # And create a data table for just dropbacks as well
 Dropbacks_Merged <- MergedData %>% filter(isDropback == 1)
