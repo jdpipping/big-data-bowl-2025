@@ -308,6 +308,13 @@ MergedData <- MergedData %>% mutate(is_post_snap_safety = ifelse(PlayerSideOfBal
 table((MergedData %>% filter(frameId == 1, position %in% "QB"))$num_safeties_pre_snap)
 table((MergedData %>% filter(frameId == 1, position %in% "QB"))$num_safeties_post_snap)
 
+# Mutate a "time since snap" variable, which can be negative if the frame comes before the snap
+# The 0.1 is so that the outcome variable is in seconds, rather than in frames
+MergedData <- MergedData %>% mutate(time_since_snap = 0.1*(frameId - frameId_Snap))
+
+# Here, limit to plays with <= 2 pre-snap safeties? Getting rid of "3rd-and-forever" situations
+MergedData <- MergedData %>% filter(num_safeties_pre_snap <= 2)
+
 # merge to create v1, which is a frame-by-frame data set rather than play-by-play
 v1 = MergedData|> 
   # join qb ids

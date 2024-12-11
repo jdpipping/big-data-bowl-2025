@@ -404,10 +404,10 @@ table(tracking_std$frameId)
 
 # Now create line of scrimmage for each play using ball data
 # Obviously, where the ball is during the ball_snap event is the LOS
-Snap_Ball_Location <- tracking_std %>%
+Snap_Ball_Location <- tracking_combined %>%
   filter(club == "football", event %in% c("ball_snap", "snap_direct")) %>%
-  select(gameId, playId, x, y) %>%
-  rename(Ball_X_Snap = x, Ball_Y_Snap = y)
+  select(gameId, playId, x, y, frameId) %>%
+  rename(Ball_X_Snap = x, Ball_Y_Snap = y, frameId_Snap = frameId)
 
 tracking_std <- tracking_std %>%
   left_join(Snap_Ball_Location, by = c("playId", "gameId"))
@@ -729,6 +729,11 @@ rm(BallCarriers_Snap, Frame1_DF)
 # MergedData <- MergedData %>% filter(wp >= 0.05 & wp <= 0.95)
 # Here's how to filter in a data table
 MergedData <- MergedData[wp >= 0.05 & wp <= 0.95]
+
+# Other possible modifications for this specific project:
+MergedData <- MergedData[xpass <= 0.95]
+MergedData <- MergedData[half_seconds_remaining >= 30]
+# MergedData <- MergedData[half_seconds_remaining >= 45 | yardline_100 <= 50]
 
 # Turn weather into a numeric variable using str_extract
 # The given "temp" variable is all NAs
