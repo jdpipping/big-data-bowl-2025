@@ -16,6 +16,9 @@ player_play_data<- read_csv("player_play.csv")
 #tracking data:
 week1 <- read_csv("tracking_week_1.csv")
 
+# If needed, can read in MergedData file that was defined earlier in data engineering file
+MergedData <- read_csv("MergedData.csv")
+
 # view(games)
 # 
 # View(plays %>%
@@ -399,4 +402,8 @@ Dropbacks_Merged <- Dropbacks_Merged %>% select(-"isDropback")
 setDT(Dropbacks_Merged)
 setkey(Dropbacks_Merged, gameId, playId, nflId, frameId)
 Dropbacks_Merged <- Dropbacks_Merged %>% relocate("gameId", "playId", "nflId", "displayName", "frameId")
+
+# If needed, here's how to export to a CSV
+write.csv(MergedData, "MergedData.csv")
+write.csv(Dropbacks_Merged, "Dropbacks_Merged.csv")
 
