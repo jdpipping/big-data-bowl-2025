@@ -1,6 +1,9 @@
 # Recall that tracking_std was defined in the data cleaning file
 tracking_std = read_csv('processed-data/tracking_std.csv')
 
+# If needed, can read in MergedData file that was most recently tweaked in Vectorized_Distances file
+MergedData <- read_csv("MergedData.csv")
+
 # extract example play: https://www.youtube.com/watch?v=2mPxPOjnAg0
 example_play_Davis_TD = tracking_std |> 
   filter(gameId == 2022100901, playId == 117) |> 
