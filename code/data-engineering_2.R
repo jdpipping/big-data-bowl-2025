@@ -347,5 +347,8 @@ left_join(safety_ids_post_snap, by = c('gameId', 'playId'))
 # save to file
 write_csv(v1, 'processed-data/v1.csv')
 
+# If needed, here's how to export to a CSV
+write.csv(MergedData, "MergedData.csv")
+
 # wipe r memory
 rm(list = ls())
