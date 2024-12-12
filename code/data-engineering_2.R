@@ -22,6 +22,9 @@ player_play = read_csv('raw-data/player_play.csv')
 # tracking data
 tracking = read_csv('processed-data/tracking_std.csv')
 
+# If needed, can read in MergedData file that was defined earlier in data cleaning file
+MergedData <- read_csv("MergedData.csv")
+
 ###################
 ### CREATING V1 ###
 ###################
