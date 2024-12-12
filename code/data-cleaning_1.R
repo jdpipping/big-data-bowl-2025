@@ -945,3 +945,6 @@ MergedData <- MergedData %>%
 # cosine_similarity_raw <- function(x, y) {
 #   cos((x*pi/180) - (y*pi/180))
 # }
+
+# If needed, here's how to export to a CSV
+write.csv(MergedData, "MergedData.csv")
