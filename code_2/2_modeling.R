@@ -164,7 +164,7 @@ fit_model_defTeamNumSafeties <- function(df_tracking) {
 # temp = fit_model_defTeamNumSafeties(df_tracking_presnap)
 # temp
 
-# estimate MOFO probability given just the defensive team and number of safeties
+# estimate MOFO probability given both team names and number of safeties
 fit_model_defTeamNumSafetiesOffTeam <- function(df_tracking) {
   df_plays = df_tracking %>% distinct(gameId,playId,possessionTeam,defensiveTeam,num_safeties,mofo_postsnap) 
   df_plays
