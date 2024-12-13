@@ -247,7 +247,7 @@ calc_distance <- function(x, y, x_baseline = 0, y_baseline = 0) {
   sqrt((x-x_baseline)^2 + (y - y_baseline)^2)
 }
 
-#vectorized bit of code:
+# vectorized bit of code:
 #WE CAN PROBABLY CLEAN THIS UP, BUT THIS IS HOW THIS WORKS:
 #1) we use map_dbl. .x is a vector, and in this case it's the row of each frame (excludes the football, so should be 1 - 22)
 #2) the first column (min_dist), basically calculates the distance for each row number in the frame to all other points on the opposing team (besides the ball), and calculates the minimum
@@ -376,7 +376,7 @@ wagner <- modeling_df %>%
            playId==692 &
            displayName=='Bobby Wagner')
 
-#plotting Bobby Wagner's movements on this play
+# plotting Bobby Wagner's movements on this play
 plotly::ggplotly(wagner %>%
   ggplot(aes(x = x,
              y = y,
@@ -395,6 +395,11 @@ MergedData <- MergedData %>%
          y_vel_component = (s*sin((90-dir)*pi/180)),
          x_acc_component = (a*cos((90-dir)*pi/180)),
          y_acc_component = (a*sin((90-dir)*pi/180)))
+
+# MergedData <- MergedData %>% arrange(gameId, playId, nflId, frameId)
+setDT(MergedData)
+setkey(MergedData, gameId, playId, nflId, frameId)
+MergedData <- MergedData %>% relocate("gameId", "playId", "nflId", "displayName", "frameId")
 
 # And create a data table for just dropbacks as well
 Dropbacks_Merged <- MergedData %>% filter(isDropback == 1)
