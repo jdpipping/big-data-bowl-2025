@@ -356,7 +356,11 @@ Safety_2_AtSnap <- Safety_2_AtSnap %>% rename(pre_snap_safety_2_name = `displayN
 MergedData <- MergedData %>% left_join(Safety_2_AtSnap, by = c("gameId", "playId"))
 rm(Safety_1_AtSnap, Safety_2_AtSnap)
 
-MergedData <- MergedData %>% mutate(X_Diff_BetweenSafeties_AtSnap = abs(pre_snap_safety_1_X_AtSnap - pre_snap_safety_2_X_AtSnap ))
+MergedData <- MergedData %>% mutate(X_Diff_BetweenSafeties_AtSnap = abs(pre_snap_safety_1_X_AtSnap - pre_snap_safety_2_X_AtSnap))
+
+# And also, for eventual modeling purposes, turn PostSnap_MOF into a numeric variable (MOFO can be 1)
+MergedData <- MergedData %>% filter(MOF_Numeric = ifelse(PostSnap_MOF %in% "MOF Open", 1,
+                                                         ifelse(PostSnap_MOF %in% "MOF Closed", 0, NA)))
 
 # For what it's worth, here are plays with exactly 2 pre-snap safeties
 TwoPreSnapSafety_Snaps <- MergedData %>% filter(num_safeties_pre_snap == 2)
