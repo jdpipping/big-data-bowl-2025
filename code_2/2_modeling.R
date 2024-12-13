@@ -184,7 +184,7 @@ fit_model_minSafetyDistToCenter <- function(df_tracking) {
 # temp = fit_model_minSafetyDistToCenter(df_tracking_presnap)
 # temp
 
-# min distance to center of field
+# min horizontal distance to ball's original location
 fit_model_minSafetyDistToBallLine <- function(df_tracking) {
   df_plays = df_tracking %>% distinct(gameId,playId,minSafetyDistToBallLine,mofo_postsnap)
   df_plays
