@@ -336,8 +336,31 @@ table((MergedData %>% filter(frameId == 1, position %in% "QB"))$num_safeties_pos
 # The 0.1 is so that the outcome variable is in seconds, rather than in frames
 MergedData <- MergedData %>% mutate(time_since_snap = 0.1*(frameId - frameId_Snap))
 
-# Here, limit to plays with <= 2 pre-snap safeties? Getting rid of "3rd-and-forever" situations
+# Here, limit to plays with <= 2 pre-snap safeties ... getting rid of "3rd-and-forever" situations
 MergedData <- MergedData %>% filter(num_safeties_pre_snap <= 2)
+
+# Now, after avoiding any plays with more than 2 safeties, get each safety's X/Y position at the time of the snap
+# This will help us detect whether there was an "X stagger," i.e. one safety way deeper than the other
+Safety_1_AtSnap <- MergedData %>% 
+  filter(PlayerSideOfBall == "defense", nflId == pre_snap_safety_1, event %in% c("ball_snap", "snap_direct")) 
+Safety_1_AtSnap <- Safety_1_AtSnap %>% select("gameId", "playId", "displayName", "x", "y")
+Safety_1_AtSnap <- Safety_1_AtSnap %>% rename(pre_snap_safety_1_name = `displayName`,
+                                                    pre_snap_safety_1_X_AtSnap = `x`, pre_snap_safety_1_Y_AtSnap = 'y')
+MergedData <- MergedData %>% left_join(Safety_1_AtSnap, by = c("gameId", "playId"))
+
+Safety_2_AtSnap <- MergedData %>% 
+  filter(PlayerSideOfBall == "defense", nflId == pre_snap_safety_2, event %in% c("ball_snap", "snap_direct")) 
+Safety_2_AtSnap <- Safety_2_AtSnap %>% select("gameId", "playId", "displayName", "x", "y")
+Safety_2_AtSnap <- Safety_2_AtSnap %>% rename(pre_snap_safety_2_name = `displayName`,
+                                              pre_snap_safety_2_X_AtSnap = `x`, pre_snap_safety_2_Y_AtSnap = 'y')
+MergedData <- MergedData %>% left_join(Safety_2_AtSnap, by = c("gameId", "playId"))
+rm(Safety_1_AtSnap, Safety_2_AtSnap)
+
+MergedData <- MergedData %>% mutate(X_Diff_BetweenSafeties_AtSnap = abs(pre_snap_safety_1_X_AtSnap - pre_snap_safety_2_X_AtSnap ))
+
+# For what it's worth, here are plays with exactly 2 pre-snap safeties
+TwoPreSnapSafety_Snaps <- MergedData %>% filter(num_safeties_pre_snap == 2)
+# Should be no NAs here: View(TwoPreSnapSafety_Snaps %>% filter(is.na(X_Diff_BetweenSafeties_AtSnap)))
 
 # merge to create v1, which is a frame-by-frame data set rather than play-by-play
 v1 = MergedData|> 
