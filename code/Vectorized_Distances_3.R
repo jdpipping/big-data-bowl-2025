@@ -403,6 +403,9 @@ setDT(Dropbacks_Merged)
 setkey(Dropbacks_Merged, gameId, playId, nflId, frameId)
 Dropbacks_Merged <- Dropbacks_Merged %>% relocate("gameId", "playId", "nflId", "displayName", "frameId")
 
+Dropbacks_2High_PreSnap <- Dropbacks_Merged %>% filter(num_safeties_pre_snap == 2)
+Dropbacks_2High_PreSnap <- Dropbacks_2High_PreSnap %>% select(-"num_safeties_pre_snap")
+
 # If needed, here's how to export to a CSV
 write.csv(MergedData, "MergedData.csv")
 write.csv(Dropbacks_Merged, "Dropbacks_Merged.csv")
