@@ -359,7 +359,7 @@ rm(Safety_1_AtSnap, Safety_2_AtSnap)
 MergedData <- MergedData %>% mutate(X_Diff_BetweenSafeties_AtSnap = abs(pre_snap_safety_1_X_AtSnap - pre_snap_safety_2_X_AtSnap))
 
 # And also, for eventual modeling purposes, turn PostSnap_MOF into a numeric variable (MOFO can be 1)
-MergedData <- MergedData %>% filter(PostSnap_MOF_Num = ifelse(PostSnap_MOF %in% "MOF Open", 1,
+MergedData <- MergedData %>% mutate(PostSnap_MOF_Num = ifelse(PostSnap_MOF %in% "MOF Open", 1,
                                                          ifelse(PostSnap_MOF %in% "MOF Closed", 0, NA)))
 
 # Get rid of the "Ambiguous" coverages
