@@ -6,8 +6,7 @@
 ### SET YOUR WORKING DIRECTORY TO THIS FILE (IN `code_2`)
 library(tidyverse)
 library(glmnet)
-
-
+library(nflplotR)
 
 ### plotting pre-sets
 theme_set(theme_bw())
@@ -135,6 +134,80 @@ plot_team_mean_entropy_boot =
   xlab("mean safety entropy")
 plot_team_mean_entropy_boot
 ggsave("results_plot_team_mean_entropy_boot.png", width=6, height=8)
+
+#######################################################
+### correlation between safety entropy and EPA/play ###
+#######################################################
+
+# nflfastr data
+nflverse_pbp <- nflfastR::load_pbp(2022)
+nflverse_pbp <- nflverse_pbp %>% filter(week %in% 1:9)
+names(nflverse_pbp)
+df_pass_plays = 
+  nflverse_pbp %>%
+  filter(pass_attempt == 1) %>%
+  filter(
+    (down == 1 | (down == 2 & ydstogo >= 5)) & 
+    half_seconds_remaining > 30 & 
+    0.05 < wp & wp < 0.95 &
+    xpass < 0.95
+  ) %>%
+  select(old_game_id, play_id, posteam, defteam, epa)
+df_pass_plays
+df_defteam_epa = 
+  df_pass_plays %>%
+  group_by(defteam) %>%
+  reframe(epa_per_play = mean(epa)) %>%
+  rename(defensiveTeam = defteam)
+df_defteam_epa
+df_epa_entropy = 
+df_team_mean_entropy %>%
+  select(defensiveTeam, mean_entropy) %>%
+  left_join(df_defteam_epa) 
+df_epa_entropy
+
+# correlations
+cor_epa_entropy = cor(df_epa_entropy$mean_entropy, df_epa_entropy$epa_per_play)
+cor_epa_entropy
+m1 = lm(epa_per_play~mean_entropy, data=df_epa_entropy)
+m1
+# m2 = lm(epa_per_play~mean_entropy, 
+#         data=df_epa_entropy%>%filter(!(defensiveTeam %in% c("LAR","DEN","PHI"))))
+# m2
+# plot
+
+df_plot_cor = 
+  df_epa_entropy %>%
+  ggplot(aes(team_abbr = defensiveTeam, x = mean_entropy, y = epa_per_play)) +
+  # geom_point() +
+  ggplot2::geom_abline(slope = coef(m1)[2], intercept = coef(m1)[1], 
+                       linewidth=1.5, color="gray20", linetype="longdash") +
+  nflplotR::geom_mean_lines(aes(x0 = mean_entropy , y0 = epa_per_play)) +
+  geom_nfl_logos(width=0.05) +
+  annotate("text", x = 0.825, y = 0.165, size=6, color="firebrick",
+           label = paste0("corr = ", round(cor_epa_entropy,2))) +
+  annotate(
+    "segment", x = 0.77, xend = 0.85, y = -0.2, yend = -0.2, 
+    arrow = arrow(type = "closed", length = unit(0.4, "cm")),
+    color = "firebrick"
+  ) +
+  annotate(
+    "text", x = 0.77, y = -0.19, hjust=0, vjust = 0.1, size = 4,
+    label = "more unpredictable safeties", color = "firebrick",
+  ) +
+  annotate(
+    "segment", x = 0.61, xend = 0.61, y = 0, yend = -0.2, 
+    arrow = arrow(type = "closed", length = unit(0.4, "cm")),
+    color = "firebrick"
+  ) +
+  annotate(
+    "text", x = 0.61, y = -0.18, hjust=0, vjust = -0.5, size = 4,
+    label = "more efficient defenses", color = "firebrick", angle = 90
+  ) +
+  ylab("defensive EPA/play on pass plays") +
+  xlab("mean safety entropy")
+# df_plot_cor
+ggsave("results_plot_epa_entropy_corr.png", df_plot_cor, width=8, height=5)
 
 #############################################
 ### BAYESIAN DEFENSIVE TEAM EFFECTS MODEL ###
