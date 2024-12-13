@@ -204,7 +204,7 @@ df_plot_cor =
     "text", x = 0.61, y = -0.18, hjust=0, vjust = -0.5, size = 4,
     label = "more efficient defenses", color = "firebrick", angle = 90
   ) +
-  ylab("defensive EPA/play on pass plays") +
+  ylab("EPA/play") +
   xlab("mean safety entropy")
 # df_plot_cor
 ggsave("results_plot_epa_entropy_corr.png", df_plot_cor, width=8, height=5)
