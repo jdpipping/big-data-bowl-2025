@@ -367,6 +367,7 @@ MergedData <- MergedData %>% filter(PostSnap_MOF %in% c("MOF Closed", "MOF Open"
 
 # For what it's worth, here are plays with exactly 2 pre-snap safeties
 TwoPreSnapSafety_Snaps <- MergedData %>% filter(num_safeties_pre_snap == 2)
+TwoPreSnapSafety_Snaps <- TwoPreSnapSafety_Snaps %>% select(-"num_safeties_pre_snap")
 # Should be no NAs here: View(TwoPreSnapSafety_Snaps %>% filter(is.na(X_Diff_BetweenSafeties_AtSnap)))
 
 # merge to create v1, which is a frame-by-frame data set rather than play-by-play
