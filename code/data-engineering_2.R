@@ -362,6 +362,9 @@ MergedData <- MergedData %>% mutate(X_Diff_BetweenSafeties_AtSnap = abs(pre_snap
 MergedData <- MergedData %>% filter(PostSnap_MOF_Num = ifelse(PostSnap_MOF %in% "MOF Open", 1,
                                                          ifelse(PostSnap_MOF %in% "MOF Closed", 0, NA)))
 
+# Get rid of the "Ambiguous" coverages
+MergedData <- MergedData %>% filter(PostSnap_MOF %in% c("MOF Closed", "MOF Open"))
+
 # For what it's worth, here are plays with exactly 2 pre-snap safeties
 TwoPreSnapSafety_Snaps <- MergedData %>% filter(num_safeties_pre_snap == 2)
 # Should be no NAs here: View(TwoPreSnapSafety_Snaps %>% filter(is.na(X_Diff_BetweenSafeties_AtSnap)))
