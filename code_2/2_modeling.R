@@ -10,11 +10,6 @@ library(Metrics)
 library(scales)
 library(splines)
 
-# need to set random seet BEFORE importing NN librariers to make it reproducible
-set.seed(529735)
-library(keras)
-library(tensorflow)
-
 ### plotting pre-sets
 theme_set(theme_bw())
 theme_update(
@@ -28,6 +23,31 @@ theme_update(
   legend.title = element_text(size=20),
   panel.spacing = unit(2, "lines")
 ) 
+
+################################
+### installing Keras package ###
+################################
+
+# # https://github.com/rstudio/tensorflow/issues/510
+# # https://github.com/rstudio/tfprobability/issues/155
+# ### install the development version of packages, in case the
+# ### issue is already fixed but not on CRAN yet.
+# ######remotes::install_github(sprintf("rstudio/%s", c("reticulate", "tensorflow", "keras")), force = TRUE)
+# pkgs = c("reticulate", "tensorflow", "keras")
+# remove.packages(pkgs)
+# remotes::install_github(sprintf("rstudio/%s", pkgs))
+# reticulate::miniconda_uninstall() # start with a blank slate
+# reticulate::install_miniconda()
+# keras::install_keras()
+# tfprobability::install_tfprobability()
+# 
+# tensorflow::as_tensor("Hello World")
+# tfprobability::tfd_multivariate_normal_diag
+
+# need to set random seet BEFORE importing NN librariers to make it reproducible
+set.seed(529735)
+library(keras)
+library(tensorflow)
 
 #################
 ### READ DATA ###
