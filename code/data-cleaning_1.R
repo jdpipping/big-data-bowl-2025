@@ -330,6 +330,8 @@ tracking_std <- tracking_std %>%
   ungroup() 
 # View(tracking_std %>% filter(is.na(LineSet_OnFullPlay))) - it's empty
 table(tracking_std$LineSet_OnFullPlay)
+# OpeningFrames <- tracking_std %>% filter(frameId == 1)
+# table(OpeningFrames$LineSet_OnFullPlay) ... over the full 9 weeks, 367494 / 370852 plays have a line_set, or 99.1%
 
 # For any play w/ multiple "line_set" events, get rid of any frames before the most recent such event
 LineSet_DF <- tracking_std %>%
