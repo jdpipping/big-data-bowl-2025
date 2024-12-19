@@ -59,7 +59,7 @@ all_pids
 sum(all_pids$n)
 
 # merge eval with pid's
-df_eval =
+df_eval1 =
   df_eval0 %>% 
   left_join(
     all_pids %>% select(nflId_p1 = nflId, pid1 = pid)
@@ -69,6 +69,20 @@ df_eval =
   ) %>%
   mutate(pid2 = ifelse(is.na(pid2), 0, pid2)) %>% # label NAs as player 0
   mutate(tid = as.numeric(as.factor(defensiveTeam)))
+df_eval1
+
+# add play-level EPA from nflfastr data
+nflverse_pbp <- nflfastR::load_pbp(2022)
+nflverse_pbp <- nflverse_pbp %>% filter(week %in% 1:9)
+nflverse_pbp1 = 
+  nflverse_pbp %>%
+  mutate(gameId = as.numeric(old_game_id), playId = as.numeric(play_id)) %>%
+  select(gameId, playId, epa)
+nflverse_pbp1
+df_eval = 
+  df_eval1 %>%
+  left_join(nflverse_pbp1) %>%
+  relocate(epa, .after = entropy)
 df_eval
 
 #################################
@@ -139,75 +153,97 @@ ggsave("results_plot_team_mean_entropy_boot.png", width=6, height=8)
 ### correlation between safety entropy and EPA/play ###
 #######################################################
 
-# nflfastr data
-nflverse_pbp <- nflfastR::load_pbp(2022)
-nflverse_pbp <- nflverse_pbp %>% filter(week %in% 1:9)
-names(nflverse_pbp)
-df_pass_plays = 
-  nflverse_pbp %>%
-  filter(pass_attempt == 1) %>%
-  filter(
-    (down == 1 | (down == 2 & ydstogo >= 5)) & 
-    half_seconds_remaining > 30 & 
-    0.05 < wp & wp < 0.95 &
-    xpass < 0.95
-  ) %>%
-  select(old_game_id, play_id, posteam, defteam, epa)
-df_pass_plays
-df_defteam_epa = 
-  df_pass_plays %>%
-  group_by(defteam) %>%
-  reframe(epa_per_play = mean(epa)) %>%
-  rename(defensiveTeam = defteam)
-df_defteam_epa
+#
 df_epa_entropy = 
-df_team_mean_entropy %>%
-  select(defensiveTeam, mean_entropy) %>%
-  left_join(df_defteam_epa) 
+  df_eval %>%
+  group_by(defensiveTeam) %>%
+  reframe(mean_entropy = mean(entropy), epa_per_play = mean(epa)) 
 df_epa_entropy
 
 # correlations
-df_for_lm = df_epa_entropy
-# df_for_lm = df_epa_entropy %>% filter(!(defensiveTeam %in% c("PHI")))
-cor_epa_entropy = cor(df_for_lm$mean_entropy, df_for_lm$epa_per_play)
-cor_epa_entropy
-m1 = lm(epa_per_play~mean_entropy, data=df_for_lm)
-m1
-
-# plot
-df_plot_cor = 
-  df_epa_entropy %>%
-  ggplot(aes(team_abbr = defensiveTeam, x = mean_entropy, y = epa_per_play)) +
-  ###
-  annotate("text", x = 0.825, y = 0.19, size=6, color="firebrick",
-           label = paste0("corr = ", round(cor_epa_entropy,2))) +
-  ggplot2::geom_abline(slope = coef(m1)[2], intercept = coef(m1)[1],
-                       linewidth=1.5, color="gray20", linetype="longdash") +
-  ###
-  nflplotR::geom_mean_lines(aes(x0 = mean_entropy , y0 = epa_per_play)) +
-  geom_nfl_logos(width=0.05) +
-  annotate(
-    "segment", x = 0.77, xend = 0.85, y = -0.2, yend = -0.2, 
-    arrow = arrow(type = "closed", length = unit(0.4, "cm")),
-    color = "firebrick"
-  ) +
-  annotate(
-    "text", x = 0.77, y = -0.19, hjust=0, vjust = 0.1, size = 4,
-    label = "more unpredictable safeties", color = "firebrick",
-  ) +
-  annotate(
-    "segment", x = 0.61, xend = 0.61, y = 0, yend = -0.2, 
-    arrow = arrow(type = "closed", length = unit(0.4, "cm")),
-    color = "firebrick"
-  ) +
-  annotate(
-    "text", x = 0.61, y = -0.18, hjust=0, vjust = -0.5, size = 4,
-    label = "more efficient defenses", color = "firebrick", angle = 90
-  ) +
-  ylab("EPA/play") +
-  xlab("mean safety entropy")
-# df_plot_cor
-ggsave("results_plot_epa_entropy_corr.png", df_plot_cor, width=8, height=5)
+dfs_for_lm = list(
+  df_epa_entropy,
+  df_epa_entropy %>% filter(!(defensiveTeam %in% c("PHI"))),
+  df_epa_entropy %>% filter(!(defensiveTeam %in% c("PHI", "LV")))
+)
+for (j in 1:length(dfs_for_lm)) {
+  df_for_lm = dfs_for_lm[[j]]
+  
+  cor_epa_entropy = cor(df_for_lm$mean_entropy, df_for_lm$epa_per_play)
+  cor_epa_entropy
+  m1 = lm(epa_per_play~mean_entropy, data=df_for_lm)
+  m1
+  
+  # plot
+  df_plot_cor = 
+    df_for_lm %>%
+    ggplot(aes(team_abbr = defensiveTeam, x = mean_entropy, y = epa_per_play)) +
+    ###
+    annotate("text", x = 0.825, y = 0.19, size=6, color="firebrick",
+             label = paste0("corr = ", round(cor_epa_entropy,2))) +
+    ggplot2::geom_abline(slope = coef(m1)[2], intercept = coef(m1)[1],
+                         linewidth=1.5, color="gray20", linetype="longdash") +
+    ###
+    nflplotR::geom_mean_lines(aes(x0 = mean_entropy , y0 = epa_per_play)) +
+    geom_nfl_logos(width=0.05) +
+    annotate(
+      "segment", x = 0.78, xend = 0.86, y = -0.16, yend = -0.16, 
+      arrow = arrow(type = "closed", length = unit(0.4, "cm")),
+      color = "firebrick"
+    ) +
+    annotate(
+      "text", x = 0.78, y = -0.15, hjust=0, vjust = 0.1, size = 4,
+      label = "more unpredictable safeties", color = "firebrick",
+    ) +
+    annotate(
+      "segment", x = 0.61, xend = 0.61, y = 0, yend = -0.16, 
+      arrow = arrow(type = "closed", length = unit(0.4, "cm")),
+      color = "firebrick"
+    ) +
+    annotate(
+      "text", x = 0.61, y = -0.15, hjust=0, vjust = -0.5, size = 4,
+      label = "more efficient defenses", color = "firebrick", angle = 90
+    ) +
+    ylab("EPA/play") +
+    xlab("mean safety entropy")
+  ggsave(paste0("results_plot_epa_entropy_corr",j,".png"), df_plot_cor, width=8, height=5)
+  
+  # plot
+  if (j == 1) {
+    df_plot_cor = 
+      df_for_lm %>%
+      ggplot(aes(team_abbr = defensiveTeam, x = mean_entropy, y = epa_per_play)) +
+      # ###
+      # annotate("text", x = 0.825, y = 0.19, size=6, color="firebrick",
+      #          label = paste0("corr = ", round(cor_epa_entropy,2))) +
+      # ggplot2::geom_abline(slope = coef(m1)[2], intercept = coef(m1)[1],
+      #                      linewidth=1.5, color="gray20", linetype="longdash") +
+      # ###
+      nflplotR::geom_mean_lines(aes(x0 = mean_entropy , y0 = epa_per_play)) +
+      geom_nfl_logos(width=0.05) +
+      annotate(
+        "segment", x = 0.78, xend = 0.86, y = -0.16, yend = -0.16, 
+        arrow = arrow(type = "closed", length = unit(0.4, "cm")),
+        color = "firebrick"
+      ) +
+      annotate(
+        "text", x = 0.78, y = -0.15, hjust=0, vjust = 0.1, size = 4,
+        label = "more unpredictable safeties", color = "firebrick",
+      ) +
+      annotate(
+        "segment", x = 0.63, xend = 0.63, y = 0.15, yend = -0.16, 
+        arrow = arrow(type = "closed", length = unit(0.4, "cm")),
+        color = "firebrick"
+      ) +
+      annotate(
+        "text", x = 0.63, y = -0.15, hjust=0, vjust = -0.5, size = 4,
+        label = "more efficient defenses", color = "firebrick", angle = 90
+      ) +
+      ylab("EPA/play") +
+      xlab("mean safety entropy")
+    ggsave(paste0("results_plot_epa_entropy_corr_A",j,".png"), df_plot_cor, width=8, height=5)
+  }
+}
 
 #############################################
 ### BAYESIAN DEFENSIVE TEAM EFFECTS MODEL ###
