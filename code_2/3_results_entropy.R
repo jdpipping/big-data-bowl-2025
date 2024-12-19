@@ -167,25 +167,25 @@ df_team_mean_entropy %>%
 df_epa_entropy
 
 # correlations
-cor_epa_entropy = cor(df_epa_entropy$mean_entropy, df_epa_entropy$epa_per_play)
+df_for_lm = df_epa_entropy
+# df_for_lm = df_epa_entropy %>% filter(!(defensiveTeam %in% c("PHI")))
+cor_epa_entropy = cor(df_for_lm$mean_entropy, df_for_lm$epa_per_play)
 cor_epa_entropy
-m1 = lm(epa_per_play~mean_entropy, data=df_epa_entropy)
+m1 = lm(epa_per_play~mean_entropy, data=df_for_lm)
 m1
-# m2 = lm(epa_per_play~mean_entropy, 
-#         data=df_epa_entropy%>%filter(!(defensiveTeam %in% c("LAR","DEN","PHI"))))
-# m2
-# plot
 
+# plot
 df_plot_cor = 
   df_epa_entropy %>%
   ggplot(aes(team_abbr = defensiveTeam, x = mean_entropy, y = epa_per_play)) +
-  # geom_point() +
-  ggplot2::geom_abline(slope = coef(m1)[2], intercept = coef(m1)[1], 
+  ###
+  annotate("text", x = 0.825, y = 0.19, size=6, color="firebrick",
+           label = paste0("corr = ", round(cor_epa_entropy,2))) +
+  ggplot2::geom_abline(slope = coef(m1)[2], intercept = coef(m1)[1],
                        linewidth=1.5, color="gray20", linetype="longdash") +
+  ###
   nflplotR::geom_mean_lines(aes(x0 = mean_entropy , y0 = epa_per_play)) +
   geom_nfl_logos(width=0.05) +
-  annotate("text", x = 0.825, y = 0.165, size=6, color="firebrick",
-           label = paste0("corr = ", round(cor_epa_entropy,2))) +
   annotate(
     "segment", x = 0.77, xend = 0.85, y = -0.2, yend = -0.2, 
     arrow = arrow(type = "closed", length = unit(0.4, "cm")),

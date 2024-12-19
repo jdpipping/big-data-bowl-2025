@@ -274,22 +274,29 @@ for (week in WEEKS) {
   df_postsnap_locs
   
   ### rightmost & leftmost defender
-  df_furthest_defenders = 
+  df_furthest_defenders_0 = 
     df_tracking_3 %>%
     group_by(gameId, playId, nflId) %>%
-    filter(t_after_snap == 0) %>%
+    filter(t_after_snap == 0 & posGroup == "defense") %>%
     ungroup() %>%
-    select(gameId, playId, nflId, x_snap = x, y_snap = y) %>%
+    select(gameId, playId, nflId, pos_official, x_snap = x, y_snap = y) %>%
     arrange(gameId, playId, y_snap) %>%
     group_by(gameId, playId) %>%
-    filter(
-      y_snap == max(y_snap) | y_snap == min(y_snap),
-      row_number() == 1 | row_number() == n()
+    mutate(
+      p = ifelse(row_number() == 1, "leftmost_def", ifelse(row_number() == n(), "rightmost_def", NA)),
     ) %>%
-    mutate(p = c("leftmost_def", "rightmost_def")) %>%
-    ungroup() %>%
-    pivot_wider(values_from = c(nflId,x_snap, y_snap), names_from = p) 
+    ungroup()
+  df_furthest_defenders_0
+  
+  df_furthest_defenders = 
+    df_furthest_defenders_0 %>%
+    filter(!is.na(p)) %>%
+    pivot_wider(values_from = c(nflId, pos_official, x_snap, y_snap), names_from = p) 
   df_furthest_defenders
+  
+  # leftmost & rightmost defender quality check
+  table(df_furthest_defenders$pos_official_leftmost_def)
+  table(df_furthest_defenders$pos_official_rightmost_def)
   
   # define pre-snap safety from tracking data
   pre_snap_safeties_0 = 
@@ -305,7 +312,7 @@ for (week in WEEKS) {
     mutate(beyond_8AndAHalf = if_else(x >= los + 8.5, T, F)) |>
     # join with rightmost & leftmost defenders
     left_join(
-      df_furthest_defenders %>% select(-all_of(contains("snap")))
+      df_furthest_defenders %>% select(-all_of(contains("snap")), -all_of(contains("pos_official")))
     )
   pre_snap_safeties_0
   dim(df_tracking_3)
@@ -444,28 +451,28 @@ key_vars = c("gameId", "playId", "nflId", "displayName")
 tracking_vars = c(
   "t_after_snap", "x", "y", "s", "a", "o", "dir"
 )
-df_tracking_B = df_tracking_A %>% select(c(all_of(key_vars), all_of(tracking_vars)))
-df_tracking_B
+df_tracking_C = df_tracking_A %>% select(c(all_of(key_vars), all_of(tracking_vars)))
+df_tracking_C
 
 # players dataframe
 players_vars = c(
   "pos_official", "posGroup", "is_pre_safety", "x_postsnap", "y_postsnap"
 )
-df_players_B = df_tracking_A %>% select(c(all_of(key_vars), all_of(players_vars))) %>% distinct() 
-df_players_B
+df_players_C = df_tracking_A %>% select(c(all_of(key_vars), all_of(players_vars))) %>% distinct() 
+df_players_C
 
 # plays dataframe
 plays_vars = c("gameId", "playId", setdiff(all_vars, c(
   key_vars, tracking_vars, players_vars, "beyond_8AndAHalf", "nflId_rightmost_def", "nflId_leftmost_def"
 )))
 plays_vars
-df_plays_B = df_tracking_A %>% select(all_of(plays_vars)) %>% distinct() 
-df_plays_B
+df_plays_C = df_tracking_A %>% select(all_of(plays_vars)) %>% distinct() 
+df_plays_C
 
 # save data
-write_csv(df_tracking_B, "../processed-data/df_B_tracking.csv")
-write_csv(df_players_B, "../processed-data/df_B_players.csv")
-write_csv(df_plays_B, "../processed-data/df_B_plays.csv")
+write_csv(df_tracking_C, "../processed-data/df_C_tracking.csv")
+write_csv(df_players_C, "../processed-data/df_C_players.csv")
+write_csv(df_plays_C, "../processed-data/df_C_plays.csv")
 
 # delete the intermediate files - DANGEROUS 
 filenames_to_delete = sapply(WEEKS, FUN = get_filename)

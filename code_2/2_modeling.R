@@ -54,17 +54,17 @@ library(tensorflow)
 #################
 
 # read data
-df_tracking_B = read_csv("../processed-data/df_B_tracking.csv", show_col_types = F)
-df_players_B = read_csv("../processed-data/df_B_players.csv", show_col_types = F)
-df_plays_B = read_csv("../processed-data/df_B_plays.csv", show_col_types = F)
+df_tracking_C = read_csv("../processed-data/df_C_tracking.csv", show_col_types = F)
+df_players_C = read_csv("../processed-data/df_C_players.csv", show_col_types = F)
+df_plays_C = read_csv("../processed-data/df_C_plays.csv", show_col_types = F)
 
 # join data into one big dataframe
 df_tracking_OG = 
-  df_players_B %>%
-  left_join(df_tracking_B) %>% 
-  left_join(df_plays_B) %>%
+  df_players_C %>%
+  left_join(df_tracking_C) %>% 
+  left_join(df_plays_C) %>%
   relocate(num_safeties, .after = is_pre_safety)
-dim(df_tracking_B)
+dim(df_tracking_C)
 dim(df_tracking_OG)
 # View(df_tracking_OG[1:1000,])
 
@@ -244,17 +244,33 @@ num_def_players_per_play =
   reframe(num_def_players = n()) 
 table(num_def_players_per_play$num_def_players) # good enough I guess...
 
-df_tracking_safeties = 
+df_tracking_safeties_0 = 
   # keep just the pre-snap safeties ... and keep in mind we already limited to only pre-snap frames above
   df_tracking_def |>
   filter(is_pre_safety) |>
   select(-c(pos_official, posGroup, is_pre_safety)) #|>
   # # keep early downs -- LREADY DID THIS IN THE PREVIOUS FILE!!
   # filter(down == 1 | (down == 2 & yardsToGo >= 5))
-df_tracking_safeties
-nrow(df_tracking_safeties %>% distinct(gameId, playId))
-table(df_tracking_safeties$t_after_snap)
-# View(df_tracking_safeties[1:2000,])
+df_tracking_safeties_0
+nrow(df_tracking_safeties_0)
+nrow(df_tracking_safeties_0 %>% distinct(gameId, playId))
+sum(is.na(df_tracking_safeties_0))
+table(df_tracking_safeties_0$t_after_snap)
+# View(df_tracking_safeties_0[1:2000,])
+
+# remove NAs
+rows_with_NA = which(apply(df_tracking_safeties_0, 1, function(row) any(is.na(row))))
+plays_with_NA = df_tracking_safeties_0[rows_with_NA,] %>% distinct(gameId, playId) %>% mutate(playHasNA = TRUE)
+plays_with_NA
+df_tracking_safeties = 
+  df_tracking_safeties_0 %>% 
+  left_join(plays_with_NA) %>% 
+  mutate(playHasNA = ifelse(is.na(playHasNA), FALSE, playHasNA)) %>%
+  filter(!playHasNA) %>% 
+  select(-playHasNA)
+dim(df_tracking_safeties_0)
+dim(df_tracking_safeties)
+sum(is.na(df_tracking_safeties))
 
 ########################################
 ### FUNCTIONAL DATA ANALYSIS EXAMPLE ###
@@ -469,6 +485,14 @@ df_safety_movement_2
 df_safety_movement_1
 df_safety_movement_2
 
+# check NA
+sum(is.na(df_safety_movement_1))
+sum(is.na(df_safety_movement_2))
+
+# save movement features
+write_csv(df_safety_movement_1, "df_safety_movement_1.csv")
+write_csv(df_safety_movement_2, "df_safety_movement_2.csv")
+
 #########################################################
 ### NEURAL NETWORK MODEL FOR FUNCTIONAL DATA ANALYSIS ###
 #########################################################
@@ -603,10 +627,6 @@ predict_movement_NN <- function(df_test, model) {
 df_safety_movement_1
 df_safety_movement_2 
 
-# save movement features
-write_csv(df_safety_movement_1, "df_safety_movement_1.csv")
-write_csv(df_safety_movement_2, "df_safety_movement_2.csv")
-
 # play indices
 plays_all = 
   bind_rows(
@@ -621,7 +641,7 @@ plays_all
 # K-fold cross validation
 TEST_NN = TRUE
 NUM_FOLDS = 10 #FIXME
-set.seed(98247) # for reproducibility of the folds
+set.seed(12345) # for reproducibility of the folds
 folds <- cvFolds(n = nrow(plays_all), K = NUM_FOLDS, type = "random")
 plays_all_f = 
   tibble(i = tibble(folds$subsets)[[1]][,1], FOLD = folds$which) %>% 
