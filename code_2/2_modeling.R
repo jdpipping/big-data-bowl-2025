@@ -95,11 +95,11 @@ df_tracking_presnap =
   relocate(y1_postsnap, .after=x1_postsnap) |>
   # min safety distance to center
   group_by(gameId, playId) |>
-  mutate(minSafetyDistToCenter = min(abs( ifelse(is_pre_safety, y1, Inf) ))) |>
+  mutate(minSafetyDistToMOF = min(abs( ifelse(is_pre_safety, y1, Inf) ))) |>
   ungroup() |>
   # min safety distance to ball line
   group_by(gameId, playId) |>
-  mutate(minSafetyDistToBallLine = min(abs( ifelse(is_pre_safety, y - ball_y_snap, Inf) ))) |>
+  mutate(minSafetyHorizDistToBallLine = min(abs( ifelse(is_pre_safety, y - ball_y_snap, Inf) ))) |>
   ungroup() 
 df_tracking_presnap
 table(df_tracking_presnap$t_after_snap)
@@ -195,34 +195,34 @@ fit_model_defTeamNumSafetiesOffTeam <- function(df_tracking) {
 # temp
 
 # min distance to center of field
-fit_model_minSafetyDistToCenter <- function(df_tracking) {
-  df_plays = df_tracking %>% distinct(gameId,playId,minSafetyDistToCenter,mofo_postsnap)
+fit_model_minSafetyDistToMOF <- function(df_tracking) {
+  df_plays = df_tracking %>% distinct(gameId,playId,minSafetyDistToMOF,mofo_postsnap)
   df_plays
-  glm(mofo_postsnap ~ minSafetyDistToCenter, data = df_plays, family = "binomial")
+  glm(mofo_postsnap ~ minSafetyDistToMOF, data = df_plays, family = "binomial")
 }
 # # example
-# temp = fit_model_minSafetyDistToCenter(df_tracking_presnap)
+# temp = fit_model_minSafetyDistToMOF(df_tracking_presnap)
 # temp
 
 # min horizontal distance to ball's original location
-fit_model_minSafetyDistToBallLine <- function(df_tracking) {
-  df_plays = df_tracking %>% distinct(gameId,playId,minSafetyDistToBallLine,mofo_postsnap)
+fit_model_minSafetyHorizDistToBallLine <- function(df_tracking) {
+  df_plays = df_tracking %>% distinct(gameId,playId,minSafetyHorizDistToBallLine,mofo_postsnap)
   df_plays
-  glm(mofo_postsnap ~ minSafetyDistToBallLine, data = df_plays, family = "binomial")
+  glm(mofo_postsnap ~ minSafetyHorizDistToBallLine, data = df_plays, family = "binomial")
 }
 # # example
-# temp = fit_model_minSafetyDistToBallLine(df_tracking_presnap)
+# temp = fit_model_minSafetyHorizDistToBallLine(df_tracking_presnap)
 # temp
 
 # # multivariable baseline model
 # fit_model_best_baseline <- function(df_tracking) {
 #   df_plays = df_tracking %>% distinct(
-#     gameId,playId,mofo_postsnap,possessionTeam,minSafetyDistToCenter,defensiveTeam,num_safeties
+#     gameId,playId,mofo_postsnap,possessionTeam,minSafetyDistToMOF,defensiveTeam,num_safeties
 #   )
 #   df_plays
-#   glm(mofo_postsnap ~ minSafetyDistToCenter + defensiveTeam:factor(num_safeties) + possessionTeam,
+#   glm(mofo_postsnap ~ minSafetyDistToMOF + defensiveTeam:factor(num_safeties) + possessionTeam,
 #       data = df_plays, family = "binomial")
-#   # glm(mofo_postsnap ~ minSafetyDistToCenter + defensiveTeam:factor(num_safeties), data = df_plays, family = "binomial")
+#   # glm(mofo_postsnap ~ minSafetyDistToMOF + defensiveTeam:factor(num_safeties), data = df_plays, family = "binomial")
 # }
 # # # example
 # # temp = fit_model_best_baseline(df_tracking_presnap)
@@ -432,7 +432,7 @@ df_movement_features_A =
   distinct(
     gameId, playId, nflId, 
     displayName, num_safeties, mofo_postsnap,
-    minSafetyDistToCenter, minSafetyDistToBallLine,
+    minSafetyDistToMOF, minSafetyHorizDistToBallLine,
     defensiveTeam, possessionTeam, los
   ) %>% 
   left_join(df_movement_features) %>%
@@ -500,7 +500,7 @@ df_safety_movement_2
 get_movement_X <- function(df) {
   X = df %>%
     select(
-      minSafetyDistToCenter,
+      minSafetyDistToMOF,
       all_of(contains("_first")), all_of(contains("_last")),
       all_of(contains("spline"))
     )
@@ -647,7 +647,7 @@ for (fold in 1:NUM_FOLDS) {
   nrow(plays_train)
   vars_for_12 = c(
     "i","FOLD","gameId","playId","num_safeties","mofo_postsnap",
-    "minSafetyDistToBallLine","minSafetyDistToCenter","defensiveTeam","possessionTeam","los"
+    "minSafetyHorizDistToBallLine","minSafetyDistToMOF","defensiveTeam","possessionTeam","los"
   )
   df_train_12 = bind_rows(
     df_train_1 %>% select(all_of(vars_for_12)),
@@ -673,8 +673,8 @@ for (fold in 1:NUM_FOLDS) {
   fit_offteam = fit_model_offteam(df_train_12)
   fit_defTeamNumSafeties = fit_model_defTeamNumSafeties(df_train_12)
   fit_defTeamNumSafetiesOffTeam = fit_model_defTeamNumSafetiesOffTeam(df_train_12)
-  fit_minSafetyDistToCenter = fit_model_minSafetyDistToCenter(df_train_12)
-  fit_minSafetyDistToBallLine = fit_model_minSafetyDistToBallLine(df_train_12)
+  fit_minSafetyDistToMOF = fit_model_minSafetyDistToMOF(df_train_12)
+  fit_minSafetyHorizDistToBallLine = fit_model_minSafetyHorizDistToBallLine(df_train_12)
   # fit_best_baseline = fit_model_best_baseline(df_train_12)
   
   # fit NN models
@@ -694,8 +694,8 @@ for (fold in 1:NUM_FOLDS) {
       pred_offteam = predict(fit_offteam, ., type = "response"),
       pred_defTeamNumSafeties = predict(fit_defTeamNumSafeties, ., type = "response"),
       pred_defTeamNumSafetiesOffTeam = predict(fit_defTeamNumSafetiesOffTeam, ., type = "response"),
-      pred_minSafetyDistToCenter = predict(fit_minSafetyDistToCenter, ., type = "response"),
-      pred_minSafetyDistToBallLine = predict(fit_minSafetyDistToBallLine, ., type = "response"),
+      pred_minSafetyDistToMOF = predict(fit_minSafetyDistToMOF, ., type = "response"),
+      pred_minSafetyHorizDistToBallLine = predict(fit_minSafetyHorizDistToBallLine, ., type = "response"),
       # pred_best_baseline = predict(fit_best_baseline, ., type = "response"),
     ) %>%
     select(gameId, playId, mofo_postsnap, all_of(starts_with("pred"))) %>%
@@ -712,8 +712,8 @@ for (fold in 1:NUM_FOLDS) {
       pred_offteam = predict(fit_offteam, ., type = "response"),
       pred_defTeamNumSafeties = predict(fit_defTeamNumSafeties, ., type = "response"),
       pred_defTeamNumSafetiesOffTeam = predict(fit_defTeamNumSafetiesOffTeam, ., type = "response"),
-      pred_minSafetyDistToCenter = predict(fit_minSafetyDistToCenter, ., type = "response"),
-      pred_minSafetyDistToBallLine = predict(fit_minSafetyDistToBallLine, ., type = "response"),
+      pred_minSafetyDistToMOF = predict(fit_minSafetyDistToMOF, ., type = "response"),
+      pred_minSafetyHorizDistToBallLine = predict(fit_minSafetyHorizDistToBallLine, ., type = "response"),
       # pred_best_baseline = predict(fit_best_baseline, ., type = "response"),
     ) %>%
     select(gameId, playId, mofo_postsnap, all_of(starts_with("pred"))) %>%
