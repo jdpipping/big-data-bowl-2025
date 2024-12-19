@@ -31,5 +31,5 @@ Select_Dropbacks_Merged <- Select_Dropbacks_Merged %>% relocate("gameId", "playI
 
 # Some good ones to check out where the model correctly guessed a disguised coverage:
 # View(NN_model_results_DF %>% filter((num_safeties_pre_snap == 2 & p < 0.3) | (num_safeties_pre_snap == 1 & p > 0.7)))
-# View(Select_Dropbacks_Merged %>% filter(gameId == 2022091101, playId == 2298))
-# View(Select_Dropbacks_Merged %>% filter(gameId == 2022101000, playId == 3407))
+# View(Select_Dropbacks_Merged %>% filter(gameId == 2022091101, playId == 2298)) ... 2-high turns to Cover 3
+# View(Select_Dropbacks_Merged %>% filter(gameId == 2022092507, playId == 1836)) ... 1-high turns to Cover 2
