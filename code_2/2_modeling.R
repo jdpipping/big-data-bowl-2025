@@ -245,7 +245,7 @@ num_def_players_per_play =
 table(num_def_players_per_play$num_def_players) # good enough I guess...
 
 df_tracking_safeties = 
-  # keep just the pre-snap safeties
+  # keep just the pre-snap safeties ... and keep in mind we already limited to only pre-snap frames above
   df_tracking_def |>
   filter(is_pre_safety) |>
   select(-c(pos_official, posGroup, is_pre_safety)) #|>
