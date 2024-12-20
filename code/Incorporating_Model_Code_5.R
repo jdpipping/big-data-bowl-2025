@@ -33,3 +33,6 @@ final_dropbacks_merged <- final_dropbacks_merged %>% relocate("gameId", "playId"
 # View(NN_model_results_DF %>% filter((num_safeties_pre_snap == 2 & p < 0.3) | (num_safeties_pre_snap == 1 & p > 0.7)))
 # View(final_dropbacks_merged %>% filter(gameId == 2022091101, playId == 2298)) ... 2-high turns to Cover 3
 # View(final_dropbacks_merged %>% filter(gameId == 2022092507, playId == 1836)) ... 1-high turns to Cover 2
+
+# On the flip side, here are "conventional" snaps, where model's guess of the post-snap coverage matched pre-snap alignment
+# View(NN_model_results_DF %>% filter((num_safeties_pre_snap == 2 & p > 0.7) | (num_safeties_pre_snap == 1 & p < 0.3)))
