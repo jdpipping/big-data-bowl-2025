@@ -438,13 +438,12 @@ Safety_PreSnapMovement_ByPlay <- MergedData_PreSnapFrames %>% filter(is_pre_snap
 # Let's define "creep distance" as distance from ball at the time of line_set - distance from ball at the snap
 # Another option is maximum distance from ball - distance from ball at the snap
 # And another is maximum distance from ball - minimum distance from ball
-# But we should probably account for players back-pedaling further away from the ball as well
+# But we should probably account for players back-pedaling further away from the ball as well ... i.e. we want negative values to be possible
 Safety_PreSnapMovement_ByPlay <- Safety_PreSnapMovement_ByPlay %>% 
   mutate(Safety_VertCreptDistance = Initial_X_DistFromBall - X_DistFromBall_AtSnap)
 Safety_PreSnapMovement_ByPlay <- Safety_PreSnapMovement_ByPlay %>% 
   mutate(Safety_TotalCreptDistance_TowardBall = Initial_Tot_DistFromBall - Tot_DistFromBall_AtSnap)
 # Keep in mind TotDistance already exists, for total distance covered altogether (even if it wasn't all directly toward the ball)
-
 
 # MergedData <- MergedData %>% arrange(gameId, playId, nflId, frameId)
 setDT(MergedData)
