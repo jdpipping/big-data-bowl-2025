@@ -36,6 +36,7 @@ df_safety_movement_1 <- read_csv("df_safety_movement_1.csv")
 df_safety_movement_2 <- read_csv("df_safety_movement_2.csv")
 
 # Get the column names here to align with those of Dropbacks_Merged
+# Note: for 2-high plays, i.e. df_safety_movement_2, minSafetyDistToMOF refers to the minimum across both safeties
 colnames(df_safety_movement_1)
 colnames(df_safety_movement_2)
 colnames(Dropbacks_Merged)
