@@ -28,6 +28,7 @@ rm(NN_DF_abridged)
 setDT(final_dropbacks_merged)
 setkey(final_dropbacks_merged, gameId, playId, nflId, frameId)
 final_dropbacks_merged <- final_dropbacks_merged %>% relocate("gameId", "playId", "nflId", "displayName", "frameId")
+rm(Dropbacks_Merged)
 
 # Some good ones to check out where the model correctly guessed a disguised coverage:
 # View(NN_model_results_DF %>% filter((num_safeties_pre_snap == 2 & p < 0.3) | (num_safeties_pre_snap == 1 & p > 0.7)))
