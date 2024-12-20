@@ -396,6 +396,56 @@ MergedData <- MergedData %>%
          x_acc_component = (a*cos((90-dir)*pi/180)),
          y_acc_component = (a*sin((90-dir)*pi/180)))
 
+# Create "safety crept distance" using code similar to "aggregating frames" from 2023-24
+# NOTE: b/c this DF will only include defensive players and only pre-snap frames, X_AbsDistFromBall is equivalent to X_DistFromBall
+# In other words, it's not possible for a defensive player to have a negative X_DistFromBall value before the snap
+MergedData_PreSnapFrames <- MergedData %>% filter(frameType != 'AFTER_SNAP')
+
+# NOTE: if we want "last element," just replace the [1] with [length(ball_x)], or whatever the variable was
+Safety_PreSnapMovement_ByPlay <- MergedData_PreSnapFrames %>% filter(is_pre_snap_safety == TRUE) %>%
+  group_by(gameId, playId, nflId, displayName) %>%
+  summarize(Frames = n(), down = max(down), distance = max(yardsToGo), Team = max(club),
+            PosTeam = max(posteam), DefTeam = max(defteam),
+            posteam_type = max(posteam_type), yardline_100 = max(yardline_100),
+            Dropback = max(isDropback),
+            Initial_X = x[1], Initial_Y = y[1], MaxSpeed = max(s), AvgSpeed = mean(s),
+            MaxAcceleration = max(a), AvgAcceleration = mean(a),
+            Max_x_vel_component = max(x_vel_component), Max_y_vel_component = max(y_vel_component), 
+            Max_x_acc_component = max(x_acc_component), Max_y_acc_component = max(y_acc_component),
+            Mean_x_vel_component = mean(x_vel_component), Mean_y_vel_component = mean(y_vel_component), 
+            Mean_x_acc_component = mean(x_acc_component), Mean_y_acc_component = mean(y_acc_component), 
+            TotDistance = sum(dis), InitialOrientation = o[1],
+            InitialDirection = dir[1], Ball_X_Snap = max(Ball_X_Snap),
+            Ball_Y_Snap = max(Ball_Y_Snap), Initial_X_DistFromBall = X_DistFromBall[1],
+            Initial_Y_DistFromBall = Y_DistFromBall[1], Initial_Tot_DistFromBall = TotDistFromBall[1],
+            Initial_Y_DistFromMOF = Y_distFromMOF[1], Initial_Y_AbsDistFromMOF = abs(Y_distFromMOF[1]),
+            Max_X_DistFromBall = max(X_DistFromBall),
+            Max_Y_AbsDistFromBall = max(Y_AbsDistFromBall), Max_Tot_DistFromBall = max(TotDistFromBall),
+            X_DistFromBall_AtSnap = X_DistFromBall[length(X_DistFromBall)],
+            Y_DistFromBall_AtSnap = Y_DistFromBall[length(Y_DistFromBall)],
+            Y_AbsDistFromBall_AtSnap = Y_AbsDistFromBall[length(Y_AbsDistFromBall)],
+            Y_DistFromMOF_AtSnap = Y_distFromMOF[length(Y_distFromMOF)],
+            Y_AbsDistFromMOF_AtSnap = abs(Y_distFromMOF[length(Y_distFromMOF)]),
+            Tot_DistFromBall_AtSnap = TotDistFromBall[length(TotDistFromBall)],
+            Speed_AtSnap = s[length(s)], Acceleration_AtSnap = a[length(a)],
+            x_vel_component_AtSnap = x_vel_component[length(x_vel_component)],
+            y_vel_component_AtSnap = y_vel_component[length(y_vel_component)],
+            x_acc_component_AtSnap = x_acc_component[length(x_acc_component)],
+            y_acc_component_AtSnap = y_acc_component[length(y_acc_component)],
+            Orientation_AtSnap = o[length(o)], Direction_AtSnap = dir[length(dir)],
+            PosGroup = max(PosGroup), position = max(position))
+
+# Let's define "creep distance" as distance from ball at the time of line_set - distance from ball at the snap
+# Another option is maximum distance from ball - distance from ball at the snap
+# And another is maximum distance from ball - minimum distance from ball
+# But we should probably account for players back-pedaling further away from the ball as well
+Safety_PreSnapMovement_ByPlay <- Safety_PreSnapMovement_ByPlay %>% 
+  mutate(Safety_VertCreptDistance = Initial_X_DistFromBall - X_DistFromBall_AtSnap)
+Safety_PreSnapMovement_ByPlay <- Safety_PreSnapMovement_ByPlay %>% 
+  mutate(Safety_TotalCreptDistance_TowardBall = Initial_Tot_DistFromBall - Tot_DistFromBall_AtSnap)
+# Keep in mind TotDistance already exists, for total distance covered altogether (even if it wasn't all directly toward the ball)
+
+
 # MergedData <- MergedData %>% arrange(gameId, playId, nflId, frameId)
 setDT(MergedData)
 setkey(MergedData, gameId, playId, nflId, frameId)
