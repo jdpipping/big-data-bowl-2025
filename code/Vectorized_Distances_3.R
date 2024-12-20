@@ -396,54 +396,106 @@ MergedData <- MergedData %>%
          x_acc_component = (a*cos((90-dir)*pi/180)),
          y_acc_component = (a*sin((90-dir)*pi/180)))
 
-# Create "safety crept distance" using code similar to "aggregating frames" from 2023-24
+# Create "safety creep distance" using code similar to "aggregating frames" from 2023-24
 # NOTE: b/c this DF will only include defensive players and only pre-snap frames, X_AbsDistFromBall is equivalent to X_DistFromBall
 # In other words, it's not possible for a defensive player to have a negative X_DistFromBall value before the snap
 MergedData_PreSnapFrames <- MergedData %>% filter(frameType != 'AFTER_SNAP')
 
 # NOTE: if we want "last element," just replace the [1] with [length(ball_x)], or whatever the variable was
-Safety_PreSnapMovement_ByPlay <- MergedData_PreSnapFrames %>% filter(is_pre_snap_safety == TRUE) %>%
-  group_by(gameId, playId, nflId, displayName) %>%
-  summarize(Frames = n(), down = max(down), distance = max(yardsToGo), Team = max(club),
-            PosTeam = max(posteam), DefTeam = max(defteam),
-            posteam_type = max(posteam_type), yardline_100 = max(yardline_100),
-            Dropback = max(isDropback),
-            Initial_X = x[1], Initial_Y = y[1], MaxSpeed = max(s), AvgSpeed = mean(s),
-            MaxAcceleration = max(a), AvgAcceleration = mean(a),
-            Max_x_vel_component = max(x_vel_component), Max_y_vel_component = max(y_vel_component), 
-            Max_x_acc_component = max(x_acc_component), Max_y_acc_component = max(y_acc_component),
-            Mean_x_vel_component = mean(x_vel_component), Mean_y_vel_component = mean(y_vel_component), 
-            Mean_x_acc_component = mean(x_acc_component), Mean_y_acc_component = mean(y_acc_component), 
-            TotDistance = sum(dis), InitialOrientation = o[1],
-            InitialDirection = dir[1], Ball_X_Snap = max(Ball_X_Snap),
-            Ball_Y_Snap = max(Ball_Y_Snap), Initial_X_DistFromBall = X_DistFromBall[1],
-            Initial_Y_DistFromBall = Y_DistFromBall[1], Initial_Tot_DistFromBall = TotDistFromBall[1],
-            Initial_Y_DistFromMOF = Y_distFromMOF[1], Initial_Y_AbsDistFromMOF = abs(Y_distFromMOF[1]),
-            Max_X_DistFromBall = max(X_DistFromBall),
-            Max_Y_AbsDistFromBall = max(Y_AbsDistFromBall), Max_Tot_DistFromBall = max(TotDistFromBall),
-            X_DistFromBall_AtSnap = X_DistFromBall[length(X_DistFromBall)],
-            Y_DistFromBall_AtSnap = Y_DistFromBall[length(Y_DistFromBall)],
-            Y_AbsDistFromBall_AtSnap = Y_AbsDistFromBall[length(Y_AbsDistFromBall)],
-            Y_DistFromMOF_AtSnap = Y_distFromMOF[length(Y_distFromMOF)],
-            Y_AbsDistFromMOF_AtSnap = abs(Y_distFromMOF[length(Y_distFromMOF)]),
-            Tot_DistFromBall_AtSnap = TotDistFromBall[length(TotDistFromBall)],
-            Speed_AtSnap = s[length(s)], Acceleration_AtSnap = a[length(a)],
-            x_vel_component_AtSnap = x_vel_component[length(x_vel_component)],
-            y_vel_component_AtSnap = y_vel_component[length(y_vel_component)],
-            x_acc_component_AtSnap = x_acc_component[length(x_acc_component)],
-            y_acc_component_AtSnap = y_acc_component[length(y_acc_component)],
-            Orientation_AtSnap = o[length(o)], Direction_AtSnap = dir[length(dir)],
-            PosGroup = max(PosGroup), position = max(position))
+Safety1_PreSnapMovement_ByPlay <- MergedData_PreSnapFrames %>% filter(nflId == pre_snap_safety_1) %>%
+  group_by(gameId, playId, displayName) %>%
+  summarize(PreSnap_Frames = n(), down = max(down), distance = max(yardsToGo), Team = max(club),
+            PosTeam = max(posteam), # DefTeam = max(defteam), posteam_type = max(posteam_type), 
+            yardline_100 = max(yardline_100), Dropback = max(isDropback),
+            Safety1_Initial_X = x[1], Safety1_Initial_Y = y[1], Safety1_MaxSpeed = max(s), Safety1_AvgSpeed = mean(s),
+            Safety1_MaxAcceleration = max(a), Safety1_AvgAcceleration = mean(a),
+            Safety1_Max_x_vel_component = max(x_vel_component), Safety1_Max_y_vel_component = max(y_vel_component), 
+            Safety1_Max_x_acc_component = max(x_acc_component), Safety1_Max_y_acc_component = max(y_acc_component),
+            Safety1_Mean_x_vel_component = mean(x_vel_component), Safety1_Mean_y_vel_component = mean(y_vel_component), 
+            Safety1_Mean_x_acc_component = mean(x_acc_component), Safety1_Mean_y_acc_component = mean(y_acc_component), 
+            Safety1_TotDistance = sum(dis), Safety1_InitialOrientation = o[1],
+            Safety1_InitialDirection = dir[1], Ball_X_Snap = max(Ball_X_Snap),
+            Ball_Y_Snap = max(Ball_Y_Snap), Safety1_Initial_X_DistFromBall = X_DistFromBall[1],
+            Safety1_Initial_Y_DistFromBall = Y_DistFromBall[1], Safety1_Initial_Tot_DistFromBall = TotDistFromBall[1],
+            Safety1_Initial_Y_DistFromMOF = Y_distFromMOF[1], Safety1_Initial_Y_AbsDistFromMOF = abs(Y_distFromMOF[1]),
+            Safety1_Max_X_DistFromBall = max(X_DistFromBall),
+            Safety1_Max_Y_AbsDistFromBall = max(Y_AbsDistFromBall), Safety1_Max_Tot_DistFromBall = max(TotDistFromBall),
+            Safety1_X_DistFromBall_AtSnap = X_DistFromBall[length(X_DistFromBall)],
+            Safety1_Y_DistFromBall_AtSnap = Y_DistFromBall[length(Y_DistFromBall)],
+            Safety1_Y_AbsDistFromBall_AtSnap = Y_AbsDistFromBall[length(Y_AbsDistFromBall)],
+            Safety1_Y_DistFromMOF_AtSnap = Y_distFromMOF[length(Y_distFromMOF)],
+            Safety1_Y_AbsDistFromMOF_AtSnap = abs(Y_distFromMOF[length(Y_distFromMOF)]),
+            Safety1_Tot_DistFromBall_AtSnap = TotDistFromBall[length(TotDistFromBall)],
+            Safety1_Speed_AtSnap = s[length(s)], Safety1_Acceleration_AtSnap = a[length(a)],
+            Safety1_x_vel_component_AtSnap = x_vel_component[length(x_vel_component)],
+            Safety1_y_vel_component_AtSnap = y_vel_component[length(y_vel_component)],
+            Safety1_x_acc_component_AtSnap = x_acc_component[length(x_acc_component)],
+            Safety1_y_acc_component_AtSnap = y_acc_component[length(y_acc_component)],
+            Safety1_Orientation_AtSnap = o[length(o)], Safety1_Direction_AtSnap = dir[length(dir)],
+            Safety1_PosGroup = max(PosGroup), Safety1_position = max(position))
+
+Safety2_PreSnapMovement_ByPlay <- MergedData_PreSnapFrames %>% filter(nflId == pre_snap_safety_2) %>%
+  group_by(gameId, playId, displayName) %>%
+  summarize(PreSnap_Frames = n(), down = max(down), distance = max(yardsToGo), Team = max(club),
+            PosTeam = max(posteam), # DefTeam = max(defteam), posteam_type = max(posteam_type), 
+            yardline_100 = max(yardline_100), Dropback = max(isDropback),
+            Safety2_Initial_X = x[1], Safety2_Initial_Y = y[1], Safety2_MaxSpeed = max(s), Safety2_AvgSpeed = mean(s),
+            Safety2_MaxAcceleration = max(a), Safety2_AvgAcceleration = mean(a),
+            Safety2_Max_x_vel_component = max(x_vel_component), Safety2_Max_y_vel_component = max(y_vel_component), 
+            Safety2_Max_x_acc_component = max(x_acc_component), Safety2_Max_y_acc_component = max(y_acc_component),
+            Safety2_Mean_x_vel_component = mean(x_vel_component), Safety2_Mean_y_vel_component = mean(y_vel_component), 
+            Safety2_Mean_x_acc_component = mean(x_acc_component), Safety2_Mean_y_acc_component = mean(y_acc_component), 
+            Safety2_TotDistance = sum(dis), Safety2_InitialOrientation = o[1],
+            Safety2_InitialDirection = dir[1], Ball_X_Snap = max(Ball_X_Snap),
+            Ball_Y_Snap = max(Ball_Y_Snap), Safety2_Initial_X_DistFromBall = X_DistFromBall[1],
+            Safety2_Initial_Y_DistFromBall = Y_DistFromBall[1], Safety2_Initial_Tot_DistFromBall = TotDistFromBall[1],
+            Safety2_Initial_Y_DistFromMOF = Y_distFromMOF[1], Safety2_Initial_Y_AbsDistFromMOF = abs(Y_distFromMOF[1]),
+            Safety2_Max_X_DistFromBall = max(X_DistFromBall),
+            Safety2_Max_Y_AbsDistFromBall = max(Y_AbsDistFromBall), Safety2_Max_Tot_DistFromBall = max(TotDistFromBall),
+            Safety2_X_DistFromBall_AtSnap = X_DistFromBall[length(X_DistFromBall)],
+            Safety2_Y_DistFromBall_AtSnap = Y_DistFromBall[length(Y_DistFromBall)],
+            Safety2_Y_AbsDistFromBall_AtSnap = Y_AbsDistFromBall[length(Y_AbsDistFromBall)],
+            Safety2_Y_DistFromMOF_AtSnap = Y_distFromMOF[length(Y_distFromMOF)],
+            Safety2_Y_AbsDistFromMOF_AtSnap = abs(Y_distFromMOF[length(Y_distFromMOF)]),
+            Safety2_Tot_DistFromBall_AtSnap = TotDistFromBall[length(TotDistFromBall)],
+            Safety2_Speed_AtSnap = s[length(s)], Safety2_Acceleration_AtSnap = a[length(a)],
+            Safety2_x_vel_component_AtSnap = x_vel_component[length(x_vel_component)],
+            Safety2_y_vel_component_AtSnap = y_vel_component[length(y_vel_component)],
+            Safety2_x_acc_component_AtSnap = x_acc_component[length(x_acc_component)],
+            Safety2_y_acc_component_AtSnap = y_acc_component[length(y_acc_component)],
+            Safety2_Orientation_AtSnap = o[length(o)], Safety2_Direction_AtSnap = dir[length(dir)],
+            Safety2_PosGroup = max(PosGroup), Safety2_position = max(position))
+rm(MergedData_PreSnapFrames)
 
 # Let's define "creep distance" as distance from ball at the time of line_set - distance from ball at the snap
 # Another option is maximum distance from ball - distance from ball at the snap
 # And another is maximum distance from ball - minimum distance from ball
-# But we should probably account for players back-pedaling further away from the ball as well ... i.e. we want negative values to be possible
-Safety_PreSnapMovement_ByPlay <- Safety_PreSnapMovement_ByPlay %>% 
-  mutate(Safety_VertCreptDistance = Initial_X_DistFromBall - X_DistFromBall_AtSnap)
-Safety_PreSnapMovement_ByPlay <- Safety_PreSnapMovement_ByPlay %>% 
-  mutate(Safety_TotalCreptDistance_TowardBall = Initial_Tot_DistFromBall - Tot_DistFromBall_AtSnap)
+# But we should probably account for players back-pedaling further away from the ball as well  ... i.e. we want negative values to be possible
+Safety1_PreSnapMovement_ByPlay <- Safety1_PreSnapMovement_ByPlay %>% 
+  mutate(Safety1_VertCreptDistance = Safety1_Initial_X_DistFromBall - Safety1_X_DistFromBall_AtSnap)
+Safety1_PreSnapMovement_ByPlay <- Safety1_PreSnapMovement_ByPlay %>% 
+  mutate(Safety1_TotalCreptDistance_TowardBall = Safety1_Initial_Tot_DistFromBall - Safety1_Tot_DistFromBall_AtSnap)
+
+Safety2_PreSnapMovement_ByPlay <- Safety2_PreSnapMovement_ByPlay %>% 
+  mutate(Safety2_VertCreptDistance = Safety2_Initial_X_DistFromBall - Safety2_X_DistFromBall_AtSnap)
+Safety2_PreSnapMovement_ByPlay <- Safety2_PreSnapMovement_ByPlay %>% 
+  mutate(Safety2_TotalCreptDistance_TowardBall = Safety2_Initial_Tot_DistFromBall - Safety2_Tot_DistFromBall_AtSnap)
 # Keep in mind TotDistance already exists, for total distance covered altogether (even if it wasn't all directly toward the ball)
+
+# Now before we run any merge()/join() functions, get rid of any unnecessary columns
+# For example, don't need displayName, because pre_snap_safety_1_name already exists within MergedData
+# And don't need down/distance, because those also already exist within MergedData
+Safety1_PreSnapMovement_ByPlay <- Safety1_PreSnapMovement_ByPlay %>% 
+  select(-c("displayName", "PreSnap_Frames", "down", "distance", "Team", "PosTeam", "yardline_100", "Dropback", "Ball_X_Snap", "Ball_Y_Snap"))
+Safety2_PreSnapMovement_ByPlay <- Safety2_PreSnapMovement_ByPlay %>% 
+  select(-c("displayName", "PreSnap_Frames", "down", "distance", "Team", "PosTeam", "yardline_100", "Dropback", "Ball_X_Snap", "Ball_Y_Snap"))
+
+MergedData <- MergedData %>%
+  left_join(Safety1_PreSnapMovement_ByPlay, by = c("gameId", "playId"))
+rm(Safety1_PreSnapMovement_ByPlay)
+MergedData <- MergedData %>%
+  left_join(Safety2_PreSnapMovement_ByPlay, by = c("gameId", "playId"))
+rm(Safety2_PreSnapMovement_ByPlay)
 
 # MergedData <- MergedData %>% arrange(gameId, playId, nflId, frameId)
 setDT(MergedData)
