@@ -1,8 +1,9 @@
 # Recall that tracking_std was defined in the data cleaning file
 tracking_std = read_csv('processed-data/tracking_std.csv')
 
-# If needed, can read in MergedData file that was most recently tweaked in Vectorized_Distances file
+# If needed, can read in MergedData and Dropbacks_Merged files that were most recently tweaked in Vectorized_Distances file
 MergedData <- read_csv("MergedData.csv")
+Dropbacks_Merged <- read_csv("Dropbacks_Merged.csv")
 
 # extract example play: https://www.youtube.com/watch?v=2mPxPOjnAg0
 example_play_Davis_TD = tracking_std |> 
@@ -42,9 +43,9 @@ set.seed(1128)
 # This could be replaced by whichever play you want to look into
 # This example is an Isaiah McKenzie 12-yard reception from Josh Allen against Bills in Week 1, 2022
 
-# We could use MergedData, like this, but then the football wouldn't be included
+# We could use Dropbacks_Merged, like this, but then the football wouldn't be included
 # This is b/c we got rid of the football when making TrackingWithStats_PlayerNames in data cleaning file
-# example_play <- MergedData %>% filter(gameId == 2022090800 & playId == 617)
+# example_play <- Dropbacks_Merged %>% filter(gameId == 2022090800 & playId == 617)
 
 # But here's how to do it from the original tracking data CSV
 # Recall that tracking data has Rams' tricode as LA, not LAR (for some reason)
@@ -68,7 +69,7 @@ example_play_id <- unique(example_play$playId)
 #
 # merging tracking data to play
 # example_play <- inner_join(example_play,
-#                            MergedData,
+#                            Dropbacks_Merged,
 #                            by = c("gameId" = "gameId",
 #                                   "playId" = "playId"))
 
@@ -134,8 +135,8 @@ ggplot() +
   geom_point(data = example_play, aes(x = (xmax-y),
                                       y = x,
                                       shape = club,
-                                      fill = team_color, # if we used MergedData, this would say Player_Role
-                                      group = team_color, # if we used MergedData, this would say Player_Role
+                                      fill = team_color, # if we used Dropbacks_Merged, this would say Player_Role
+                                      group = team_color, # if we used Dropbacks_Merged, this would say Player_Role
                                       size = club),
              alpha = 0.7) +  
   # ggforce::geom_circle(data = example_play, aes(x0=X_ball_carrier, y0=Y_ball_carrier, r=10)) +
