@@ -20,14 +20,14 @@ NN_model_results_DF <- NN_model_results_DF %>% rename(pre_snap_safety_2_name = `
 
 # Now merge() this to Dropbacks_Merged ... to keep it simple, can just limit the NN_model_results_DF to gameId, playId, and "p"
 NN_DF_abridged <- NN_model_results_DF %>% select(c("gameId", "playId", "p"))
-final_dropbacks_merged <- merge(x = Dropbacks_Merged, y = NN_DF_abridged, 
+Dropbacks_Merged <- merge(x = Dropbacks_Merged, y = NN_DF_abridged, 
                           by = c("gameId", "playId"))
-final_dropbacks_merged <- final_dropbacks_merged %>% rename(MOFO_probability_FDA = `p`)
+Dropbacks_Merged <- Dropbacks_Merged %>% rename(MOFO_probability_FDA = `p`)
 rm(NN_DF_abridged, NN_model_results_DF)
 
-setDT(final_dropbacks_merged)
-setkey(final_dropbacks_merged, gameId, playId, nflId, frameId)
-final_dropbacks_merged <- final_dropbacks_merged %>% relocate("gameId", "playId", "nflId", "displayName", "frameId")
+setDT(Dropbacks_Merged)
+setkey(Dropbacks_Merged, gameId, playId, nflId, frameId)
+Dropbacks_Merged <- Dropbacks_Merged %>% relocate("gameId", "playId", "nflId", "displayName", "frameId")
 rm(Dropbacks_Merged)
 
 # The goal is to explore why the model says what it says, and to do so, clustering will be important
@@ -35,10 +35,10 @@ rm(Dropbacks_Merged)
 df_safety_movement_1 <- read_csv("df_safety_movement_1.csv")
 df_safety_movement_2 <- read_csv("df_safety_movement_2.csv")
 
-# Get the column names here to align with those of final_dropbacks_merged
+# Get the column names here to align with those of Dropbacks_Merged
 colnames(df_safety_movement_1)
 colnames(df_safety_movement_2)
-colnames(final_dropbacks_merged)
+colnames(Dropbacks_Merged)
 df_safety_movement_1 <- df_safety_movement_1 %>% rename(num_safeties_pre_snap = `num_safeties`)
 df_safety_movement_2 <- df_safety_movement_2 %>% rename(num_safeties_pre_snap = `num_safeties`)
 df_safety_movement_1 <- df_safety_movement_1 %>% rename(defteam = `defensiveTeam`)
@@ -68,13 +68,13 @@ df_safety_movement_1 <- df_safety_movement_1 %>% rename(pre_snap_safety_1_Y_AtSn
 df_safety_movement_2 <- df_safety_movement_2 %>% rename(pre_snap_safety_1_Y_AtSnap = `y_last_p1`)
 df_safety_movement_2 <- df_safety_movement_2 %>% rename(pre_snap_safety_2_Y_AtSnap = `y_last_p2`)
 
-# Now merge() these to final_dropbacks_merged, but probably have to separate to 1-high and 2-high plays
+# Now merge() these to Dropbacks_Merged, but probably have to separate to 1-high and 2-high plays
 # To keep it simple, take out some unnecessary columns from df_safety_movement DFs
 df_safety_movement_1 <- df_safety_movement_1 %>% 
   select(-c("pre_snap_safety_1", "pre_snap_safety_1_name", "num_safeties_pre_snap", "PostSnap_MOF_Num",
             "defteam", "posteam", "Ball_X_Snap", "pre_snap_safety_1_X_AtSnap", "pre_snap_safety_1_Y_AtSnap",
             "Safety1_Initial_X", "Safety1_Initial_Y"))
-final_dropbacks_1High <- merge(x = final_dropbacks_merged, y = df_safety_movement_1,
+final_dropbacks_1High <- merge(x = Dropbacks_Merged, y = df_safety_movement_1,
                                by = c("gameId", "playId"))
 
 df_safety_movement_2 <- df_safety_movement_2 %>% 
@@ -83,15 +83,15 @@ df_safety_movement_2 <- df_safety_movement_2 %>%
             "defteam", "posteam", "Ball_X_Snap", "pre_snap_safety_1_X_AtSnap", "pre_snap_safety_1_Y_AtSnap",
             "pre_snap_safety_2_X_AtSnap", "pre_snap_safety_2_Y_AtSnap",
             "Safety1_Initial_X", "Safety1_Initial_Y", "Safety2_Initial_X", "Safety2_Initial_Y"))
-final_dropbacks_2High <- merge(x = final_dropbacks_merged, y = df_safety_movement_2,
+final_dropbacks_2High <- merge(x = Dropbacks_Merged, y = df_safety_movement_2,
                                by = c("gameId", "playId"))
 
 rm(df_safety_movement_1, df_safety_movement_2)
 
 # Some good ones to check out where the model correctly guessed a disguised coverage:
 # View(NN_model_results_DF %>% filter((num_safeties_pre_snap == 2 & p < 0.3) | (num_safeties_pre_snap == 1 & p > 0.7)))
-# View(final_dropbacks_merged %>% filter(gameId == 2022091101, playId == 2298)) ... 2-high turns to Cover 3
-# View(final_dropbacks_merged %>% filter(gameId == 2022092507, playId == 1836)) ... 1-high turns to Cover 2
+# View(Dropbacks_Merged %>% filter(gameId == 2022091101, playId == 2298)) ... 2-high turns to Cover 3
+# View(Dropbacks_Merged %>% filter(gameId == 2022092507, playId == 1836)) ... 1-high turns to Cover 2
 
 # On the flip side, here are "conventional" snaps, where model's guess of the post-snap coverage matched pre-snap alignment
 # View(NN_model_results_DF %>% filter((num_safeties_pre_snap == 2 & p > 0.7) | (num_safeties_pre_snap == 1 & p < 0.3)))
