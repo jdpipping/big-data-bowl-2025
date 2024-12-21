@@ -89,6 +89,41 @@ final_dropbacks_2High <- merge(x = Dropbacks_Merged, y = df_safety_movement_2,
 
 rm(df_safety_movement_1, df_safety_movement_2)
 
+# Adjust 1-high column names to match 2-high, then rbind()
+final_dropbacks_1High <- final_dropbacks_1High %>% rename(x_spline_basis1_p1 = `x_spline_basis1`,
+                                                          x_spline_basis2_p1 = `x_spline_basis2`,
+                                                          x_spline_basis3_p1 = `x_spline_basis3`,
+                                                          x_spline_basis4_p1 = `x_spline_basis4`,
+                                                          x_spline_basis5_p1 = `x_spline_basis5`,
+                                                          x_spline_basis6_p1 = `x_spline_basis6`,
+                                                          x_spline_basis7_p1 = `x_spline_basis7`,
+                                                          x_spline_basis8_p1 = `x_spline_basis8`,
+                                                          x_spline_basis9_p1 = `x_spline_basis9`,
+                                                          x_spline_basis10_p1 = `x_spline_basis10`,
+                                                          y_spline_basis1_p1 = `y_spline_basis1`,
+                                                          y_spline_basis2_p1 = `y_spline_basis2`,
+                                                          y_spline_basis3_p1 = `y_spline_basis3`,
+                                                          y_spline_basis4_p1 = `y_spline_basis4`,
+                                                          y_spline_basis5_p1 = `y_spline_basis5`,
+                                                          y_spline_basis6_p1 = `y_spline_basis6`,
+                                                          y_spline_basis7_p1 = `y_spline_basis7`,
+                                                          y_spline_basis8_p1 = `y_spline_basis8`,
+                                                          y_spline_basis9_p1 = `y_spline_basis9`,
+                                                          y_spline_basis10_p1 = `y_spline_basis10`)
+
+# We can't rbind() while they have a different number of columns, so let's add "NA" columns to final_dropbacks_1High
+# Identify the columns that are in final_dropbacks_2High but not in final_dropbacks_1High
+missing_cols <- setdiff(names(final_dropbacks_2High), names(final_dropbacks_1High))
+
+# Add these columns to final_dropbacks_1High with NA values
+for (col in missing_cols) {
+  final_dropbacks_1High[[col]] <- NA
+}
+
+# Now rbind() will work since both data frames have the same columns
+final_dropbacks_merged <- rbind(final_dropbacks_1High, final_dropbacks_2High)
+rm(Dropbacks_Merged)
+
 # Some good ones to check out where the model correctly guessed a disguised coverage:
 # View(NN_model_results_DF %>% filter((num_safeties_pre_snap == 2 & p < 0.3) | (num_safeties_pre_snap == 1 & p > 0.7)))
 # View(Dropbacks_Merged %>% filter(gameId == 2022091101, playId == 2298)) ... 2-high turns to Cover 3
