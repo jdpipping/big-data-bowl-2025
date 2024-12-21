@@ -122,7 +122,7 @@ for (col in missing_cols) {
 
 # Now rbind() will work since both data frames have the same columns
 final_dropbacks_merged <- rbind(final_dropbacks_1High, final_dropbacks_2High)
-rm(Dropbacks_Merged)
+rm(Dropbacks_Merged, missing_cols)
 
 # Some good ones to check out where the model correctly guessed a disguised coverage:
 # View(NN_model_results_DF %>% filter((num_safeties_pre_snap == 2 & p < 0.3) | (num_safeties_pre_snap == 1 & p > 0.7)))
