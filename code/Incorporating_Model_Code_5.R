@@ -23,7 +23,7 @@ NN_DF_abridged <- NN_model_results_DF %>% select(c("gameId", "playId", "p"))
 Dropbacks_Merged <- merge(x = Dropbacks_Merged, y = NN_DF_abridged, 
                           by = c("gameId", "playId"))
 Dropbacks_Merged <- Dropbacks_Merged %>% rename(MOFO_probability_FDA = `p`)
-rm(NN_DF_abridged, NN_model_results_DF)
+rm(NN_DF_abridged)
 
 setDT(Dropbacks_Merged)
 setkey(Dropbacks_Merged, gameId, playId, nflId, frameId)
