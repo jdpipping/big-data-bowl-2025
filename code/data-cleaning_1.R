@@ -854,13 +854,27 @@ MergedData <- MergedData %>%
 # Now we want to exclude "extra" frames, i.e. ones after the play ended
 table(MergedData$event)
 # QB slide example: View(MergedData %>% filter(playId == 4789))
-# Include fumbles, b/c anything after a defensive player recovers a fumble isn't relative to this analysis
+# Include fumbles, b/c anything after a defensive player recovers a fumble isn't relative to this project's analysis
+# Similarly, we can include "dropped_pass", b/c even if a dropped pass got intercepted later, that's not relevant for this project
 Frames_EndOfPlay <- MergedData %>%
-  filter(event %in% c("out_of_bounds", "safety", "qb_sack", "qb_slide", "tackle", "touchdown", "fumble", "fumble_defense_recovered")) %>%
+  filter(event %in% c("play_submit", "out_of_bounds", "safety", "qb_sack", "qb_slide", "pass_outcome_incomplete", "dropped_pass", "pass_outcome_touchdown", "tackle", "touchdown", "fumble", "fumble_defense_recovered")) %>%
   select(gameId, playId, nflId, displayName, frameId) %>%
   rename(FrameNumber_EndOfPlay = frameId)
 
-# Some plays have multiple of these events, e.g. View(MergedData %>% filter(playId == 3449))
+# Do a quick check to see if there are any plays with no "play-ending" events
+MergedData <- MergedData %>% mutate(PlayEnd_OnFrame = 
+                                                    ifelse(!is.na(event) & event %in% c("play_submit", "out_of_bounds", "safety", "qb_sack", "qb_slide", "pass_outcome_incomplete", "dropped_pass", "pass_outcome_touchdown", "tackle", "touchdown", "fumble", "fumble_defense_recovered"), 1, 
+                                                           ifelse(!is.na(event) & !event %in% c("play_submit", "out_of_bounds", "safety", "qb_sack", "qb_slide", "pass_outcome_incomplete", "dropped_pass", "pass_outcome_touchdown", "tackle", "touchdown", "fumble", "fumble_defense_recovered"), 0, NA)))
+MergedData <- MergedData %>%
+  group_by(gameId, playId, nflId, displayName) %>%
+  mutate(PlayEnd_OnFullPlay = sum(PlayEnd_OnFrame, na.rm = TRUE)) %>%
+  ungroup() 
+# View(MergedData %>% filter(is.na(PlayEnd_OnFullPlay))) - it's empty
+table(MergedData$PlayEnd_OnFullPlay)
+# View(MergedData %>% filter(PlayEnd_OnFullPlay < 1)) ... should be empty
+MergedData <- MergedData %>% select(-"PlayEnd_OnFullPlay")
+
+# Some plays have multiple of these "play-ending" events
 # Therefore, make it so that only the first relevant "play-ending" frame shows up
 Frames_EndOfPlay <- Frames_EndOfPlay %>%
   group_by(gameId, playId, nflId, displayName) %>%
@@ -870,17 +884,18 @@ Frames_EndOfPlay <- Frames_EndOfPlay %>% filter(Frame_Rank == 1)
 Frames_EndOfPlay <- Frames_EndOfPlay %>% select(-"Frame_Rank")
 
 MergedData <- merge(x = MergedData, y = Frames_EndOfPlay, 
-                    by = c("playId", "gameId", "nflId", "displayName"))
+                    by = c("playId", "gameId", "nflId", "displayName"), all.x = TRUE)
 # MergedData <- MergedData %>% arrange(gameId, playId, nflId, frameId)
 setDT(MergedData)
 setkey(MergedData, gameId, playId, nflId, frameId)
 MergedData <- MergedData %>% relocate("gameId", "playId", "nflId", "displayName", "frameId")
 
 MergedData <- MergedData %>% group_by(gameId, playId, nflId) %>% 
-  mutate(Unnecessary_Late = ifelse(frameId > FrameNumber_EndOfPlay, TRUE, FALSE)) %>% 
+  mutate(Unnecessary_Late = ifelse(!is.na(FrameNumber_EndOfPlay) & frameId > FrameNumber_EndOfPlay, TRUE, 
+                                   ifelse(!is.na(FrameNumber_EndOfPlay) & frameId <= FrameNumber_EndOfPlay, FALSE, NA))) %>% 
   ungroup()
 
-MergedData <- MergedData %>% filter(Unnecessary_Late == FALSE)
+MergedData <- MergedData %>% filter(Unnecessary_Late == FALSE | is.na(Unnecessary_Late))
 rm(Frames_EndOfPlay)
 MergedData <- MergedData %>% select(-"Unnecessary_Late")
 
