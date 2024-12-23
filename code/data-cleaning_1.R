@@ -897,7 +897,7 @@ MergedData <- MergedData %>% group_by(gameId, playId, nflId) %>%
 
 MergedData <- MergedData %>% filter(Unnecessary_Late == FALSE | is.na(Unnecessary_Late))
 rm(Frames_EndOfPlay)
-MergedData <- MergedData %>% select(-"Unnecessary_Late")
+MergedData <- MergedData %>% select(-"Unnecessary_Late", "PlayEnd_OnFrame")
 
 # Create a Player_Role variable (i.e. defender, ball-carrier, or other offensive player)
 MergedData <- MergedData %>%
