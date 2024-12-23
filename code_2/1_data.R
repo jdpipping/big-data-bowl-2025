@@ -215,6 +215,14 @@ for (week in WEEKS) {
     distinct(gameId, playId, frameId_of_line_set = frameId) |>
     ungroup()
   time_of_line_set
+
+  # time of end of play
+   time_of_end_of_play = tracking |>
+    group_by(gameId, playId) %>%
+    filter(event %in% c("out_of_bounds", "safety", "qb_sack", "qb_slide", "tackle", "touchdown", "fumble", "fumble_defense_recovered")) |>
+    distinct(gameId, playId, frameId_of_end_of_play = frameId) |>
+    ungroup()
+  time_of_end_of_play
   
   # ball y
   ball_y_snap = tracking |>
@@ -243,10 +251,18 @@ for (week in WEEKS) {
   dim(df_tracking_1)
   dim(df_tracking_2)
   # View(df_tracking_2[1:1000,])
+
+  # in each play, remove all frames after play is done
+  df_tracking_2.5 = df_tracking_2 |>
+    filter(frameId <= frameId_of_end_of_play) 
+  dim(df_tracking_1)
+  dim(df_tracking_2)
+  dim(df_tracking_2.5)
+  # View(df_tracking_2[1:1000,])
   
   # manipulate the tracking data s'more
   df_tracking_3 = 
-    df_tracking_2 |>
+    df_tracking_2.5 |>
     select(-frameId_of_line_set) |>
     # merge in snap frames
     left_join(snap_frames, by = c('gameId', 'playId')) |> 
