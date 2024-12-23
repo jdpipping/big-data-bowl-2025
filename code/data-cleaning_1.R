@@ -822,7 +822,7 @@ MergedData <- MergedData %>%
 # View(MergedData %>% filter(playId != order_sequence)) ... order_sequence is almost always the same as playId
 colnames(MergedData)
 MergedData <- MergedData %>% 
-  select(-c("week", "collegeName", "rushLocationType", 
+  select(-c("week", "collegeName", "rushLocationType", "height_inches", "temp", "Season_MaxSpeed",
             "drive", "run_location", "run_gap", "home_coach", "away_coach",
             "air_epa", "yac_epa", "rush_attempt", "order_sequence", "stadium", "stadium_id"))
 setDT(MergedData)
