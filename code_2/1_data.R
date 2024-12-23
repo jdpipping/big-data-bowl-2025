@@ -219,7 +219,7 @@ for (week in WEEKS) {
   # time of end of play
    time_of_end_of_play = tracking |>
     group_by(gameId, playId) %>%
-    filter(event %in% c("out_of_bounds", "safety", "qb_sack", "qb_slide", "tackle", "touchdown", "fumble", "fumble_defense_recovered")) |>
+    filter(event %in% c("out_of_bounds", "safety", "pass_outcome_incomplete", "qb_sack", "qb_slide", "tackle", "touchdown", "fumble", "fumble_defense_recovered")) |>
     distinct(gameId, playId, frameId_of_end_of_play = frameId) |>
     ungroup()
   time_of_end_of_play
