@@ -545,7 +545,7 @@ plays <- plays %>% mutate(aligned_total_receivers = aligned_left_receivers + ali
 plays <- plays %>% relocate(aligned_left_receivers, aligned_right_receivers, aligned_total_receivers, .after = offenseFormation)
 
 # For the sake of simplicity, let's get rid of weird plays with more than 5
-# View(plays %>% filter(receiverAlignment %in% "4x2")) ... direct snap to RB can make numbers show up
+# View(plays %>% filter(receiverAlignment %in% "4x2")) ... direct snap to RB can make weird numbers show up
 plays <- plays %>% filter(aligned_total_receivers <= 5)
 
 # These are all empty
