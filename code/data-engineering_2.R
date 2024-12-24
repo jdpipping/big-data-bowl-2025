@@ -345,14 +345,14 @@ Safety_1_AtSnap <- MergedData %>%
   filter(PlayerSideOfBall == "defense", nflId == pre_snap_safety_1, event %in% c("ball_snap", "snap_direct")) 
 Safety_1_AtSnap <- Safety_1_AtSnap %>% select("gameId", "playId", "displayName", "x", "y")
 Safety_1_AtSnap <- Safety_1_AtSnap %>% rename(pre_snap_safety_1_name = `displayName`,
-                                                    pre_snap_safety_1_X_AtSnap = `x`, pre_snap_safety_1_Y_AtSnap = 'y')
+                                                    pre_snap_safety_1_X_AtSnap = `x`, pre_snap_safety_1_Y_AtSnap = `y`)
 MergedData <- MergedData %>% left_join(Safety_1_AtSnap, by = c("gameId", "playId"))
 
 Safety_2_AtSnap <- MergedData %>% 
   filter(PlayerSideOfBall == "defense", nflId == pre_snap_safety_2, event %in% c("ball_snap", "snap_direct")) 
 Safety_2_AtSnap <- Safety_2_AtSnap %>% select("gameId", "playId", "displayName", "x", "y")
 Safety_2_AtSnap <- Safety_2_AtSnap %>% rename(pre_snap_safety_2_name = `displayName`,
-                                              pre_snap_safety_2_X_AtSnap = `x`, pre_snap_safety_2_Y_AtSnap = 'y')
+                                              pre_snap_safety_2_X_AtSnap = `x`, pre_snap_safety_2_Y_AtSnap = `y`)
 MergedData <- MergedData %>% left_join(Safety_2_AtSnap, by = c("gameId", "playId"))
 rm(Safety_1_AtSnap, Safety_2_AtSnap)
 
