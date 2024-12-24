@@ -130,6 +130,13 @@ rm(Dropbacks_Merged, missing_cols)
 # View(Dropbacks_Merged %>% filter(gameId == 2022092507, playId == 1836)) ... 1-high turns to Cover 2
 # View(Dropbacks_Merged %>% filter(gameId == 2022090800, playId == 2623)) ... 2-high turns to Cover 1 Hole
 # View(Dropbacks_Merged %>% filter(gameId == 2022101606, playId == 3531)) ... 1-high turns to Cover 0
+# View(Dropbacks_Merged %>% filter(gameId == 2022090800, playId == 1504)) ... 2-high turns to Cover 3 Sky
+# View(Dropbacks_Merged %>% filter(gameId == 2022090800, playId == 167)) ... 2-high turns to Cover 3 Sky
+# View(Dropbacks_Merged %>% filter(gameId == 2022090800, playId == 2288)) ... 2-high turns to Cover 3 Sky
+# View(Dropbacks_Merged %>% filter(gameId == 2022091100, playId == 1672)) ... 2-high turns to Cover 3 Sky
+# View(Dropbacks_Merged %>% filter(gameId == 2022091100, playId == 3475)) ... 2-high turns to Cover 1 Hole
+# View(Dropbacks_Merged %>% filter(gameId == 2022091100, playId == 2533)) ... 2-high turns to Cover 1 Hole
 
-# Here are "conventional" examples, where model's guess of the post-snap coverage was correct, and matched pre-snap alignment
+# Here are "conventional" snaps, where model's guess of the post-snap coverage was right, and matched pre-snap alignment
 # View(NN_model_results_DF %>% filter((num_safeties_pre_snap == 2 & p > 0.7) | (num_safeties_pre_snap == 1 & p < 0.3)))
+# View(Dropbacks_Merged %>% filter(gameId == 2022090800, playId == 1967)) ... Cover 2 out of 2-high
