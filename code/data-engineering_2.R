@@ -358,6 +358,17 @@ rm(Safety_1_AtSnap, Safety_2_AtSnap)
 
 MergedData <- MergedData %>% mutate(X_Diff_BetweenSafeties_AtSnap = abs(pre_snap_safety_1_X_AtSnap - pre_snap_safety_2_X_AtSnap))
 
+# Also get post_snap_safety_1_name and post_snap_safety_2_name using merge()
+players <- fread("players.csv")
+NamesAndIDs <- players %>% select("nflId", "displayName")
+NamesAndIDs_Safety1 <- NamesAndIDs %>% rename(post_snap_safety_1_name = `displayName`)
+NamesAndIDs_Safety2 <- NamesAndIDs %>% rename(post_snap_safety_2_name = `displayName`)
+MergedData <- merge(x = MergedData, y = NamesAndIDs_Safety1, 
+                    by.x = "post_snap_safety_1", by.y = "nflId", all.x = TRUE)
+MergedData <- merge(x = MergedData, y = NamesAndIDs_Safety2, 
+                    by.x = "post_snap_safety_2", by.y = "nflId", all.x = TRUE)
+rm(players, NamesAndIDs, NamesAndIDs_Safety1, NamesAndIDs_Safety2)
+
 # And also, for eventual modeling purposes, turn PostSnap_MOF into a numeric variable (MOFO can be 1)
 MergedData <- MergedData %>% mutate(PostSnap_MOF_Num = ifelse(PostSnap_MOF %in% "MOF Open", 1,
                                                          ifelse(PostSnap_MOF %in% "MOF Closed", 0, NA)))
