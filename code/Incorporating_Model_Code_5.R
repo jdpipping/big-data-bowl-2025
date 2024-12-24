@@ -56,12 +56,13 @@ df_safety_movement_2 <- df_safety_movement_2 %>% rename(pre_snap_safety_2 = `nfl
 df_safety_movement_1 <- df_safety_movement_1 %>% rename(pre_snap_safety_1_name = `displayName`)
 df_safety_movement_2 <- df_safety_movement_2 %>% rename(pre_snap_safety_1_name = `displayName_p1`)
 df_safety_movement_2 <- df_safety_movement_2 %>% rename(pre_snap_safety_2_name = `displayName_p2`)
-df_safety_movement_1 <- df_safety_movement_1 %>% rename(Safety1_Initial_X = `x_first`)
-df_safety_movement_2 <- df_safety_movement_2 %>% rename(Safety1_Initial_X = `x_first_p1`)
-df_safety_movement_2 <- df_safety_movement_2 %>% rename(Safety2_Initial_X = `x_first_p2`)
-df_safety_movement_1 <- df_safety_movement_1 %>% rename(Safety1_Initial_Y = `y_first`)
-df_safety_movement_2 <- df_safety_movement_2 %>% rename(Safety1_Initial_Y = `y_first_p1`)
-df_safety_movement_2 <- df_safety_movement_2 %>% rename(Safety2_Initial_Y = `y_first_p2`)
+# Recall that x_first, y_first refer to 3 seconds before the snap in the NN model, NOT the locations during line_set
+df_safety_movement_1 <- df_safety_movement_1 %>% rename(Safety1_X_3SecBeforeSnap = `x_first`)
+df_safety_movement_2 <- df_safety_movement_2 %>% rename(Safety1_X_3SecBeforeSnap = `x_first_p1`)
+df_safety_movement_2 <- df_safety_movement_2 %>% rename(Safety2_X_3SecBeforeSnap = `x_first_p2`)
+df_safety_movement_1 <- df_safety_movement_1 %>% rename(Safety1_Y_3SecBeforeSnap = `y_first`)
+df_safety_movement_2 <- df_safety_movement_2 %>% rename(Safety1_Y_3SecBeforeSnap = `y_first_p1`)
+df_safety_movement_2 <- df_safety_movement_2 %>% rename(Safety2_Y_3SecBeforeSnap = `y_first_p2`)
 df_safety_movement_1 <- df_safety_movement_1 %>% rename(pre_snap_safety_1_X_AtSnap = `x_last`)
 df_safety_movement_2 <- df_safety_movement_2 %>% rename(pre_snap_safety_1_X_AtSnap = `x_last_p1`)
 df_safety_movement_2 <- df_safety_movement_2 %>% rename(pre_snap_safety_2_X_AtSnap = `x_last_p2`)
@@ -74,7 +75,7 @@ df_safety_movement_2 <- df_safety_movement_2 %>% rename(pre_snap_safety_2_Y_AtSn
 df_safety_movement_1 <- df_safety_movement_1 %>% 
   select(-c("pre_snap_safety_1", "pre_snap_safety_1_name", "num_safeties_pre_snap", "PostSnap_MOF_Num",
             "defteam", "posteam", "Ball_X_Snap", "pre_snap_safety_1_X_AtSnap", "pre_snap_safety_1_Y_AtSnap",
-            "Safety1_Initial_X", "Safety1_Initial_Y"))
+            "Safety1_X_3SecBeforeSnap", "Safety1_Y_3SecBeforeSnap"))
 final_dropbacks_1High <- merge(x = Dropbacks_Merged, y = df_safety_movement_1,
                                by = c("gameId", "playId"))
 
@@ -83,7 +84,7 @@ df_safety_movement_2 <- df_safety_movement_2 %>%
             "num_safeties_pre_snap", "PostSnap_MOF_Num",
             "defteam", "posteam", "Ball_X_Snap", "pre_snap_safety_1_X_AtSnap", "pre_snap_safety_1_Y_AtSnap",
             "pre_snap_safety_2_X_AtSnap", "pre_snap_safety_2_Y_AtSnap",
-            "Safety1_Initial_X", "Safety1_Initial_Y", "Safety2_Initial_X", "Safety2_Initial_Y"))
+            "Safety1_X_3SecBeforeSnap", "Safety1_Y_3SecBeforeSnap", "Safety2_X_3SecBeforeSnap", "Safety2_Y_3SecBeforeSnap"))
 final_dropbacks_2High <- merge(x = Dropbacks_Merged, y = df_safety_movement_2,
                                by = c("gameId", "playId"))
 
