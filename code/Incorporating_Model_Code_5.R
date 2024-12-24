@@ -36,7 +36,7 @@ df_safety_movement_1 <- read_csv("df_safety_movement_1.csv")
 df_safety_movement_2 <- read_csv("df_safety_movement_2.csv")
 
 # Get the column names here to align with those of Dropbacks_Merged
-# Note: for 2-high plays, i.e. df_safety_movement_2, minSafetyDistToMOF refers to the minimum across both safeties
+# Note: for 2-high plays, i.e. df_safety_movement_2, minSafetyDistToMOF refers to the minimum across both safeties, BEFORE SNAP
 colnames(df_safety_movement_1)
 colnames(df_safety_movement_2)
 colnames(Dropbacks_Merged)
@@ -125,6 +125,9 @@ for (col in missing_cols) {
 final_dropbacks_merged <- rbind(final_dropbacks_1High, final_dropbacks_2High)
 rm(Dropbacks_Merged, missing_cols, final_dropbacks_1High, final_dropbacks_2High)
 
+# And change column name of minSafetyDistToMOF to make it less ambiguous
+final_dropbacks_merged <- final_dropbacks_merged %>% rename(min_SafetyHorizDistToMOF_PreSnap = `minSafetyDistToMOF`)
+
 # Some good ones to check out where the model correctly guessed a disguised coverage
 # And recall that PostSnap_MOF_Num in final_dropbacks_merged is equivalent to mofo_postsnap in the original NN_model_results_DF
 # View(NN_model_results_DF %>% filter((num_safeties_pre_snap == 2 & p < 0.3 & PostSnap_MOF_Num == 0) | (num_safeties_pre_snap == 1 & p > 0.7 & PostSnap_MOF_Num == 1)))
@@ -153,7 +156,6 @@ rm(Dropbacks_Merged, missing_cols, final_dropbacks_1High, final_dropbacks_2High)
 # View(final_dropbacks_merged %>% filter(gameId == 2022091100, playId == 3119)) ... Cover 3 out of 1-high
 # View(final_dropbacks_merged %>% filter(gameId == 2022091100, playId == 1587)) ... Cover 3 out of 1-high
 # View(final_dropbacks_merged %>% filter(gameId == 2022091101, playId == 599)) ... hard to tell but looks like Cover 4 out of 2-high
-
 
 # Write final_dropbacks_merged into a CSV
 write.csv(final_dropbacks_merged, "final_dropbacks_merged.csv")
