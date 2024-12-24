@@ -122,7 +122,7 @@ for (col in missing_cols) {
 
 # Now rbind() will work since both data frames have the same columns
 final_dropbacks_merged <- rbind(final_dropbacks_1High, final_dropbacks_2High)
-rm(Dropbacks_Merged, missing_cols)
+rm(Dropbacks_Merged, missing_cols, final_dropbacks_1High, final_dropbacks_2High)
 
 # Some good ones to check out where the model correctly guessed a disguised coverage
 # Recall that PostSnap_MOF_Num in final_dropbacks_merged is equivalent to mofo_postsnap in the original NN_model_results_DF
