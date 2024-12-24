@@ -125,7 +125,7 @@ final_dropbacks_merged <- rbind(final_dropbacks_1High, final_dropbacks_2High)
 rm(Dropbacks_Merged, missing_cols, final_dropbacks_1High, final_dropbacks_2High)
 
 # Some good ones to check out where the model correctly guessed a disguised coverage
-# Recall that PostSnap_MOF_Num in final_dropbacks_merged is equivalent to mofo_postsnap in the original NN_model_results_DF
+# And recall that PostSnap_MOF_Num in final_dropbacks_merged is equivalent to mofo_postsnap in the original NN_model_results_DF
 # View(NN_model_results_DF %>% filter((num_safeties_pre_snap == 2 & p < 0.3 & PostSnap_MOF_Num == 0) | (num_safeties_pre_snap == 1 & p > 0.7 & PostSnap_MOF_Num == 1)))
 # View(final_dropbacks_merged %>% filter(gameId == 2022091101, playId == 2298)) ... 2-high turns to Cover 3 Sky
 # View(final_dropbacks_merged %>% filter(gameId == 2022092507, playId == 1836)) ... 1-high turns to Cover 2
@@ -137,6 +137,10 @@ rm(Dropbacks_Merged, missing_cols, final_dropbacks_1High, final_dropbacks_2High)
 # View(final_dropbacks_merged %>% filter(gameId == 2022091100, playId == 1672)) ... 2-high turns to Cover 3 Sky
 # View(final_dropbacks_merged %>% filter(gameId == 2022091100, playId == 3475)) ... 2-high turns to Cover 1 Hole
 # View(final_dropbacks_merged %>% filter(gameId == 2022091100, playId == 2533)) ... 2-high turns to Cover 1 Hole
+# View(final_dropbacks_merged %>% filter(gameId == 2022091100, playId == 3177)) ... 2-high turns to Cover 3 Sky
+# View(final_dropbacks_merged %>% filter(gameId == 2022091100, playId == 1769)) ... 2-high turns to Cover 3 Sky
+# View(final_dropbacks_merged %>% filter(gameId == 2022091100, playId == 2159)) ... some type of miscommunication, but looks like intent was 2-high to Cover 3 zone blitz
+# View(final_dropbacks_merged %>% filter(gameId == 2022091100, playId == 2226)) ... 2-high to Cover 3 Sky
 
 # Here are "conventional" snaps, where model's guess of the post-snap coverage was right, and matched pre-snap alignment
 # View(NN_model_results_DF %>% filter((num_safeties_pre_snap == 2 & p > 0.7 & PostSnap_MOF_Num == 1) | (num_safeties_pre_snap == 1 & p < 0.3 & PostSnap_MOF_Num == 0)))
@@ -144,6 +148,11 @@ rm(Dropbacks_Merged, missing_cols, final_dropbacks_1High, final_dropbacks_2High)
 # View(final_dropbacks_merged %>% filter(gameId == 2022090800, playId == 2336)) ... Tampa 2 out of 2-high
 # View(final_dropbacks_merged %>% filter(gameId == 2022090800, playId == 954)) ... Cover 2 out of 2-high
 # View(final_dropbacks_merged %>% filter(gameId == 2022091100, playId == 783)) ... Cover 1 Hole out of 1-high
+# View(final_dropbacks_merged %>% filter(gameId == 2022091100, playId == 2303)) ... Cover 1 Hole out of 1-high
+# View(final_dropbacks_merged %>% filter(gameId == 2022091100, playId == 3119)) ... Cover 3 out of 1-high
+# View(final_dropbacks_merged %>% filter(gameId == 2022091100, playId == 1587)) ... Cover 3 out of 1-high
+# View(final_dropbacks_merged %>% filter(gameId == 2022091101, playId == 599)) ... hard to tell but looks like Cover 4 out of 2-high
+
 
 # Write final_dropbacks_merged into a CSV
 write.csv(final_dropbacks_merged, "final_dropbacks_merged.csv")
