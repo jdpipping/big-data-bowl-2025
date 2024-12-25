@@ -1,3 +1,5 @@
+library(tidyverse)
+
 # If needed, can read in Dropbacks_Merged file that was defined earlier in vectorized distances file
 Dropbacks_Merged <- read_csv("Dropbacks_Merged.csv")
 
