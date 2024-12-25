@@ -126,7 +126,7 @@ final_dropbacks_merged <- rbind(final_dropbacks_1High, final_dropbacks_2High)
 rm(Dropbacks_Merged, missing_cols, final_dropbacks_1High, final_dropbacks_2High)
 
 # And change column name of minSafetyDistToMOF to make it less ambiguous
-final_dropbacks_merged <- final_dropbacks_merged %>% rename(min_SafetyHorizDistToMOF_PreSnap = `minSafetyDistToMOF`)
+final_dropbacks_merged <- final_dropbacks_merged %>% rename(min_SafetyAbsHorizDistToMOF_PreSnap = `minSafetyDistToMOF`)
 
 # Some good ones to check out where the model correctly guessed a disguised coverage
 # And recall that PostSnap_MOF_Num in final_dropbacks_merged is equivalent to mofo_postsnap in the original NN_model_results_DF
