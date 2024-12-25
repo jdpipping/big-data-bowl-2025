@@ -29,6 +29,7 @@ players <- fread('players.csv')
 plays <- fread('plays.csv')
 # View(df_safety_movement_1)
 
+
 # Do the entire process for 1-high and 2-high plays separately
 # Start with tracking data, then add the safety movement ... but DON'T join on nflId, b/c one DF only includes safeties
 # Change df_safety_movement_1 column names to reflect nflId and displayName just referring to safeties
@@ -39,10 +40,10 @@ df_safety_movement_1 <- df_safety_movement_1 %>% rename(displayName_p1 = `displa
 tracking_week_3 <- fread("tracking_week_3.csv")
 Week3_NamesAndNumbers <- tracking_week_3 %>% select(c(nflId, displayName, jerseyNumber))
 Week3_NamesAndNumbers <- unique(Week3_NamesAndNumbers)
-df_C_tracking <- df_C_tracking %>% left_join(Week3_NamesAndNumbers, by = c("nflId", "displayName"))  
+df_C_tracking_1 <- df_C_tracking %>% left_join(Week3_NamesAndNumbers, by = c("nflId", "displayName"))  
 rm(tracking_week_3, Week3_NamesAndNumbers)
 
-all_dat_joined_1 <- df_C_tracking %>% 
+all_dat_joined_1 <- df_C_tracking_1 %>% 
   left_join(df_safety_movement_1, by = c('gameId', 'playId'))
 
 # Now pick the specific play(s) we want
@@ -186,10 +187,10 @@ anim_func(dataset = comp_df, game = 2022092507, play = 1836)
 tracking_week_1 <- fread("tracking_week_1.csv")
 Week1_NamesAndNumbers <- tracking_week_1 %>% select(c(nflId, displayName, jerseyNumber))
 Week1_NamesAndNumbers <- unique(Week1_NamesAndNumbers)
-df_C_tracking <- df_C_tracking %>% left_join(Week1_NamesAndNumbers, by = c("nflId", "displayName"))  
+df_C_tracking_2 <- df_C_tracking %>% left_join(Week1_NamesAndNumbers, by = c("nflId", "displayName"))  
 rm(tracking_week_1, Week1_NamesAndNumbers)
 
-all_dat_joined_2 <- df_C_tracking %>% 
+all_dat_joined_2 <- df_C_tracking_2 %>% 
   left_join(df_safety_movement_2, by = c('gameId', 'playId'))
 
 # Now pick the specific play(s) we want
@@ -325,6 +326,7 @@ comp_df <- all_dat_joined_2 %>%
 anim_func(dataset = comp_df, game = 2022090800, play = 1504)  
 # animate(anim_func(dataset = comp_df, game = 2022090800, play = 1504), duration = 30)
 # animate(anim_func(dataset = comp_df, game = 2022090800, play = 1504), duration = 30)
+rm(df_C_players, df_C_plays, df_C_tracking, df_safety_movement_1, df_safety_movement_2, out_of_sample_preds)
 
 ######## DIFFERENT ANIMATION EXAMPLES THAT AREN'T DIRECTLY USED IN FINAL PROJECT #########
 
