@@ -271,12 +271,12 @@ View(clustering_dat1 %>%
        ungroup())
 
 # this is the clustering combination with the most plays in the safety # 1 file:
-# max prob is ~30%, while the min prob is ~#12%; let's compare those plays
+# max prob is ~30%, while the min prob is ~12%; let's compare those plays
 View(clustering_dat1 %>%
-       filter(x_first_binned=='(14.8,16.7]' &
-              y_first_binned=='(-0.918,1.32]' &
-              x_last_binned=='(14.1,16.1]' &
-              y_last_binned=='(-0.313,1.84]'))
+       filter(x_first_binned == '(14.8,16.7]' &
+              y_first_binned == '(-0.918,1.32]' &
+              x_last_binned == '(14.1,16.1]' &
+              y_last_binned == '(-0.313,1.84]'))
 
 games_for_comp <- c(2022100908, 2022092503, 2022092505)
 plays_for_comp <- c(1233, 2783, 348)
@@ -341,14 +341,14 @@ all_dat_joined <- clustering_dat1 %>%
 
 all_dat_joined <- all_dat_joined %>%
   mutate(club = case_when(
-    displayName=='football' ~ 'football',
-    displayName==displayName_p1 ~ 'Safety #1',
-    displayName==displayName_p2 ~ 'Safety #2',
-    teamAbbr==possessionTeam ~ 'Offense',
-    teamAbbr==defensiveTeam ~ 'Defense'
+    displayName == 'football' ~ 'football',
+    displayName == displayName_p1 ~ 'Safety #1',
+    displayName == displayName_p2 ~ 'Safety #2',
+    teamAbbr == possessionTeam ~ 'Offense',
+    teamAbbr == defensiveTeam ~ 'Defense'
   ),
-  t_after_snap=round(t_after_snap,3))
-  #mutate(teamAbbr=ifelse(displayName=='football', 'football', teamAbbr))
+  t_after_snap = round(t_after_snap,3))
+  #mutate(teamAbbr = ifelse(displayName == 'football', 'football', teamAbbr))
 
 
 comp_df <- all_dat_joined %>%
@@ -428,7 +428,6 @@ df_for_an<-comp_df %>%
   ungroup()
 
 unique(df_for_an$teamAbbr)
-
 
 View(df_for_an)
 
