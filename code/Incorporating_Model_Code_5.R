@@ -76,8 +76,7 @@ df_safety_movement_2 <- df_safety_movement_2 %>% rename(pre_snap_safety_2_Y_AtSn
 # To keep it simple, take out some unnecessary columns from df_safety_movement DFs
 df_safety_movement_1 <- df_safety_movement_1 %>% 
   select(-c("pre_snap_safety_1", "pre_snap_safety_1_name", "num_safeties_pre_snap", "PostSnap_MOF_Num",
-            "defteam", "posteam", "Ball_X_Snap", "pre_snap_safety_1_X_AtSnap", "pre_snap_safety_1_Y_AtSnap",
-            "Safety1_X_3SecBeforeSnap", "Safety1_Y_3SecBeforeSnap"))
+            "defteam", "posteam", "Ball_X_Snap", "pre_snap_safety_1_X_AtSnap", "pre_snap_safety_1_Y_AtSnap"))
 final_dropbacks_1High <- merge(x = Dropbacks_Merged, y = df_safety_movement_1,
                                by = c("gameId", "playId"))
 
@@ -85,8 +84,7 @@ df_safety_movement_2 <- df_safety_movement_2 %>%
   select(-c("pre_snap_safety_1", "pre_snap_safety_1_name", "pre_snap_safety_2", "pre_snap_safety_2_name", 
             "num_safeties_pre_snap", "PostSnap_MOF_Num",
             "defteam", "posteam", "Ball_X_Snap", "pre_snap_safety_1_X_AtSnap", "pre_snap_safety_1_Y_AtSnap",
-            "pre_snap_safety_2_X_AtSnap", "pre_snap_safety_2_Y_AtSnap",
-            "Safety1_X_3SecBeforeSnap", "Safety1_Y_3SecBeforeSnap", "Safety2_X_3SecBeforeSnap", "Safety2_Y_3SecBeforeSnap"))
+            "pre_snap_safety_2_X_AtSnap", "pre_snap_safety_2_Y_AtSnap"))
 final_dropbacks_2High <- merge(x = Dropbacks_Merged, y = df_safety_movement_2,
                                by = c("gameId", "playId"))
 
