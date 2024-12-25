@@ -4,16 +4,16 @@ library(gganimate)
 source("https://raw.githubusercontent.com/mlfurman3/gg_field/main/gg_field.R")
 
 
-#these are the files related directly to the 
+# these are files related directly to the animation code
 safety_movement1 <- read_csv('df_safety_movement_1.csv')
 safety_movement2 <- read_csv('df_safety_movement_2.csv')
 out_of_sample_preds <- read_csv('results_df_preds_outOfSample.csv')
 
-#tracking the entire plays:
+# tracking the entire plays:
 df_C_players <- read_csv('df_C_players.csv')
 df_C_plays <- read_csv('df_C_plays.csv')
 df_C_tracking <- read_csv('df_C_tracking.csv')
-# the following three files are the raw files given to us from the 
+# the following three files are the raw files given to us from the Kaggle data
 player_play <- read_csv('player_play.csv') 
 all_players <- read_csv('players.csv')
 plays <- read_csv('plays.csv')
