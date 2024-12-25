@@ -183,7 +183,7 @@ df_C_plays <- read_csv('df_C_plays.csv')
 df_C_tracking <- read_csv('df_C_tracking.csv')
 # the following three files are the raw files given to us from the Kaggle data
 player_play <- read_csv('player_play.csv') 
-all_players <- read_csv('players.csv')
+players <- read_csv('players.csv')
 plays <- read_csv('plays.csv')
 #View(safety_movement1)
 
