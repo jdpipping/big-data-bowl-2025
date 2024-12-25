@@ -173,8 +173,8 @@ ggplot() +
 ########################### MORE DETAILED ANIMATION CODE BELOW ##########################
 
 # these are files related directly to the animation code
-safety_movement1 <- read_csv('df_safety_movement_1.csv')
-safety_movement2 <- read_csv('df_safety_movement_2.csv')
+df_safety_movement_1 <- read_csv('df_safety_movement_1.csv')
+df_safety_movement_2 <- read_csv('df_safety_movement_2.csv')
 out_of_sample_preds <- read_csv('results_df_preds_outOfSample.csv')
 
 # tracking the entire plays:
@@ -185,7 +185,7 @@ df_C_tracking <- read_csv('df_C_tracking.csv')
 player_play <- read_csv('player_play.csv') 
 players <- read_csv('players.csv')
 plays <- read_csv('plays.csv')
-#View(safety_movement1)
+#View(df_safety_movement_1)
 
 # try clustering on the single safety preds:
 set.seed(0)
@@ -198,7 +198,7 @@ wss <- function(df, k) {
 # Compute and plot wss for k = 1 to k = 15
 k.values <- 2:15
 
-clustering_dat1 <- safety_movement1 %>%
+clustering_dat1 <- df_safety_movement_1 %>%
   select(gameId, playId,x_first:y_spline_basis10)
 
 # extract wss for 2-15 clusters using sapply 
