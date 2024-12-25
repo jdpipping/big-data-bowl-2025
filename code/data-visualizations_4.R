@@ -1,3 +1,5 @@
+library(tidyverse)
+
 # Recall that tracking_std was defined in the data cleaning file
 tracking_std = read_csv('processed-data/tracking_std.csv')
 
