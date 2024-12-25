@@ -29,7 +29,6 @@ players <- fread('players.csv')
 plays <- fread('plays.csv')
 # View(df_safety_movement_1)
 
-
 # Do the entire process for 1-high and 2-high plays separately
 # Start with tracking data, then add the safety movement ... but DON'T join on nflId, b/c one DF only includes safeties
 # Change df_safety_movement_1 column names to reflect nflId and displayName just referring to safeties
@@ -257,8 +256,8 @@ all_dat_joined_2 <- all_dat_joined_2 %>%
                                ifelse(!is.na(mofo_postsnap) & mofo_postsnap %in% 0, "MOF Closed", NA)))
 
 # attributes used for plot. first is away, second is football, third is home
-cols_fill <- c('Offense' = "blue", 'Defense'="goldenrod", 'football'="brown", 'Safety #1'='navyblue', 'Safety #2'='navyblue')
-cols_col <- c('Offense' = "blue", 'Defense'="goldenrod", 'football'="brown", 'Safety #1'='navyblue', 'Safety #2'='navyblue')
+cols_fill <- c('Offense' = "red", 'Defense'="dodgerblue", 'football'="brown", 'Safety #1'='navyblue', 'Safety #2'='navyblue')
+cols_col <- c('Offense' = "red", 'Defense'="dodgerblue", 'football'="brown", 'Safety #1'='navyblue', 'Safety #2'='navyblue')
 size_vals <- c(6, 4, 6, 6, 6)
 shape_vals <- c(21, 16, 21, 21, 21)
 plot_title <- all_dat_joined_2[1, playDescription]
