@@ -420,7 +420,7 @@ anim_func(dataset = comp_df, game = games_for_comp[1], play = plays_for_comp[1])
 animate(anim_func(dataset = comp_df, game = games_for_comp[2], play = plays_for_comp[2]), duration = 30)
 animate(anim_func(dataset = comp_df, game = games_for_comp[3], play = plays_for_comp[3]), duration = 30)
 
-
+# This data frame tests Antonio Winfield specifically
 df_for_an<-comp_df %>%
   filter(gameId==games_for_comp[1] & playId==plays_for_comp[1]) %>%
   group_by(gameId, playId, nflId) %>%
