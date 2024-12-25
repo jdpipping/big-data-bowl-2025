@@ -171,6 +171,7 @@ ggplot() +
   NULL
 
 ########################### MORE DETAILED ANIMATION CODE BELOW ##########################
+############################ ALONG WITH HOW TO CREATE CLUSTERS ##########################
 
 # these are files related directly to the animation code
 df_safety_movement_1 <- read_csv('df_safety_movement_1.csv')
