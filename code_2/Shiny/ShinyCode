@@ -1,0 +1,66 @@
+setwd("C:/Users/justi/OneDrive/Penn/BDB(2025)")
+
+#packages:
+library(tidyverse)
+library(ggplot2)
+library(shiny)
+
+#pulling in the file that includes the data cleaning/animations:
+#source('Clustering_Preds.R')
+#let's set the selector's:
+play_descriptions <- unique(all_dat_joined$playDescription)
+
+# Define UI for application that draws a histogram
+ui <- fluidPage(
+
+    # Application title
+    titlePanel("Shiny Application (Visualizing Plays)"),
+
+    # Sidebar with a slider input for number of bins 
+    sidebarLayout(
+        sidebarPanel(
+            selectInput(inputId = 'PlayDescriptions1', label = 'Choose Play Description #1', choices = c(play_descriptions), selected = '(9:31) M.Mariota pass incomplete deep left to F.Franks.'),
+            selectInput(inputId = 'PlayDescriptions2', label = 'Choose Play Description #2', choices = c(play_descriptions), selected = '(9:31) M.Mariota pass incomplete deep left to F.Franks.')
+        ),
+
+        # Show a plot of the generated distribution
+        mainPanel(
+           #tableOutput("test_table")
+            imageOutput(outputId = 'Animation_1'),
+            imageOutput(outputId = 'Animation_2')
+        )
+    )
+)
+
+# Define server logic required to draw a histogram
+server <- function(input, output) {
+    
+    output$Animation_1 <- renderImage({
+        anim <- anim_func(dataset = all_dat_joined, description = input$PlayDescriptions1)
+        anim_save("outfile.gif", animate(anim)) # New
+        
+        # Return a list containing the filename
+        list(src = "outfile.gif", contentType = "image/gif")
+    },
+    deleteFile = TRUE
+    )
+    
+    output$Animation_2 <- renderImage({
+        anim <- anim_func(dataset = all_dat_joined, description = input$PlayDescriptions2)
+        anim_save("outfile.gif", animate(anim)) # New
+        
+        # Return a list containing the filename
+        list(src = "outfile.gif", contentType = "image/gif")
+    },
+    deleteFile = TRUE
+    )
+
+    # output$test_table <- renderTable({
+    #     # generate bins based on input$bins from ui.R
+    #     all_dat_joined %>%
+    #         filter(playDescription==input$PlayDescriptions1)
+    # })
+}
+
+# Run the application 
+shinyApp(ui = ui, server = server)
