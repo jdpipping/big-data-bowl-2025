@@ -272,9 +272,9 @@ for (j in 1:length(dfs_for_lm)) {
   }
 }
 
-#######################################################
+##########################################################################
 ### correlation between safety entropy and EPA/play on disguised plays ###
-######################################################
+##########################################################################
 
 #
 entropy_cutoff = 0.8
@@ -288,9 +288,11 @@ entropy(p_cutoffs)
 #
 df_epa_entropy_disguised = 
   df_eval %>%
-  filter(entropy > entropy_cutoff) %>%
   group_by(defensiveTeam) %>%
-  reframe(mean_entropy = mean(entropy), epa_per_play = mean(epa), n_disguised_plays = n()) 
+  mutate(n_plays = n()) %>%
+  filter(entropy > entropy_cutoff) %>%
+  reframe(mean_entropy = mean(entropy), epa_per_play = mean(epa), n_disguised_plays = n(), n_plays = unique(n_plays)) %>%
+  mutate(frac_disguised = n_disguised_plays/n_plays)
 df_epa_entropy_disguised
 
 # 
@@ -348,6 +350,201 @@ p_cutoff_L = uniroot(function(p) entropy(p) - e, c(0.00000001, 0.5))$root
 p_cutoff_U = uniroot(function(p) entropy(p) - e, c(0.5, 0.9999999))$root
 p_cutoffs = c(p_cutoff_L, p_cutoff_U)
 p_cutoffs
+
+######################################################
+### EPA/play versus EPA/play on high entropy plays ###
+######################################################
+
+#
+df_epa_entropy
+df_epa_entropy_disguised
+df_epa_all_vs_highEntropy = 
+  left_join(
+    df_epa_entropy %>% select(defensiveTeam, epa_per_play),
+    df_epa_entropy_disguised %>% select(defensiveTeam, epa_per_play) %>% rename(epa_per_play_highEntropy = epa_per_play),
+  )
+df_epa_all_vs_highEntropy
+
+### plot
+df_for_lm_all_vs_highEntropy = df_epa_all_vs_highEntropy #FIXME
+
+cor_epa_entropy_all_vs_highEntropy = cor(df_for_lm_all_vs_highEntropy$epa_per_play, df_for_lm_all_vs_highEntropy$epa_per_play_highEntropy)
+cor_epa_entropy_all_vs_highEntropy
+m1_all_vs_highEntropy = lm(epa_per_play~epa_per_play_highEntropy, data=df_for_lm_all_vs_highEntropy)
+m1_all_vs_highEntropy
+
+# plot
+df_plot_cor_all_vs_highEntropy = 
+  df_for_lm_all_vs_highEntropy %>%
+  ggplot(aes(team_abbr = defensiveTeam, x = epa_per_play, y = epa_per_play_highEntropy)) +
+  ggplot2::geom_abline(slope = 1, intercept = 0, color="red", linetype="longdash") +
+  # geom_vline(xintercept=0, color = "red", linetype="dashed") +
+  # geom_hline(yintercept=0, color = "red", linetype="dashed") +
+  geom_nfl_logos(width=0.05) +
+  # annotate("text", x = 0.3, y = 0.3, size=6, color="firebrick",
+  #          label = paste0("corr = ", round(cor_epa_entropy_all_vs_highEntropy,2))) +
+  xlab("EPA/play") +
+  ylab("EPA/play on high entropy plays")
+ggsave(paste0("results_plot_epa_all_vs_highEntropy_corr.png"), df_plot_cor_all_vs_highEntropy, width=8, height=5)
+
+#
+df_for_lm_all_vs_highEntropy %>% 
+  reframe(
+    sum(epa_per_play_highEntropy < epa_per_play),
+    mean(epa_per_play_highEntropy < epa_per_play),
+  )
+
+###########################################################################
+### EPA/play on high entropy plays versus EPA/play on low entropy plays ###
+###########################################################################
+
+#
+entropy_cutoff_L = .79; entropy_cutoff_U = .79;
+
+#
+p_cutoff_L = uniroot(function(p) entropy(p) - entropy_cutoff_L, c(0.00000001, 0.5))$root
+p_cutoff_U = uniroot(function(p) entropy(p) - entropy_cutoff_L, c(0.5, 0.9999999))$root
+p_cutoffs = c(p_cutoff_L, p_cutoff_U)
+p_cutoffs
+entropy(p_cutoffs)
+
+df_epa_entropy_disguised = 
+  df_eval %>%
+  group_by(defensiveTeam) %>%
+  mutate(n_plays = n()) %>%
+  filter(entropy > entropy_cutoff_U) %>%
+  reframe(mean_entropy = mean(entropy), epa_per_play = mean(epa), n_disguised_plays = n(), n_plays = unique(n_plays)) %>%
+  mutate(frac_disguised = n_disguised_plays/n_plays)
+df_epa_entropy_disguised
+
+df_epa_entropy_undisguised = 
+  df_eval %>%
+  group_by(defensiveTeam) %>%
+  mutate(n_plays = n()) %>%
+  filter(entropy <= entropy_cutoff_L) %>%
+  reframe(mean_entropy = mean(entropy), epa_per_play = mean(epa), n_undisguised_plays = n(), n_plays = unique(n_plays)) %>%
+  mutate(frac_undisguised = n_undisguised_plays/n_plays)
+df_epa_entropy_undisguised
+
+df_epa_lowHighEntropy = 
+  left_join(
+    df_epa_entropy_disguised %>% select(defensiveTeam, epa_per_play, n_disguised_plays) %>% rename(epa_per_play_highEntropy = epa_per_play),
+    df_epa_entropy_undisguised %>% select(defensiveTeam, epa_per_play, n_undisguised_plays) %>% rename(epa_per_play_lowEntropy = epa_per_play),
+  )
+df_epa_lowHighEntropy
+
+# summary statistics
+df_epa_lowHighEntropy %>% reframe(mean(n_disguised_plays), mean(n_undisguised_plays))
+df_epa_lowHighEntropy %>% 
+  reframe(
+    sum(epa_per_play_highEntropy < epa_per_play_lowEntropy),
+    mean(epa_per_play_highEntropy < epa_per_play_lowEntropy),
+  )
+
+### plot
+cor_epa_entropy_lowHighEntropy = cor(df_epa_lowHighEntropy$epa_per_play_highEntropy, df_epa_lowHighEntropy$epa_per_play_lowEntropy)
+cor_epa_entropy_lowHighEntropy
+m1_lowHighEntropy = lm(epa_per_play_highEntropy~epa_per_play_lowEntropy, data=df_epa_lowHighEntropy)
+m1_lowHighEntropy
+
+# 
+df_plot_cor_lowHighEntropy = 
+  df_epa_lowHighEntropy %>%
+  ggplot(aes(team_abbr = defensiveTeam, x = epa_per_play_lowEntropy, y = epa_per_play_highEntropy)) +
+  # nflplotR::geom_mean_lines(aes(x0 = epa_per_play_lowEntropy , y0 = epa_per_play_highEntropy)) +
+  # ggplot2::geom_abline(slope = 1, intercept = 0, color="dodgerblue2", linetype="longdash") +
+  ggplot2::geom_abline(slope = 1, intercept = 0, color="red", linetype="longdash") +
+  geom_nfl_logos(width=0.05) +
+  annotate(
+    "segment", x =  0.32, xend = 0.08, y = -0.6, yend = -0.6, 
+    arrow = arrow(type = "closed", length = unit(0.4, "cm")),
+    color = "firebrick"
+  ) +
+  annotate(
+    "text", x =  0.1, y = -0.6, hjust=0, vjust = -0.5, size = 4,
+    label = "better defensive outcomes", color = "firebrick"
+  ) +
+  annotate(
+    "segment", x =  -0.3, xend = -0.3, y = -.05, yend = -0.6, 
+    arrow = arrow(type = "closed", length = unit(0.4, "cm")),
+    color = "firebrick"
+  ) +
+  annotate(
+    "text", x = -0.3, y = -0.55, hjust=0, vjust = -0.5, size = 4,
+    label = "better defensive outcomes", color = "firebrick", angle = 90
+  ) +
+  xlab(paste0("EPA/play on low entropy plays")) +
+  ylab(paste0("EPA/play on high entropy plays"))
+ggsave(paste0("results_plot_epa_lowHighEntropy_corr.png"), df_plot_cor_lowHighEntropy, width=8, height=5)
+
+##################################################################
+### EPA/play on high entropy plays versus Frac disguised plays ###
+##################################################################
+
+#
+df_epaDisguised_vs_fracDisguised = 
+  df_epa_entropy_disguised %>% 
+  select(defensiveTeam, epa_per_play, frac_disguised) %>% 
+  rename(epa_per_play_highEntropy = epa_per_play)
+df_epaDisguised_vs_fracDisguised
+
+### plot
+cor_epaDisguised_vs_fracDisguised = cor(df_epaDisguised_vs_fracDisguised$epa_per_play_highEntropy, df_epaDisguised_vs_fracDisguised$frac_disguised)
+cor_epaDisguised_vs_fracDisguised
+m1_epaDisguised_vs_fracDisguised = lm(epa_per_play_highEntropy~frac_disguised, data=df_epaDisguised_vs_fracDisguised)
+m1_epaDisguised_vs_fracDisguised
+
+# plot
+df_plot_epaDisguised_vs_fracDisguised = 
+  df_epaDisguised_vs_fracDisguised %>%
+  ggplot(aes(team_abbr = defensiveTeam, x = frac_disguised, y = epa_per_play_highEntropy)) +
+  ggplot2::geom_abline(slope = coef(m1_epaDisguised_vs_fracDisguised)[2], 
+                       intercept = coef(m1_epaDisguised_vs_fracDisguised)[1],
+                       linewidth=1.5, color="gray20", linetype="longdash") +
+  nflplotR::geom_mean_lines(aes(x0 =  frac_disguised, y0 = epa_per_play_highEntropy)) +
+  geom_nfl_logos(width=0.05) +
+  annotate("text", x = 0.65, y = 0.4, size=6, color="firebrick",
+           label = paste0("corr = ", round(cor_epaDisguised_vs_fracDisguised,2))) +
+  xlab("fraction of plays that are high entropy") +
+  ylab("EPA/play on high entropy plays")
+ggsave(paste0("results_plot_epaDisguised_vs_fracDisguised.png"), 
+       df_plot_epaDisguised_vs_fracDisguised, width=8, height=5)
+
+##########################################################
+### EPA/play on high entropy plays versus Mean Entropy ###
+##########################################################
+
+#
+df_epaDisguised_vs_meanEntropy = 
+  df_epa_entropy_disguised %>% 
+  select(defensiveTeam, epa_per_play) %>% 
+  rename(epa_per_play_highEntropy = epa_per_play) %>%
+  left_join(
+    df_epa_entropy %>% select(defensiveTeam, mean_entropy)
+  )
+df_epaDisguised_vs_meanEntropy
+
+### plot
+cor_epaDisguised_vs_meanEntropy = cor(df_epaDisguised_vs_meanEntropy$epa_per_play_highEntropy, df_epaDisguised_vs_meanEntropy$mean_entropy)
+cor_epaDisguised_vs_meanEntropy
+m1_epaDisguised_vs_meanEntropy = lm(epa_per_play_highEntropy~mean_entropy, data=df_epaDisguised_vs_meanEntropy)
+m1_epaDisguised_vs_meanEntropy
+
+# plot
+df_plot_epaDisguised_vs_meanEntropy = 
+  df_epaDisguised_vs_meanEntropy %>%
+  ggplot(aes(team_abbr = defensiveTeam, x = mean_entropy, y = epa_per_play_highEntropy)) +
+  ggplot2::geom_abline(slope = coef(m1_epaDisguised_vs_meanEntropy)[2], 
+                       intercept = coef(m1_epaDisguised_vs_meanEntropy)[1],
+                       linewidth=1.5, color="gray20", linetype="longdash") +
+  nflplotR::geom_mean_lines(aes(x0 =  mean_entropy, y0 = epa_per_play_highEntropy)) +
+  geom_nfl_logos(width=0.05) +
+  annotate("text", x = 0.65, y = 0.4, size=6, color="firebrick",
+           label = paste0("corr = ", round(cor_epaDisguised_vs_meanEntropy,2))) +
+  xlab("mean safety entropy") +
+  ylab("EPA/play on high entropy plays")
+ggsave(paste0("results_plot_epaDisguised_vs_meanEntropy.png"), 
+       df_plot_epaDisguised_vs_meanEntropy, width=8, height=5)
 
 #############################################
 ### BAYESIAN DEFENSIVE TEAM EFFECTS MODEL ###
