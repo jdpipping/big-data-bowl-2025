@@ -85,9 +85,29 @@ df_eval =
   relocate(epa, .after = entropy)
 df_eval
 
-#################################
-### DDEFENSIVE SAFETY ENTROPY ###
-#################################
+# num plays
+nplays = nrow(df_eval)
+nplays
+# num games
+ngames = length(unique(df_eval$gameId))
+ngames
+# num dropbacks per team per game
+nplays / ngames * 32
+nplays / ngames / 2
+16 * 0.04
+
+################################
+### DEFENSIVE SAFETY ENTROPY ###
+################################
+
+plot_entropy_graph =
+  tibble(p = seq(0,1,length.out=250)) %>%
+  mutate(entropy = -p*log(p,base=2) - (1-p)*log(1-p,base=2)) %>%
+  mutate(entropy = ifelse(p==0,0,entropy)) %>%
+  mutate(entropy = ifelse(p==1,0,entropy)) %>%
+  ggplot(aes(x=p,y=entropy)) +
+  geom_line(linewidth=1)
+ggsave("results_plot_entropy_v_prob.png",plot_entropy_graph,width=6,height=5)
 
 # plot mean entropy by team
 df_team_mean_entropy =
@@ -159,6 +179,13 @@ df_epa_entropy =
   group_by(defensiveTeam) %>%
   reframe(mean_entropy = mean(entropy), epa_per_play = mean(epa)) 
 df_epa_entropy
+
+#
+sd(df_epa_entropy$epa_per_play)
+sd(df_epa_entropy$epa_per_play)*2
+df_epa_entropy %>% 
+  mutate(numSdsFromMean_epa = abs(epa_per_play - mean(epa_per_play))/sd(epa_per_play)) %>% 
+  arrange(-numSdsFromMean_epa)
 
 # correlations
 dfs_for_lm = list(
@@ -244,6 +271,73 @@ for (j in 1:length(dfs_for_lm)) {
     ggsave(paste0("results_plot_epa_entropy_corr_A",j,".png"), df_plot_cor, width=8, height=5)
   }
 }
+
+#######################################################
+### correlation between safety entropy and EPA/play on disguised plays ###
+######################################################
+
+#
+entropy_cutoff = 0.8
+entropy <- function(p) -p*log(p,2) -(1-p)*log(1-p,2)
+p_cutoff_L = uniroot(function(p) entropy(p) - entropy_cutoff, c(0.00000001, 0.5))$root
+p_cutoff_U = uniroot(function(p) entropy(p) - entropy_cutoff, c(0.5, 0.9999999))$root
+p_cutoffs = c(p_cutoff_L, p_cutoff_U)
+p_cutoffs
+entropy(p_cutoffs)
+
+#
+df_epa_entropy_disguised = 
+  df_eval %>%
+  filter(entropy > entropy_cutoff) %>%
+  group_by(defensiveTeam) %>%
+  reframe(mean_entropy = mean(entropy), epa_per_play = mean(epa), n_disguised_plays = n()) 
+df_epa_entropy_disguised
+
+### plot
+
+df_for_lm_disguised = df_epa_entropy_disguised #FIXME
+
+cor_epa_entropy_disguised = cor(df_for_lm_disguised$mean_entropy, df_for_lm_disguised$epa_per_play)
+cor_epa_entropy_disguised
+m1_disguised = lm(epa_per_play~mean_entropy, data=df_for_lm_disguised)
+m1_disguised
+
+# plot
+df_plot_cor_disguised = 
+  df_for_lm_disguised %>%
+  ggplot(aes(team_abbr = defensiveTeam, x = mean_entropy, y = epa_per_play)) +
+  ggplot2::geom_abline(slope = coef(m1_disguised)[2], intercept = coef(m1_disguised)[1],
+                       linewidth=1.5, color="gray20", linetype="longdash") +
+  ###
+  nflplotR::geom_mean_lines(aes(x0 = mean_entropy , y0 = epa_per_play)) +
+  # geom_point(aes(size = n_disguised_plays)) +
+  geom_nfl_logos(width=0.05) +
+  labs(title = paste0("considering only disguised plays (entropy > ",entropy_cutoff,")")) +
+  ###
+  annotate("text", x = 0.945, y = 0.3, size=6, color="firebrick",
+           label = paste0("corr = ", round(cor_epa_entropy_disguised,2))) +
+  annotate(
+    "segment", x = 0.935, xend = 0.9525, y = -0.50, yend = -0.50,
+    arrow = arrow(type = "closed", length = unit(0.4, "cm")),
+    color = "firebrick"
+  ) +
+  annotate(
+    "text", x = 0.935, y = -0.50, hjust=0, vjust =-0.5, size = 4,
+    label = "more unpredictable safeties", color = "firebrick",
+  ) +
+  annotate(
+    "segment", x = 0.91, xend = 0.91, y = -0.125, yend = -0.65,
+    arrow = arrow(type = "closed", length = unit(0.4, "cm")),
+    color = "firebrick"
+  ) +
+  annotate(
+    "text", x = 0.91, y = -0.60, hjust=0, vjust = -0.5, size = 4,
+    label = "more efficient defenses", color = "firebrick", angle = 90
+  ) +
+  ylab("EPA/play") +
+  xlab("mean safety entropy")
+ggsave(paste0("results_plot_epa_entropy_disguised_corr.png"), df_plot_cor_disguised, width=8, height=5)
+
 
 #############################################
 ### BAYESIAN DEFENSIVE TEAM EFFECTS MODEL ###

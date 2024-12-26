@@ -68,6 +68,21 @@ dim(df_tracking_C)
 dim(df_tracking_OG)
 # View(df_tracking_OG[1:1000,])
 
+# safety quality check
+df_safety_quality_check = 
+  df_tracking_OG %>%
+  filter(pos_official %in% c("SS","FS") | is_pre_safety) %>%
+  distinct(gameId, playId, nflId, displayName, pos_official, is_pre_safety)
+df_safety_quality_check
+# examine the players we assigned to pre-snap-safety who aren't officially safeties
+table(
+  (df_safety_quality_check %>% filter(is_pre_safety))$pos_official
+)
+# examine the official safeties who we did not assign to pre-snap-safety
+table(
+  (df_safety_quality_check %>% filter(pos_official %in% c("SS","FS")))$is_pre_safety
+)
+
 ##############################
 ### MODIFIED TRACKING DATA ###
 ##############################
@@ -135,13 +150,13 @@ table(df_tracking_presnap$t_after_snap)
 #######################
 
 # estimate MOFO probability using the overall mean
-fit_model_overallMean <- function(df_tracking) {
+fit_model_intercept <- function(df_tracking) {
   df_plays = df_tracking %>% distinct(gameId,playId,mofo_postsnap) 
   df_plays
   glm(mofo_postsnap ~ 1, data = df_plays, family = "binomial")
 }
 # # example
-# temp = fit_model_overallMean(df_tracking_presnap)
+# temp = fit_model_intercept(df_tracking_presnap)
 # temp
 
 # estimate MOFO probability given just the number of safeties
@@ -626,6 +641,9 @@ predict_movement_NN <- function(df_test, model) {
 # dataframes with tracking data features
 df_safety_movement_1
 df_safety_movement_2 
+nrow(df_safety_movement_1) + nrow(df_safety_movement_2) # num plays
+nrow(df_safety_movement_1) # num plays
+nrow(df_safety_movement_2) # num plays
 
 # play indices
 plays_all = 
@@ -687,7 +705,7 @@ for (fold in 1:NUM_FOLDS) {
   nrow(df_test_12) == nrow(plays_test)
   
   # fit baseline models
-  fit_overallMean = fit_model_overallMean(df_train_12)
+  fit_intercept = fit_model_intercept(df_train_12)
   fit_numSafeties = fit_model_numSafeties(df_train_12)
   fit_defteam = fit_model_defteam(df_train_12)
   fit_offteam = fit_model_offteam(df_train_12)
@@ -708,7 +726,7 @@ for (fold in 1:NUM_FOLDS) {
     df_test_1 %>%
     mutate(
       pred_fairCoin = 0.5,
-      pred_overallMean = predict(fit_overallMean, ., type = "response"),
+      pred_intercept = predict(fit_intercept, ., type = "response"),
       pred_numSafeties = predict(fit_numSafeties, ., type = "response"),
       pred_defteam = predict(fit_defteam, ., type = "response"),
       pred_offteam = predict(fit_offteam, ., type = "response"),
@@ -726,7 +744,7 @@ for (fold in 1:NUM_FOLDS) {
     df_test_2 %>%
     mutate(
       pred_fairCoin = 0.5,
-      pred_overallMean = predict(fit_overallMean, ., type = "response"),
+      pred_intercept = predict(fit_intercept, ., type = "response"),
       pred_numSafeties = predict(fit_numSafeties, ., type = "response"),
       pred_defteam = predict(fit_defteam, ., type = "response"),
       pred_offteam = predict(fit_offteam, ., type = "response"),
