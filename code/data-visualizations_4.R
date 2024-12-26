@@ -346,7 +346,6 @@ comp_df <- all_dat_joined_2 %>%
 anim_func(dataset = comp_df, game = 2022090800, play = 1504)  
 # animate(anim_func(dataset = comp_df, game = 2022090800, play = 1504), duration = 30)
 # animate(anim_func(dataset = comp_df, game = 2022090800, play = 1504), duration = 30)
-rm(df_C_players, df_C_plays, df_C_tracking, df_C_tracking_1, df_C_tracking_2, df_safety_movement_1, df_safety_movement_2, out_of_sample_preds, all_dat_joined_1, all_dat_joined_2, comp_df)
 
 # Now here's how to save it as a GIF
 animation_2 <- anim_func(dataset = comp_df, game = 2022090800, play = 1504)
@@ -361,6 +360,8 @@ gif_animation_2 <- animate(animation_2,
 
 # Save the GIF to a file
 anim_save("play_animation_2.gif", animation = gif_animation_2)
+
+rm(df_C_players, df_C_plays, df_C_tracking, df_C_tracking_1, df_C_tracking_2, df_safety_movement_1, df_safety_movement_2, out_of_sample_preds, all_dat_joined_1, all_dat_joined_2, comp_df)
 
 ######## DIFFERENT ANIMATION EXAMPLES THAT AREN'T DIRECTLY USED IN FINAL PROJECT #########
 
