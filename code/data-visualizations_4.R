@@ -167,7 +167,7 @@ anim_func <- function(dataset, play, game) {
     transition_time(t_after_snap)  +
     ease_aes("linear") +
     labs(title = plot_title,
-         caption = 'T: {frame_time}') 
+         caption = 'Time Since Snap: {frame_time}') 
   
 }
 
@@ -314,7 +314,7 @@ anim_func <- function(dataset, play, game) {
     transition_time(t_after_snap)  +
     ease_aes("linear") +
     labs(title = plot_title,
-         caption = 'T: {frame_time}') 
+         caption = 'Time Since Snap: {frame_time}') 
   
 }
 
@@ -325,7 +325,7 @@ comp_df <- all_dat_joined_2 %>%
 anim_func(dataset = comp_df, game = 2022090800, play = 1504)  
 # animate(anim_func(dataset = comp_df, game = 2022090800, play = 1504), duration = 30)
 # animate(anim_func(dataset = comp_df, game = 2022090800, play = 1504), duration = 30)
-rm(df_C_players, df_C_plays, df_C_tracking, df_safety_movement_1, df_safety_movement_2, out_of_sample_preds)
+rm(df_C_players, df_C_plays, df_C_tracking, df_C_tracking_1, df_C_tracking_2, df_safety_movement_1, df_safety_movement_2, out_of_sample_preds, all_dat_joined_1, all_dat_joined_2, comp_df)
 
 ######## DIFFERENT ANIMATION EXAMPLES THAT AREN'T DIRECTLY USED IN FINAL PROJECT #########
 
