@@ -167,7 +167,7 @@ anim_func <- function(dataset, play, game) {
     transition_time(t_after_snap)  +
     ease_aes("linear") +
     labs(title = plot_title,
-         caption = 'T: {frame_time}') 
+         caption = 'Time Since Snap: {frame_time}') 
   
 }
 
@@ -314,7 +314,7 @@ anim_func <- function(dataset, play, game) {
     transition_time(t_after_snap)  +
     ease_aes("linear") +
     labs(title = plot_title,
-         caption = 'T: {frame_time}') 
+         caption = 'Time Since Snap: {frame_time}') 
   
 }
 
