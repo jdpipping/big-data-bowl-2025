@@ -35,6 +35,13 @@ plays <- fread('plays.csv')
 df_safety_movement_1 <- df_safety_movement_1 %>% rename(nflId_p1 = `nflId`)
 df_safety_movement_1 <- df_safety_movement_1 %>% rename(displayName_p1 = `displayName`)
 
+# Also add frameId to df_C_tracking
+df_C_tracking <- df_C_tracking %>%
+  group_by(gameId, playId, nflId, displayName) %>%
+  mutate(frameId = rank(t_after_snap, ties.method = "first")) %>%
+  ungroup() 
+table(df_C_tracking$frameId)
+
 # And also add the jersey numbers by incorporating the original tracking data ... this example was Week 3
 tracking_week_3 <- fread("tracking_week_3.csv")
 Week3_NamesAndNumbers <- tracking_week_3 %>% select(c(nflId, displayName, jerseyNumber))
@@ -178,6 +185,20 @@ comp_df <- all_dat_joined_1 %>%
 anim_func(dataset = comp_df, game = 2022092507, play = 1836)  
 # animate(anim_func(dataset = comp_df, game = 2022092507, play = 1836), duration = 30)
 # animate(anim_func(dataset = comp_df, game = 2022092507, play = 1836), duration = 30)
+
+# Now here's how to save it as a GIF
+animation_1 <- anim_func(dataset = comp_df, game = 2022092507, play = 1836)
+
+# Use animate to create the GIF object
+gif_animation_1 <- animate(animation_1, 
+                         nframes = nFrames,       # Number of frames
+                         fps = 10,               # Frames per second
+                         width = 800,            # Width of the output GIF
+                         height = 600,           # Height of the output GIF
+                         renderer = gifski_renderer())
+
+# Save the GIF to a file
+anim_save("play_animation_1.gif", animation = gif_animation_1)
 
 # Now repeat that entire process for 2-high plays
 # Start with tracking data, then add the safety movement ... but DON'T join on nflId, b/c one DF only includes safeties
@@ -326,6 +347,20 @@ anim_func(dataset = comp_df, game = 2022090800, play = 1504)
 # animate(anim_func(dataset = comp_df, game = 2022090800, play = 1504), duration = 30)
 # animate(anim_func(dataset = comp_df, game = 2022090800, play = 1504), duration = 30)
 rm(df_C_players, df_C_plays, df_C_tracking, df_C_tracking_1, df_C_tracking_2, df_safety_movement_1, df_safety_movement_2, out_of_sample_preds, all_dat_joined_1, all_dat_joined_2, comp_df)
+
+# Now here's how to save it as a GIF
+animation_2 <- anim_func(dataset = comp_df, game = 2022090800, play = 1504)
+
+# Use animate to create the GIF object
+gif_animation_2 <- animate(animation_2, 
+                         nframes = nFrames,       # Number of frames
+                         fps = 10,               # Frames per second
+                         width = 800,            # Width of the output GIF
+                         height = 600,           # Height of the output GIF
+                         renderer = gifski_renderer())
+
+# Save the GIF to a file
+anim_save("play_animation_2.gif", animation = gif_animation_2)
 
 ######## DIFFERENT ANIMATION EXAMPLES THAT AREN'T DIRECTLY USED IN FINAL PROJECT #########
 
