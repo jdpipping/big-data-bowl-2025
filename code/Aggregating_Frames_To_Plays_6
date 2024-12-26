@@ -177,7 +177,7 @@ Stats_ByPlayerAndPlay_Final <- final_dropbacks_merged %>% filter(club != "footba
             y_spline_basis7_p2 = max(y_spline_basis7_p2), y_spline_basis8_p2 = max(y_spline_basis8_p2),                  
             y_spline_basis9_p2 = max(y_spline_basis9_p2), y_spline_basis10_p2 = max(y_spline_basis10_p2))
 
-Stats_ByPlayerAndPlay_Final <- Stats_ByPlayerAndPlay_Final %>% filter(club != "football") %>%
+Stats_ByPlayerAndPlay_Final <- Stats_ByPlayerAndPlay_Final %>%
   mutate(Indiv_OffTD = ifelse(PlayerSideOfBall %in% "offense" & !is.na(IsBallCarrier) & IsBallCarrier == 1 & !is.na(td_team) & td_team == PosTeam, 1,
                ifelse(PlayerSideOfBall %in% "offense" & (is.na(IsBallCarrier) | IsBallCarrier == 0 | is.na(td_team) | td_team != PosTeam), 0, NA)))
 Stats_ByPlayerAndPlay_Final <- Stats_ByPlayerAndPlay_Final %>%
