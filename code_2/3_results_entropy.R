@@ -293,6 +293,9 @@ df_epa_entropy_disguised =
   reframe(mean_entropy = mean(entropy), epa_per_play = mean(epa), n_disguised_plays = n()) 
 df_epa_entropy_disguised
 
+# 
+mean(df_epa_entropy_disguised$n_disguised_plays)
+
 ### plot
 
 df_for_lm_disguised = df_epa_entropy_disguised #FIXME
@@ -338,6 +341,13 @@ df_plot_cor_disguised =
   xlab("mean safety entropy")
 ggsave(paste0("results_plot_epa_entropy_disguised_corr.png"), df_plot_cor_disguised, width=8, height=5)
 
+
+#
+e = 0.95
+p_cutoff_L = uniroot(function(p) entropy(p) - e, c(0.00000001, 0.5))$root
+p_cutoff_U = uniroot(function(p) entropy(p) - e, c(0.5, 0.9999999))$root
+p_cutoffs = c(p_cutoff_L, p_cutoff_U)
+p_cutoffs
 
 #############################################
 ### BAYESIAN DEFENSIVE TEAM EFFECTS MODEL ###
