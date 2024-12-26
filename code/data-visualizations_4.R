@@ -120,7 +120,7 @@ cols_fill <- c('Offense' = "black", 'Defense'="dodgerblue", 'football'="brown", 
 cols_col <- c('Offense' = "black", 'Defense'="dodgerblue", 'football'="brown", 'Safety #1'='navyblue') #, 'Safety #2'='navyblue')
 size_vals <- c(6, 4, 6, 6)
 shape_vals <- c(21, 16, 21, 21)
-plot_title <- all_dat_joined_1[1, playDescription]
+plot_title <- all_dat_joined_1[1, "playDescription"]
 nFrames <- max(all_dat_joined_1$frameId)
 
 #setting the field:
@@ -281,7 +281,7 @@ cols_fill <- c('Offense' = "red", 'Defense'="dodgerblue", 'football'="brown", 'S
 cols_col <- c('Offense' = "red", 'Defense'="dodgerblue", 'football'="brown", 'Safety #1'='navyblue', 'Safety #2'='navyblue')
 size_vals <- c(6, 4, 6, 6, 6)
 shape_vals <- c(21, 16, 21, 21, 21)
-plot_title <- all_dat_joined_2[1, playDescription]
+plot_title <- all_dat_joined_2[1, "playDescription"]
 nFrames <- max(all_dat_joined_2$frameId)
 
 #setting the field:
