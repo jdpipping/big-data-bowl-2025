@@ -1,4 +1,7 @@
 library(tidyverse)
+library(reactable)
+library(ggplot2)
+library(gt)
 
 # If needed, can read in final_dropbacks_merged file that was defined earlier in "incorporating model code" file
 final_dropbacks_merged <- read_csv("final_dropbacks_merged.csv")
@@ -411,7 +414,6 @@ reactable(PlaySuccess_DisguiseVsNone_NFLWide, defaultPageSize = 20, columns = ma
 } else {
   colDef()
 }))
-# But realistically, this is probably best for scouting of a specific opponent, not a self-scout
 
 Plot1 <- PlaySuccess_DisguiseVsNone_NFLWide %>%
   ggplot(aes(x = Disguise, y = AvgEPA)) +
