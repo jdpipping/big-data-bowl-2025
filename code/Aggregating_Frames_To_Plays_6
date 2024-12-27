@@ -315,6 +315,336 @@ Stats_ByFullPlay_Final <- final_dropbacks_merged %>%
             y_spline_basis7_p2 = max(y_spline_basis7_p2), y_spline_basis8_p2 = max(y_spline_basis8_p2),                  
             y_spline_basis9_p2 = max(y_spline_basis9_p2), y_spline_basis10_p2 = max(y_spline_basis10_p2))
 
+# These are for if/when we want to make confidence intervals
+# Recall, Bernoulli is binary variable (i.e. use for proportions)
+SD_Bernoulli <- function(x){
+  mu <- mean(x, na.rm = TRUE)
+  return( sqrt( (mu*(1 - mu)) ))
+}
+
+SE_Bernoulli <- function(x){
+  mu <- mean(x, na.rm = TRUE)
+  return( sqrt( (mu*(1 - mu))/(length(x)) ) )
+}
+
+ConfBand_Bernoulli <- function(x) {
+  return(1.96*SE_Bernoulli(x))
+}
+
+upper_Bernoulli <- function(x) {
+  mean(x, na.rm = TRUE) + ConfBand_Bernoulli(x)
+}
+
+lower_Bernoulli <- function(x) {
+  mean(x, na.rm = TRUE) - ConfBand_Bernoulli(x)
+}
+
+# Make separate formula for continuous variables
+SE_Continuous <- function(x){
+  SD <- sd(x, na.rm = TRUE)
+  return( SD/sqrt((length(x))) )
+}
+
+ConfBand_Continuous <- function(x) {
+  return(1.96*SE_Continuous(x))
+}
+
+upper_Continuous <- function(x) {
+  mean(x, na.rm = TRUE) + ConfBand_Continuous(x)
+}
+
+lower_Continuous <- function(x) {
+  mean(x, na.rm = TRUE) - ConfBand_Continuous(x)
+}
+
+# Interesting play-level stats: does offense perform notably worse against disguised coverages?
+# For the sake of simplicity, define "disguised" as different number of safeties before and after the snap
+Stats_ByFullPlay_Final <- Stats_ByFullPlay_Final %>% mutate(Disguise = ifelse(num_safeties_pre_snap != num_safeties_post_snap, "Disguise", "No Disguise"))
+Stats_ByFullPlay_Final <- Stats_ByFullPlay_Final %>% mutate(Disguise_Num = ifelse(num_safeties_pre_snap != num_safeties_post_snap, 1, 0))
+
+# Start out with basic performance on disguised vs. non-disguised dropbacks ... don't group by team to start
+PlaySuccess_DisguiseVsNone_NFLWide <- Stats_ByFullPlay_Final %>% filter(!is.na(Disguise)) %>%
+  group_by(Disguise) %>%
+  summarize(Dropbacks = n(), YPP = mean(NetYardage), TD = sum(TeamTouchdown), AvgEPA = mean(EPA, na.rm = TRUE), EPSuccessRate = mean(EPSuccess, na.rm = TRUE), FirstDownRate = mean(first_down, na.rm = TRUE),
+            LCI_YPP = lower_Continuous(NetYardage), UCI_YPP = upper_Continuous(NetYardage),
+            LCI_EPA = lower_Continuous(EPA), UCI_EPA = upper_Continuous(EPA),
+            LCI_EPSuccess = ifelse(lower_Bernoulli(EPSuccess) >= 0, lower_Bernoulli(EPSuccess), 0), 
+            UCI_EPSuccess = ifelse(upper_Bernoulli(EPSuccess) <= 1, upper_Bernoulli(EPSuccess), 1),
+            LCI_FirstDown = ifelse(lower_Bernoulli(first_down) >= 0, lower_Bernoulli(first_down), 0), 
+            UCI_FirstDown = ifelse(upper_Bernoulli(first_down) <= 1, upper_Bernoulli(first_down), 1))
+# View(PlaySuccess_DisguiseVsNone_NFLWide)
+
+# See how reactable() looks
+# Function to count the maximum number of decimal places in a numeric column, for reactable() purposes
+# This isn't necessary if we don't care about how many significant digits show up
+max_decimals <- function(x) {
+  x <- na.omit(x)
+  if (length(x) == 0) return(0)
+  max(sapply(x, function(y) {
+    if (floor(y) == y) {
+      return(0)
+    } else {
+      nchar(strsplit(as.character(y), "\\.")[[1]][2])
+    }
+  }))
+}
+
+# Now, create reactable with that conditional formatting
+reactable(PlaySuccess_DisguiseVsNone_NFLWide, defaultPageSize = 20, columns = map(PlaySuccess_DisguiseVsNone_NFLWide, ~ if (is.numeric(.x) && max_decimals(.x) > 3) {
+  colDef(format = colFormat(digits = 3))
+} else {
+  colDef()
+}))
+# But realistically, this is probably best for scouting of a specific opponent, not a self-scout
+
+Plot1 <- PlaySuccess_DisguiseVsNone_NFLWide %>%
+  ggplot(aes(x = Disguise, y = AvgEPA)) +
+  geom_bar(stat = "identity", position = "dodge", fill = "red") +
+  labs(x = "Safety Disguise?", y = "Avg EPA Allowed",
+       title = "Average EPA Allowed, by Whether Coverage was Disguised",
+       subtitle = "Weeks 1-9, 2022, Early Downs with 5+ Yards To Go (n = 4,381)",
+       caption = " ") +
+  geom_abline(intercept = 0, slope = 0, color = "darkgreen", lty = 2) +
+  geom_errorbar(aes(ymin = LCI_EPA, ymax = UCI_EPA), position = "dodge", color = "black") +
+  #   scale_y_continuous(breaks = seq(3, 8, 1)) +
+  #   coord_cartesian(ylim = c(3, 8)) +
+  theme_bw() +
+  theme(plot.title = element_text(size = 10, hjust = 0.5),
+        plot.subtitle = element_text(size = 8, hjust = 0.5))
+
+Plot2 <- PlaySuccess_DisguiseVsNone_NFLWide %>%
+  ggplot(aes(x = Disguise, y = EPSuccessRate)) +
+  geom_bar(stat = "identity", position = "dodge", fill = "black") +
+  labs(x = "Safety Disguise?", y = "Success Rate Allowed",
+       title = "Success Rate Allowed, by Whether Coverage was Disguised",
+       subtitle = "Weeks 1-9, 2022, Early Downs with 5+ Yards To Go (n = 4,381)",
+       caption = "Disguise: different number of pre-snap and post-snap safeties") +
+  geom_abline(intercept = 0.5, slope = 0, color = "darkgreen", lty = 2) +
+  geom_errorbar(aes(ymin = LCI_EPSuccess, ymax = UCI_EPSuccess), position = "dodge", color = "red") +
+  scale_y_continuous(breaks = seq(0, 1, 0.2), labels = scales::percent_format(accuracy = 5L)) +
+  theme_bw() +
+  theme(plot.title = element_text(size = 10, hjust = 0.5),
+        plot.subtitle = element_text(size = 8, hjust = 0.5)) +
+  annotate("text", label = glue("Dotted Line: 50%"),
+           y = 0.51, x = 1, size = 3, color = "darkgreen")
+
+grid.arrange(Plot1, Plot2, ncol = 2)
+
+# And a similar version of that, which groups by disguise AND # of pre-snap safeties
+PlaySuccess_DisguiseAndSafeties_NFLWide <- Stats_ByFullPlay_Final %>% filter(!is.na(Disguise)) %>%
+  group_by(Disguise, num_safeties_pre_snap) %>%
+  summarize(Dropbacks = n(), YPP = mean(NetYardage), TD = sum(TeamTouchdown), AvgEPA = mean(EPA, na.rm = TRUE), EPSuccessRate = mean(EPSuccess, na.rm = TRUE), FirstDownRate = mean(first_down, na.rm = TRUE),
+            LCI_YPP = lower_Continuous(NetYardage), UCI_YPP = upper_Continuous(NetYardage),
+            LCI_EPA = lower_Continuous(EPA), UCI_EPA = upper_Continuous(EPA),
+            LCI_EPSuccess = ifelse(lower_Bernoulli(EPSuccess) >= 0, lower_Bernoulli(EPSuccess), 0), 
+            UCI_EPSuccess = ifelse(upper_Bernoulli(EPSuccess) <= 1, upper_Bernoulli(EPSuccess), 1),
+            LCI_FirstDown = ifelse(lower_Bernoulli(first_down) >= 0, lower_Bernoulli(first_down), 0), 
+            UCI_FirstDown = ifelse(upper_Bernoulli(first_down) <= 1, upper_Bernoulli(first_down), 1))
+# View(PlaySuccess_DisguiseAndSafeties_NFLWide)
+
+PlaySuccess_DisguiseAndSafeties_NFLWide <- PlaySuccess_DisguiseAndSafeties_NFLWide %>% 
+  mutate(PreSnapSafeties_Graph = case_when(
+    num_safeties_pre_snap == 1 ~ "1 Pre-Snap Safety",
+    num_safeties_pre_snap == 2 ~ "2 Pre-Snap Safeties")) 
+
+Plot3 <- PlaySuccess_DisguiseAndSafeties_NFLWide %>%
+  ggplot(aes(x = Disguise, y = AvgEPA)) +
+  geom_bar(stat = "identity", position = "dodge", fill = "red") +
+  labs(x = "Safety Disguise?", y = "Avg EPA Allowed",
+       title = "Average EPA Allowed, by Whether Coverage was Disguised",
+       subtitle = "Weeks 1-9, 2022, Early Downs with 5+ Yards To Go (n = 4,381)",
+       caption = " ") +
+  geom_abline(intercept = 0, slope = 0, color = "darkgreen", lty = 2) +
+  geom_errorbar(aes(ymin = LCI_EPA, ymax = UCI_EPA), position = "dodge", color = "black") +
+  #   scale_y_continuous(breaks = seq(3, 8, 1)) +
+  #   coord_cartesian(ylim = c(3, 8)) +
+  theme_bw() +
+  theme(plot.title = element_text(size = 10, hjust = 0.5),
+        plot.subtitle = element_text(size = 8, hjust = 0.5)) + facet_wrap(~PreSnapSafeties_Graph)
+
+Plot4 <- PlaySuccess_DisguiseAndSafeties_NFLWide %>%
+  ggplot(aes(x = Disguise, y = EPSuccessRate)) +
+  geom_bar(stat = "identity", position = "dodge", fill = "black") +
+  labs(x = "Safety Disguise?", y = "Success Rate Allowed",
+       title = "Success Rate Allowed, by Whether Coverage was Disguised",
+       subtitle = "Weeks 1-9, 2022, Early Downs with 5+ Yards To Go (n = 4,381)",
+       caption = "Disguise: different number of pre-snap and post-snap safeties") +
+  geom_abline(intercept = 0.5, slope = 0, color = "darkgreen", lty = 2) +
+  geom_errorbar(aes(ymin = LCI_EPSuccess, ymax = UCI_EPSuccess), position = "dodge", color = "red") +
+  scale_y_continuous(breaks = seq(0, 1, 0.2), labels = scales::percent_format(accuracy = 5L)) +
+  theme_bw() +
+  theme(plot.title = element_text(size = 10, hjust = 0.5),
+        plot.subtitle = element_text(size = 8, hjust = 0.5)) +
+  annotate("text", label = glue("Dotted Line: 50%"),
+           y = 0.51, x = 2, size = 3, color = "darkgreen") + facet_wrap(~PreSnapSafeties_Graph)
+
+grid.arrange(Plot3, Plot4, ncol = 2)
+
+# Now incorporate team defense into the equation
+PlaySuccess_DisguiseVsNone_ByDefTeam <- Stats_ByFullPlay_Final %>% filter(!is.na(Disguise)) %>%
+  group_by(DefTeam, Disguise) %>% 
+  summarize(Dropbacks = n(), YPP = mean(NetYardage), TotYds = sum(NetYardage), TD = sum(TeamTouchdown), TotEPA = sum(EPA), AvgEPA = mean(EPA, na.rm = TRUE), EPSuccessRate = mean(EPSuccess), FirstDownRate = mean(first_down, na.rm = TRUE)) %>% arrange(DefTeam, Disguise)
+# View(PlaySuccess_DisguiseVsNone_ByDefTeam)
+
+PlaySuccess_OnDisguises_ByTeam <- PlaySuccess_DisguiseVsNone_ByDefTeam %>% filter(Disguise %in% "Disguise")
+# View(PlaySuccess_OnDisguises_ByTeam)
+
+# For help with barplot + logos: https://nflplotr.nflverse.com/articles/nflplotR.html
+PlaySuccess_OnDisguises_ByTeam %>%
+  ggplot(aes(x = reorder(DefTeam, AvgEPA), y = AvgEPA)) +
+  # geom_bar(stat = "identity", position = "dodge", fill = "black") + ... that's how we would include bars and team logos
+  # geom_image(aes(x = reorder(DefTeam, AvgEPA), y = AvgEPA, image = Team), size = 0.05, asp = asp_ratio) + ... this line was to get images if we had NGS data
+  nflplotR::geom_nfl_logos(aes(team_abbr = DefTeam), width = 0.065, alpha = 1) +
+  # geom_text_repel(aes(x = reorder(DefTeam, AvgEPA), y = AvgEPA), size = 2.5) +
+  # scale_y_continuous(breaks = seq(30, 60, 10)) +
+  labs(x = "Team Logo", y = "Average EPA Allowed", 
+       title = "Average EPA Allowed on Disguised Coverages",
+       subtitle = "Weeks 1-9, 2022, Early Downs with 5+ Yards To Go (n = 4,381)",
+       caption = "Disguise: different number of pre-snap and post-snap safeties") +
+  theme_bw() +
+  theme(plot.title = element_text(size = 10, hjust = 0.5),
+        plot.subtitle = element_text(size = 8, hjust = 0.5),
+        axis.text.x = element_text(size = 0, face = "bold")) #, margin = margin(10, 0, 0, 0))) +
+  annotate("text", label = glue("Negative Value is Good for Defense"),
+           y = 0.52, x = 1.5, size = 3, color = "darkgreen") 
+# The axis.text.x is so that the actual team names don't show up
+
+# Use tab_options() w/ gt package for fancy tables for highest rate of disguised coverages and lowest EPA allowed on disguised dropbacks
+# First, gotta establish the "DisguiseRate" metric for each team, and sort in descending order
+DisguiseRate_Leaders <- Stats_ByFullPlay_Final %>% filter(!is.na(Disguise)) %>%
+  group_by(DefTeam) %>% 
+  summarize(Dropbacks = n(), DisguiseRate = mean(Disguise_Num), YPP = mean(NetYardage), TotYds = sum(NetYardage), TD = sum(TeamTouchdown), 
+            TotEPA = sum(EPA), AvgEPA = mean(EPA, na.rm = TRUE), EPSuccessRate = mean(EPSuccess), FirstDownRate = mean(first_down, na.rm = TRUE)) %>% 
+  arrange(desc(DisguiseRate))
+
+class(DisguiseRate_Leaders) <- "data.frame"
+DisguiseRate_FancyTable <- DisguiseRate_Leaders %>%
+  select(c("DefTeam", "Dropbacks", "AvgEPA", "DisguiseRate")) %>%
+  head(20) %>% # this is how we limit to the top 20
+  mutate(Rank = row_number(desc(DisguiseRate))) %>%
+  select("Rank", 1:4)
+
+DisguiseRate_FancyTable <- DisguiseRate_FancyTable |>
+  # filter(officialPosition %in% c("OLB", "DE")) |> 
+  # mutate(rank = row_number()) |> 
+  # select(1:4, "Dropbacks", "AvgEPA", "DisguiseRate") |> 
+  head(20) |> 
+  gt() |>
+  tab_options(
+    table.border.top.color = "white",
+    row.striping.include_table_body = FALSE
+  ) |>
+  opt_table_font(
+    font = list(
+      google_font("Chivo"),
+      default_fonts()
+    )
+  ) |>
+  fmt_number(
+    columns = c(DisguiseRate),
+    decimals = 2,
+  ) |>
+  data_color(
+    columns = c(DisguiseRate),
+    colors = scales::col_numeric(
+      palette = c("#FEE0D2", "#67000D"),
+      domain = NULL
+    )
+  ) |> 
+  cols_label(
+    Rank = md("**Rank**"), # the md is what makes the headers show up as bold
+    DefTeam = md("**Team**"),
+    # officialPosition = md("**Position**"),
+    Dropbacks = md("**Dropbacks**"),
+    AvgEPA = md("**Avg EPA on All Dropbacks**"),
+    DisguiseRate = html('<span style="text-decoration:overline; font-weight:bold">Disguise Rate</span>')
+  ) |> 
+  cols_align(
+    align = "center",
+    columns = Dropbacks:DisguiseRate
+  ) |> 
+  tab_header(md("**Top 20 Teams in Disguised Coverage Rate**"),
+             md("(Early Downs, 5+ Yards to Go: Weeks 1-9, 2022)")) |> # don't forget to adjust your minimum
+  tab_style(style = cell_borders(sides = "top"),
+            locations = cells_title("title")) |> 
+  tab_options(
+    table.border.top.style = "a"
+  ) |> 
+  tab_footnote(
+    footnote = "Low EPA: good for defense. Disguise: different # of pre-snap and post-snap safeties",
+    locations = cells_column_labels(
+      columns = DisguiseRate
+    )
+  )
+
+gtsave(DisguiseRate_FancyTable, "DisguiseRate_FancyTable.png")
+
+# Now use gt package for lowest EPA allowed on disguised dropbacks
+# Recall that PlaySuccess_OnDisguises_ByTeam exists, but we still need to arrange it (ASCENDING in this case, b/c defense wants low EPA allowed)
+PlaySuccess_OnDisguises_Leaders <- PlaySuccess_OnDisguises_ByTeam %>% arrange(AvgEPA)
+
+class(PlaySuccess_OnDisguises_Leaders) <- "data.frame"
+DisguiseSuccess_FancyTable <- PlaySuccess_OnDisguises_Leaders %>%
+  select(c("DefTeam", "Dropbacks", "EPSuccessRate", "AvgEPA")) %>%
+  head(20) %>% # this is how we limit to the top 20
+  mutate(Rank = row_number(AvgEPA)) %>% # DON'T use desc() in this case
+  select("Rank", 1:4)
+
+DisguiseSuccess_FancyTable <- DisguiseSuccess_FancyTable |>
+  # filter(officialPosition %in% c("OLB", "DE")) |> 
+  # mutate(rank = row_number()) |> 
+  # select(1:4, "Dropbacks", "EPSuccessRate", "AvgEPA") |> 
+  head(20) |> 
+  gt() |>
+  tab_options(
+    table.border.top.color = "white",
+    row.striping.include_table_body = FALSE
+  ) |>
+  opt_table_font(
+    font = list(
+      google_font("Chivo"),
+      default_fonts()
+    )
+  ) |>
+  fmt_number(
+    columns = c(AvgEPA),
+    decimals = 2,
+  ) |>
+  data_color(
+    columns = c(AvgEPA),
+    colors = scales::col_numeric(
+      palette = c("darkgreen", "lightgreen"), # Because we are going in ascending order, have dark column on the left
+      domain = NULL
+    )
+  ) |> 
+  cols_label(
+    Rank = md("**Rank**"), # the md is what makes the headers show up as bold
+    DefTeam = md("**Team**"),
+    # officialPosition = md("**Position**"),
+    Dropbacks = md("**Disguised Dropbacks**"),
+    EPSuccessRate = md("**Success Rate Allowed**"),
+    AvgEPA = html('<span style="text-decoration:overline; font-weight:bold">Avg EPA Allowed</span>')
+  ) |> 
+  cols_align(
+    align = "center",
+    columns = Dropbacks:AvgEPA
+  ) |> 
+  tab_header(md("**Top 20 Teams in Avg EPA Allowed on Disguised Coverages**"),
+             md("(Early Downs, 5+ Yards to Go: Weeks 1-9, 2022)")) |> # don't forget to adjust your minimum
+  tab_style(style = cell_borders(sides = "top"),
+            locations = cells_title("title")) |> 
+  tab_options(
+    table.border.top.style = "a"
+  ) |> 
+  tab_footnote(
+    footnote = "Low EPA: good for defense. Disguise: different # of pre-snap and post-snap safeties",
+    locations = cells_column_labels(
+      columns = AvgEPA
+    )
+  )
+
+gtsave(DisguiseSuccess_FancyTable, "DisguiseSuccess_FancyTable.png")
+
 # If we need to export to CSV
 write.csv(final_dropbacks_merged, "final_dropbacks_merged.csv")
 write.csv(Stats_ByPlayerAndPlay_Final, "Stats_ByPlayerAndPlay_Final.csv")
