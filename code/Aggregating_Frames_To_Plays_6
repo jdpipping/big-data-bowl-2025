@@ -672,6 +672,12 @@ combined_tables <- tags$div(
 # View in RStudio's Viewer or save as HTML
 browsable(combined_tables)
 
+# Save the combined tables to an HTML file
+save_html(combined_tables, "combined_tables.html")
+
+# Take a screenshot of the HTML and save it as a PNG
+webshot("combined_tables.html", "combined_tables.png", vwidth = 1200, vheight = 600)
+
 # If we need to export to CSV
 write.csv(final_dropbacks_merged, "final_dropbacks_merged.csv")
 write.csv(Stats_ByPlayerAndPlay_Final, "Stats_ByPlayerAndPlay_Final.csv")
