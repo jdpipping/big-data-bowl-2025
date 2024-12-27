@@ -152,7 +152,7 @@ anim_func <- function(dataset, play, game) {
                        '\n', 'MOFO Probability: ', round(100*data_for_viz$p[1], 2), '%',
                        '\n', 'Pre-Snap Safeties (in Red): ',data_for_viz$num_safeties[1],
                        '\n', 'Actual MOFO vs. MOFC: ',data_for_viz$PostSnap_MOF[1],
-                       '\n', 'Coverage Scheme: ', 'Cover 2')
+                       '\n', 'Coverage Scheme: ', 'Tampa 2')
   
   anim +
     #adding players
