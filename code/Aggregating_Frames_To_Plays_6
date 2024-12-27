@@ -544,6 +544,10 @@ DisguiseRate_FancyTable <- DisguiseRate_FancyTable |>
     columns = c(DisguiseRate),
     decimals = 2,
   ) |>
+  fmt_number(
+    columns = c(AvgEPA),
+    decimals = 3,
+  ) |>
   data_color(
     columns = c(DisguiseRate),
     colors = scales::col_numeric(
@@ -605,6 +609,10 @@ DisguiseSuccess_FancyTable <- DisguiseSuccess_FancyTable |>
       google_font("Chivo"),
       default_fonts()
     )
+  ) |>
+  fmt_number(
+    columns = c(EPSuccessRate),
+    decimals = 2,
   ) |>
   fmt_number(
     columns = c(AvgEPA),
