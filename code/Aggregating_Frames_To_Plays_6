@@ -581,6 +581,10 @@ DisguiseRate_FancyTable <- DisguiseRate_FancyTable |>
     )
   )
 
+# Add now make it so that the team logos replace the tricodes
+DisguiseRate_FancyTable <- DisguiseRate_FancyTable %>%
+  nflplotR::gt_nfl_logos(columns = "DefTeam")
+
 gtsave(DisguiseRate_FancyTable, "DisguiseRate_FancyTable.png")
 
 # Now use gt package for lowest EPA allowed on disguised dropbacks
@@ -650,6 +654,10 @@ DisguiseSuccess_FancyTable <- DisguiseSuccess_FancyTable |>
       columns = AvgEPA
     )
   )
+
+# Add now make it so that the team logos replace the tricodes
+DisguiseSuccess_FancyTable <- DisguiseSuccess_FancyTable %>%
+  nflplotR::gt_nfl_logos(columns = "DefTeam")
 
 gtsave(DisguiseSuccess_FancyTable, "DisguiseSuccess_FancyTable.png")
 
