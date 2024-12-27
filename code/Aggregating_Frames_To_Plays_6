@@ -653,6 +653,17 @@ DisguiseSuccess_FancyTable <- DisguiseSuccess_FancyTable |>
 
 gtsave(DisguiseSuccess_FancyTable, "DisguiseSuccess_FancyTable.png")
 
+# And here's how to view both gt tables simultaneously
+library(htmltools)
+combined_tables <- tags$div(
+  style = "display: flex; justify-content: space-between;",
+  tags$div(style = "margin-right: 20px;", DisguiseRate_FancyTable),
+  tags$div(DisguiseSuccess_FancyTable)
+)
+
+# View in RStudio's Viewer or save as HTML
+browsable(combined_tables)
+
 # If we need to export to CSV
 write.csv(final_dropbacks_merged, "final_dropbacks_merged.csv")
 write.csv(Stats_ByPlayerAndPlay_Final, "Stats_ByPlayerAndPlay_Final.csv")
