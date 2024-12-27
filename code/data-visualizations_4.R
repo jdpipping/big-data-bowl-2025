@@ -116,9 +116,9 @@ all_dat_joined_1 <- all_dat_joined_1 %>%
                                ifelse(!is.na(mofo_postsnap) & mofo_postsnap %in% 0, "MOF Closed", NA)))
 
 # attributes used for plot. first is away, second is football, third is home
-cols_fill <- c('Offense' = "black", 'Defense'="dodgerblue", 'football'="brown", 'Safety #1'='navyblue') #, 'Safety #2'='navyblue')
-cols_col <- c('Offense' = "black", 'Defense'="dodgerblue", 'football'="brown", 'Safety #1'='navyblue') #, 'Safety #2'='navyblue')
-size_vals <- c(6, 4, 6, 6)
+cols_fill <- c('Offense' = "black", 'Defense'="blue", 'football'="brown", 'Safety #1'='red') #, 'Safety #2'='red')
+cols_col <- c('Offense' = "black", 'Defense'="blue", 'football'="brown", 'Safety #1'='red') #, 'Safety #2'='red')
+size_vals <- c(8, 6, 8, 8)
 shape_vals <- c(21, 16, 21, 21)
 plot_title <- all_dat_joined_1[1, "playDescription"]
 nFrames <- max(all_dat_joined_1$frameId)
@@ -150,7 +150,7 @@ anim_func <- function(dataset, play, game) {
   
   plot_title <- paste0(data_for_viz$playDescription[1], 
                        '\n', 'MOFO Probability: ', round(100*data_for_viz$p[1], 2), '%',
-                       '\n', 'Pre-Snap Safeties (in Navy Blue): ',data_for_viz$num_safeties[1],
+                       '\n', 'Pre-Snap Safeties (in Red): ',data_for_viz$num_safeties[1],
                        '\n', 'Actual MOFO vs. MOFC: ',data_for_viz$PostSnap_MOF[1],
                        '\n', 'Coverage Scheme: ', 'Cover 2')
   
@@ -167,14 +167,17 @@ anim_func <- function(dataset, play, game) {
     
     # adding jersey numbers
     geom_text(data = all_dat_joined_1, aes(x = x, y = y, label = jerseyNumber), colour = "white",
-              vjust = 0.36, size = 3.5) +
+              vjust = 0.36, size = 4.5) +
     
     #titling plot with play description
     #setting animation parameters
     transition_time(t_after_snap)  +
     ease_aes("linear") +
     labs(title = plot_title,
-         caption = 'Time Since Snap: {frame_time}') 
+         caption = 'Time Since Snap: {frame_time}')  +
+    theme(plot.title = element_text(size = 12, hjust = 0.5),
+          plot.subtitle = element_text(size = 10, hjust = 0.5),
+          plot.caption = element_text(size = 8))
   
 }
 
@@ -277,9 +280,9 @@ all_dat_joined_2 <- all_dat_joined_2 %>%
                                ifelse(!is.na(mofo_postsnap) & mofo_postsnap %in% 0, "MOF Closed", NA)))
 
 # attributes used for plot. first is away, second is football, third is home
-cols_fill <- c('Offense' = "red", 'Defense'="dodgerblue", 'football'="brown", 'Safety #1'='navyblue', 'Safety #2'='navyblue')
-cols_col <- c('Offense' = "red", 'Defense'="dodgerblue", 'football'="brown", 'Safety #1'='navyblue', 'Safety #2'='navyblue')
-size_vals <- c(6, 4, 6, 6, 6)
+cols_fill <- c('Offense' = "red", 'Defense'="blue", 'football'="brown", 'Safety #1'='goldenrod', 'Safety #2'='goldenrod')
+cols_col <- c('Offense' = "red", 'Defense'="blue", 'football'="brown", 'Safety #1'='goldenrod', 'Safety #2'='goldenrod')
+size_vals <- c(8, 6, 8, 8, 8)
 shape_vals <- c(21, 16, 21, 21, 21)
 plot_title <- all_dat_joined_2[1, "playDescription"]
 nFrames <- max(all_dat_joined_2$frameId)
@@ -311,7 +314,7 @@ anim_func <- function(dataset, play, game) {
   
   plot_title <- paste0(data_for_viz$playDescription[1], 
                        '\n', 'MOFO Probability: ', round(100*data_for_viz$p[1], 2), '%',
-                       '\n', 'Pre-Snap Safeties (in Navy Blue): ',data_for_viz$num_safeties[1],
+                       '\n', 'Pre-Snap Safeties (in Gold): ',data_for_viz$num_safeties[1],
                        '\n', 'Actual MOFO vs. MOFC: ',data_for_viz$PostSnap_MOF[1],
                        '\n', 'Coverage Scheme: ', 'Cover 3 Sky')
   
@@ -328,14 +331,17 @@ anim_func <- function(dataset, play, game) {
     
     # adding jersey numbers
     geom_text(data = all_dat_joined_2, aes(x = x, y = y, label = jerseyNumber), colour = "white",
-              vjust = 0.36, size = 3.5) +
+              vjust = 0.36, size = 4.5) +
     
     #titling plot with play description
     #setting animation parameters
     transition_time(t_after_snap)  +
     ease_aes("linear") +
     labs(title = plot_title,
-         caption = 'Time Since Snap: {frame_time}') 
+         caption = 'Time Since Snap: {frame_time}') + 
+    theme(plot.title = element_text(size = 12, hjust = 0.5),
+        plot.subtitle = element_text(size = 10, hjust = 0.5),
+        plot.caption = element_text(size = 8))
   
 }
 
