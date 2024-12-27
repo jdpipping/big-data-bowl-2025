@@ -175,9 +175,9 @@ anim_func <- function(dataset, play, game) {
     ease_aes("linear") +
     labs(title = plot_title,
          caption = 'Time Since Snap: {frame_time}')  +
-    theme(plot.title = element_text(size = 12, hjust = 0.5),
-          plot.subtitle = element_text(size = 10, hjust = 0.5),
-          plot.caption = element_text(size = 8))
+    theme(plot.title = element_text(size = 14, hjust = 0.5),
+          plot.subtitle = element_text(size = 14, hjust = 0.5),
+          plot.caption = element_text(size = 12))
   
 }
 
@@ -339,9 +339,9 @@ anim_func <- function(dataset, play, game) {
     ease_aes("linear") +
     labs(title = plot_title,
          caption = 'Time Since Snap: {frame_time}') + 
-    theme(plot.title = element_text(size = 12, hjust = 0.5),
-        plot.subtitle = element_text(size = 10, hjust = 0.5),
-        plot.caption = element_text(size = 8))
+    theme(plot.title = element_text(size = 14, hjust = 0.5),
+        plot.subtitle = element_text(size = 14, hjust = 0.5),
+        plot.caption = element_text(size = 12))
   
 }
 
