@@ -423,7 +423,7 @@ Plot1 <- PlaySuccess_DisguiseVsNone_NFLWide %>%
        subtitle = "Weeks 1-9, 2022, Early Downs with 5+ Yards To Go (n = 4,381)",
        caption = " ") +
   geom_abline(intercept = 0, slope = 0, color = "darkgreen", lty = 2) +
-  geom_errorbar(aes(ymin = LCI_EPA, ymax = UCI_EPA), position = "dodge", color = "black") +
+  # geom_errorbar(aes(ymin = LCI_EPA, ymax = UCI_EPA), position = "dodge", color = "black") +
   #   scale_y_continuous(breaks = seq(3, 8, 1)) +
   #   coord_cartesian(ylim = c(3, 8)) +
   theme_bw() +
@@ -473,7 +473,7 @@ Plot3 <- PlaySuccess_DisguiseAndSafeties_NFLWide %>%
        subtitle = "Weeks 1-9, 2022, Early Downs with 5+ Yards To Go (n = 4,381)",
        caption = " ") +
   geom_abline(intercept = 0, slope = 0, color = "darkgreen", lty = 2) +
-  geom_errorbar(aes(ymin = LCI_EPA, ymax = UCI_EPA), position = "dodge", color = "black") +
+  # geom_errorbar(aes(ymin = LCI_EPA, ymax = UCI_EPA), position = "dodge", color = "black") +
   #   scale_y_continuous(breaks = seq(3, 8, 1)) +
   #   coord_cartesian(ylim = c(3, 8)) +
   theme_bw() +
