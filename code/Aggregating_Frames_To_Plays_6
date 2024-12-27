@@ -678,6 +678,142 @@ save_html(combined_tables, "combined_tables.html")
 # Take a screenshot of the HTML and save it as a PNG
 webshot("combined_tables.html", "combined_tables.png", vwidth = 1200, vheight = 600)
 
+# Let's also look into the disguised vs. non-disguised gap for teams
+# Recall that PlaySuccess_OnDisguises_ByTeam already exists
+PlaySuccess_WithoutDisguise_ByTeam <- PlaySuccess_DisguiseVsNone_ByDefTeam %>% filter(!Disguise %in% "Disguise")
+# View(PlaySuccess_WithoutDisguise_ByTeam)
+
+# Get rid of "Disguise" column for each of them
+PlaySuccess_OnDisguises_ByTeam <- PlaySuccess_OnDisguises_ByTeam %>% select(-"Disguise")
+PlaySuccess_WithoutDisguise_ByTeam <- PlaySuccess_WithoutDisguise_ByTeam %>% select(-"Disguise")
+
+# Now merge() them by DefTeam
+PlaySuccess_WithVsWithoutDisguise_ByTeam <- 
+  merge(x = PlaySuccess_OnDisguises_ByTeam, y = PlaySuccess_WithoutDisguise_ByTeam, by = "DefTeam")
+
+PlaySuccess_WithVsWithoutDisguise_ByTeam <- PlaySuccess_WithVsWithoutDisguise_ByTeam %>%
+  rename(Dropbacks_Disguise = `Dropbacks.x`)
+PlaySuccess_WithVsWithoutDisguise_ByTeam <- PlaySuccess_WithVsWithoutDisguise_ByTeam %>%
+  rename(YPP_Disguise = `YPP.x`)
+PlaySuccess_WithVsWithoutDisguise_ByTeam <- PlaySuccess_WithVsWithoutDisguise_ByTeam %>%
+  rename(TotYds_Disguise = `TotYds.x`)
+PlaySuccess_WithVsWithoutDisguise_ByTeam <- PlaySuccess_WithVsWithoutDisguise_ByTeam %>%
+  rename(TD_Disguise = `TD.x`)
+PlaySuccess_WithVsWithoutDisguise_ByTeam <- PlaySuccess_WithVsWithoutDisguise_ByTeam %>%
+  rename(TotEPA_Disguise = `TotEPA.x`)
+PlaySuccess_WithVsWithoutDisguise_ByTeam <- PlaySuccess_WithVsWithoutDisguise_ByTeam %>%
+  rename(AvgEPA_Disguise = `AvgEPA.x`)
+PlaySuccess_WithVsWithoutDisguise_ByTeam <- PlaySuccess_WithVsWithoutDisguise_ByTeam %>%
+  rename(SuccessRate_Disguise = `EPSuccessRate.x`)
+PlaySuccess_WithVsWithoutDisguise_ByTeam <- PlaySuccess_WithVsWithoutDisguise_ByTeam %>%
+  rename(FirstDownRate_Disguise = `FirstDownRate.x`)
+
+PlaySuccess_WithVsWithoutDisguise_ByTeam <- PlaySuccess_WithVsWithoutDisguise_ByTeam %>%
+  rename(Dropbacks_NoDisguise = `Dropbacks.y`)
+PlaySuccess_WithVsWithoutDisguise_ByTeam <- PlaySuccess_WithVsWithoutDisguise_ByTeam %>%
+  rename(YPP_NoDisguise = `YPP.y`)
+PlaySuccess_WithVsWithoutDisguise_ByTeam <- PlaySuccess_WithVsWithoutDisguise_ByTeam %>%
+  rename(TotYds_NoDisguise = `TotYds.y`)
+PlaySuccess_WithVsWithoutDisguise_ByTeam <- PlaySuccess_WithVsWithoutDisguise_ByTeam %>%
+  rename(TD_NoDisguise = `TD.y`)
+PlaySuccess_WithVsWithoutDisguise_ByTeam <- PlaySuccess_WithVsWithoutDisguise_ByTeam %>%
+  rename(TotEPA_NoDisguise = `TotEPA.y`)
+PlaySuccess_WithVsWithoutDisguise_ByTeam <- PlaySuccess_WithVsWithoutDisguise_ByTeam %>%
+  rename(AvgEPA_NoDisguise = `AvgEPA.y`)
+PlaySuccess_WithVsWithoutDisguise_ByTeam <- PlaySuccess_WithVsWithoutDisguise_ByTeam %>%
+  rename(SuccessRate_NoDisguise = `EPSuccessRate.y`)
+PlaySuccess_WithVsWithoutDisguise_ByTeam <- PlaySuccess_WithVsWithoutDisguise_ByTeam %>%
+  rename(FirstDownRate_NoDisguise = `FirstDownRate.y`)
+
+PlaySuccess_WithVsWithoutDisguise_ByTeam <- PlaySuccess_WithVsWithoutDisguise_ByTeam %>%
+  mutate(YPPGap = YPP_Disguise - YPP_NoDisguise)
+PlaySuccess_WithVsWithoutDisguise_ByTeam <- PlaySuccess_WithVsWithoutDisguise_ByTeam %>%
+  mutate(AvgEPAGap = AvgEPA_Disguise - AvgEPA_NoDisguise)
+PlaySuccess_WithVsWithoutDisguise_ByTeam <- PlaySuccess_WithVsWithoutDisguise_ByTeam %>%
+  mutate(SuccessRateGap = SuccessRate_Disguise - SuccessRate_NoDisguise)
+
+# This is leaderboard of LOWEST YPP gap (b/c we want to look at which defenses have better numbers when disguising)
+# View(PlaySuccess_WithVsWithoutDisguise_ByTeam %>% arrange(YPPGap) %>% select(1:3, "YPP_Disguise", "YPP_NoDisguise", "YPPGap"))
+
+# This is leaderboard of LOWEST AvgEPA gap (b/c we want to look at which defenses have better numbers when disguising)
+# View(PlaySuccess_WithVsWithoutDisguise_ByTeam %>% arrange(AvgEPAGap) %>% select(1:3, "AvgEPA_Disguise", "AvgEPA_NoDisguise", "AvgEPAGap"))
+
+# Now use gt package for which defenses improve the most when disguising, via AvgEPA
+# Arrange PlaySuccess_WithVsWithoutDisguise_ByTeam (ASCENDING in this case, b/c we want to see which defenses get better when disguising)
+PlaySuccess_WithVsWithoutDisguise_ByTeam <- PlaySuccess_WithVsWithoutDisguise_ByTeam %>% arrange(AvgEPAGap)
+
+class(PlaySuccess_WithVsWithoutDisguise_ByTeam) <- "data.frame"
+DisguiseVsNoDisguise_ByTeam_FancyTable <- PlaySuccess_WithVsWithoutDisguise_ByTeam %>%
+  select(c("DefTeam", "Dropbacks_Disguise", "Dropbacks_NoDisguise", "AvgEPA_Disguise", "AvgEPA_NoDisguise", "AvgEPAGap")) %>%
+  head(20) %>% # this is how we limit to the top 20
+  mutate(Rank = row_number(AvgEPAGap)) %>% # DON'T use desc() in this case
+  select("Rank", 1:6)
+
+DisguiseVsNoDisguise_ByTeam_FancyTable <- DisguiseVsNoDisguise_ByTeam_FancyTable |>
+  # filter(officialPosition %in% c("OLB", "DE")) |> 
+  # mutate(rank = row_number()) |> 
+  # select(1:4, "DefTeam", "Dropbacks_Disguise", "Dropbacks_NoDisguise", "AvgEPA_Disguise", "AvgEPA_NoDisguise", "AvgEPAGap") |> 
+  head(20) |> 
+  gt() |>
+  tab_options(
+    table.border.top.color = "white",
+    row.striping.include_table_body = FALSE
+  ) |>
+  opt_table_font(
+    font = list(
+      google_font("Chivo"),
+      default_fonts()
+    )
+  ) |>
+  fmt_number(
+    columns = c(AvgEPA_Disguise),
+    decimals = 2,
+  ) |>
+  fmt_number(
+    columns = c(AvgEPA_NoDisguise),
+    decimals = 2,
+  ) |>
+  data_color(
+    columns = c(AvgEPAGap),
+    colors = scales::col_numeric(
+      palette = c("pink", "darkred"), # Because we are going in ascending order, have dark column on the left
+      domain = NULL
+    )
+  ) |> 
+  cols_label(
+    Rank = md("**Rank**"), # the md is what makes the headers show up as bold
+    DefTeam = md("**Team**"),
+    # officialPosition = md("**Position**"),
+    Dropbacks_Disguise = md("**Disguised Dropbacks**"),
+    Dropbacks_NoDisguise = md("**Non-Disguised Dropbacks**"),
+    AvgEPA_Disguise = md("**Avg Disguised EPA**"),
+    AvgEPA_NoDisguise = md("**Avg Non-Disguised EPA**"),
+    AvgEPAGap = html('<span style="text-decoration:overline; font-weight:bold">Difference</span>')
+  ) |> 
+  cols_align(
+    align = "center",
+    columns = Dropbacks_Disguise:AvgEPAGap
+  ) |> 
+  tab_header(md("**Top 20 Gaps in Avg EPA Allowed With vs. Without Disguised Coverages**"),
+             md("(Early Downs, 5+ Yards to Go: Weeks 1-9, 2022)")) |> # don't forget to adjust your minimum
+  tab_style(style = cell_borders(sides = "top"),
+            locations = cells_title("title")) |> 
+  tab_options(
+    table.border.top.style = "a"
+  ) |> 
+  tab_footnote(
+    footnote = "Lower gap: better with disguises. Disguise: different # of pre-snap and post-snap safeties",
+    locations = cells_column_labels(
+      columns = AvgEPAGap
+    )
+  )
+
+# Add now make it so that the team logos replace the tricodes
+DisguiseVsNoDisguise_ByTeam_FancyTable <- DisguiseVsNoDisguise_ByTeam_FancyTable %>%
+  nflplotR::gt_nfl_logos(columns = "DefTeam")
+
+gtsave(DisguiseVsNoDisguise_ByTeam_FancyTable, "DisguiseVsNoDisguise_ByTeam_FancyTable.png")
+
 # If we need to export to CSV
 write.csv(final_dropbacks_merged, "final_dropbacks_merged.csv")
 write.csv(Stats_ByPlayerAndPlay_Final, "Stats_ByPlayerAndPlay_Final.csv")
