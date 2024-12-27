@@ -315,6 +315,13 @@ Stats_ByFullPlay_Final <- final_dropbacks_merged %>%
             y_spline_basis7_p2 = max(y_spline_basis7_p2), y_spline_basis8_p2 = max(y_spline_basis8_p2),                  
             y_spline_basis9_p2 = max(y_spline_basis9_p2), y_spline_basis10_p2 = max(y_spline_basis10_p2))
 
+# And add the single-snap entropy value to both data sets
+Stats_ByPlayerAndPlay_Final <- Stats_ByPlayerAndPlay_Final %>% 
+  mutate(Snap_Entropy = -MOFO_probability_FDA*log(MOFO_probability_FDA, 2) - (1 - MOFO_probability_FDA)*log((1-MOFO_probability_FDA), 2))
+
+Stats_ByFullPlay_Final <- Stats_ByFullPlay_Final %>% 
+  mutate(Snap_Entropy = -MOFO_probability_FDA*log(MOFO_probability_FDA, 2) - (1 - MOFO_probability_FDA)*log((1-MOFO_probability_FDA), 2))
+
 # These are for if/when we want to make confidence intervals
 # Recall, Bernoulli is binary variable (i.e. use for proportions)
 SD_Bernoulli <- function(x){
