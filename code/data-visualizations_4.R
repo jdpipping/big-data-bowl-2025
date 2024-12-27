@@ -127,7 +127,7 @@ nFrames <- max(all_dat_joined_1$frameId)
 anim <- ggplot() +
   
   #creating field underlay
-  gg_field(yardmin = 0, yardmax = 122) +
+  gg_field(yardmin = 0, yardmax = 120) +
   
   #filling forest green for behind back of endzone
   theme(panel.background = element_rect(fill = "forestgreen",
@@ -291,7 +291,7 @@ nFrames <- max(all_dat_joined_2$frameId)
 anim <- ggplot() +
   
   #creating field underlay
-  gg_field(yardmin = 0, yardmax = 122) +
+  gg_field(yardmin = 0, yardmax = 120) +
   
   #filling forest green for behind back of endzone
   theme(panel.background = element_rect(fill = "forestgreen",
@@ -731,7 +731,7 @@ shape_vals <- c(21,21, 16, 21, 21)
 anim <- ggplot() +
   
   #creating field underlay
-  gg_field(yardmin = 0, yardmax = 122) +
+  gg_field(yardmin = 0, yardmax = 120) +
   
   #filling forest green for behind back of endzone
   theme(panel.background = element_rect(fill = "forestgreen",
