@@ -318,9 +318,18 @@ Stats_ByFullPlay_Final <- final_dropbacks_merged %>%
 # And add the single-snap entropy value to both data sets
 Stats_ByPlayerAndPlay_Final <- Stats_ByPlayerAndPlay_Final %>% 
   mutate(Snap_Entropy = -MOFO_probability_FDA*log(MOFO_probability_FDA, 2) - (1 - MOFO_probability_FDA)*log((1-MOFO_probability_FDA), 2))
-
 Stats_ByFullPlay_Final <- Stats_ByFullPlay_Final %>% 
   mutate(Snap_Entropy = -MOFO_probability_FDA*log(MOFO_probability_FDA, 2) - (1 - MOFO_probability_FDA)*log((1-MOFO_probability_FDA), 2))
+
+Stats_ByPlayerAndPlay_Final <- Stats_ByPlayerAndPlay_Final %>% 
+  mutate(HighEntropy = ifelse(Snap_Entropy >= 0.8, "High Entropy", "Low Entropy"))
+Stats_ByFullPlay_Final <- Stats_ByFullPlay_Final %>% 
+  mutate(HighEntropy = ifelse(Snap_Entropy >= 0.8, "High Entropy", "Low Entropy"))
+
+Stats_ByPlayerAndPlay_Final <- Stats_ByPlayerAndPlay_Final %>% 
+  mutate(HighEntropy_Num = ifelse(Snap_Entropy >= 0.8, 1, 0))
+Stats_ByFullPlay_Final <- Stats_ByFullPlay_Final %>% 
+  mutate(HighEntropy_Num = ifelse(Snap_Entropy >= 0.8, 1, 0))
 
 # These are for if/when we want to make confidence intervals
 # Recall, Bernoulli is binary variable (i.e. use for proportions)
