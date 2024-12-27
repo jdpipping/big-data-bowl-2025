@@ -2,6 +2,7 @@ library(tidyverse)
 library(reactable)
 library(ggplot2)
 library(gt)
+library(webshot)
 
 # If needed, can read in final_dropbacks_merged file that was defined earlier in "incorporating model code" file
 final_dropbacks_merged <- read_csv("final_dropbacks_merged.csv")
