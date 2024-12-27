@@ -132,7 +132,7 @@ final_dropbacks_merged <- final_dropbacks_merged %>% rename(min_SafetyAbsHorizDi
 # And recall that PostSnap_MOF_Num in final_dropbacks_merged is equivalent to mofo_postsnap in the original NN_model_results_DF
 # View(NN_model_results_DF %>% filter((num_safeties_pre_snap == 2 & p < 0.3 & PostSnap_MOF_Num == 0) | (num_safeties_pre_snap == 1 & p > 0.7 & PostSnap_MOF_Num == 1)))
 # View(final_dropbacks_merged %>% filter(gameId == 2022091101, playId == 2298)) ... 2-high turns to Cover 3 Sky
-# View(final_dropbacks_merged %>% filter(gameId == 2022092507, playId == 1836)) ... 1-high turns to Cover 2
+# View(final_dropbacks_merged %>% filter(gameId == 2022092507, playId == 1836)) ... 1-high turns to Tampa 2
 # View(final_dropbacks_merged %>% filter(gameId == 2022090800, playId == 2623)) ... 2-high turns to Cover 1 Hole
 # View(final_dropbacks_merged %>% filter(gameId == 2022101606, playId == 3531)) ... 1-high turns to Cover 0
 # View(final_dropbacks_merged %>% filter(gameId == 2022090800, playId == 1504)) ... 2-high turns to Cover 3 Sky
