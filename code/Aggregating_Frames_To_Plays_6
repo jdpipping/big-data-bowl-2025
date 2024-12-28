@@ -510,7 +510,7 @@ PlaySuccess_OnDisguises_ByTeam <- PlaySuccess_DisguiseVsNone_ByDefTeam %>% filte
 # View(PlaySuccess_OnDisguises_ByTeam)
 
 # For help with barplot + logos: https://nflplotr.nflverse.com/articles/nflplotR.html
-PlaySuccess_OnDisguises_ByTeam %>%
+Plot5 <- PlaySuccess_OnDisguises_ByTeam %>%
   ggplot(aes(x = reorder(DefTeam, AvgEPA), y = AvgEPA)) +
   # geom_bar(stat = "identity", position = "dodge", fill = "black") + ... that's how we would include bars and team logos
   # geom_image(aes(x = reorder(DefTeam, AvgEPA), y = AvgEPA, image = Team), size = 0.05, asp = asp_ratio) + ... this line was to get images if we had NGS data
@@ -966,7 +966,7 @@ PlaySuccess_HighEntropy_ByTeam <- PlaySuccess_HighEntropyVsNone_ByDefTeam %>% fi
 # View(PlaySuccess_HighEntropy_ByTeam)
 
 # For help with barplot + logos: https://nflplotr.nflverse.com/articles/nflplotR.html
-PlaySuccess_HighEntropy_ByTeam %>%
+Plot5B <- PlaySuccess_HighEntropy_ByTeam %>%
   ggplot(aes(x = reorder(DefTeam, AvgEPA), y = AvgEPA)) +
   # geom_bar(stat = "identity", position = "dodge", fill = "black") + ... that's how we would include bars and team logos
   # geom_image(aes(x = reorder(DefTeam, AvgEPA), y = AvgEPA, image = Team), size = 0.05, asp = asp_ratio) + ... this line was to get images if we had NGS data
