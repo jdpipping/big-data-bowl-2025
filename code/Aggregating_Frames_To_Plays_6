@@ -683,20 +683,20 @@ gtsave(DisguiseSuccess_FancyTable, "DisguiseSuccess_FancyTable.png")
 
 # And here's how to view both gt tables simultaneously
 library(htmltools)
-combined_tables <- tags$div(
+combined_tables_disguise <- tags$div(
   style = "display: flex; justify-content: space-between;",
   tags$div(style = "margin-right: 20px;", DisguiseRate_FancyTable),
   tags$div(DisguiseSuccess_FancyTable)
 )
 
 # View in RStudio's Viewer or save as HTML
-browsable(combined_tables)
+browsable(combined_tables_disguise)
 
 # Save the combined tables to an HTML file
-save_html(combined_tables, "combined_tables.html")
+save_html(combined_tables_disguise, "combined_tables_disguise.html")
 
 # Take a screenshot of the HTML and save it as a PNG
-webshot("combined_tables.html", "combined_tables.png", vwidth = 1200, vheight = 600)
+webshot("combined_tables_disguise.html", "combined_tables_disguise.png", vwidth = 1200, vheight = 600)
 
 # Let's also look into the disguised vs. non-disguised gap for teams
 # Recall that PlaySuccess_OnDisguises_ByTeam already exists
