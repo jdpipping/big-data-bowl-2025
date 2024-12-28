@@ -800,7 +800,7 @@ DisguiseVsNoDisguise_ByTeam_FancyTable <- DisguiseVsNoDisguise_ByTeam_FancyTable
   data_color(
     columns = c(AvgEPAGap),
     colors = scales::col_numeric(
-      palette = c("pink", "darkred"), # Because we are going in ascending order, have dark column on the left
+      palette = c("darkred", "pink"), # Because we are going in ascending order, have dark column on the left
       domain = NULL
     )
   ) |> 
@@ -837,6 +837,462 @@ DisguiseVsNoDisguise_ByTeam_FancyTable <- DisguiseVsNoDisguise_ByTeam_FancyTable
   nflplotR::gt_nfl_logos(columns = "DefTeam")
 
 gtsave(DisguiseVsNoDisguise_ByTeam_FancyTable, "DisguiseVsNoDisguise_ByTeam_FancyTable.png")
+
+# Replicate all of the above tables with the HighEntropy variable
+# Start out with basic performance on disguised vs. non-disguised dropbacks ... don't group by team to start
+PlaySuccess_HighEntropyVsNone_NFLWide <- Stats_ByFullPlay_Final %>% filter(!is.na(HighEntropy)) %>%
+  group_by(HighEntropy) %>%
+  summarize(Dropbacks = n(), YPP = mean(NetYardage), TD = sum(TeamTouchdown), AvgEPA = mean(EPA, na.rm = TRUE), EPSuccessRate = mean(EPSuccess, na.rm = TRUE), FirstDownRate = mean(first_down, na.rm = TRUE),
+            LCI_YPP = lower_Continuous(NetYardage), UCI_YPP = upper_Continuous(NetYardage),
+            LCI_EPA = lower_Continuous(EPA), UCI_EPA = upper_Continuous(EPA),
+            LCI_EPSuccess = ifelse(lower_Bernoulli(EPSuccess) >= 0, lower_Bernoulli(EPSuccess), 0), 
+            UCI_EPSuccess = ifelse(upper_Bernoulli(EPSuccess) <= 1, upper_Bernoulli(EPSuccess), 1),
+            LCI_FirstDown = ifelse(lower_Bernoulli(first_down) >= 0, lower_Bernoulli(first_down), 0), 
+            UCI_FirstDown = ifelse(upper_Bernoulli(first_down) <= 1, upper_Bernoulli(first_down), 1))
+# View(PlaySuccess_HighEntropyVsNone_NFLWide)
+
+# See how reactable() looks
+# Function to count the maximum number of decimal places in a numeric column, for reactable() purposes
+# This isn't necessary if we don't care about how many significant digits show up
+max_decimals <- function(x) {
+  x <- na.omit(x)
+  if (length(x) == 0) return(0)
+  max(sapply(x, function(y) {
+    if (floor(y) == y) {
+      return(0)
+    } else {
+      nchar(strsplit(as.character(y), "\\.")[[1]][2])
+    }
+  }))
+}
+
+# Now, create reactable with that conditional formatting
+reactable(PlaySuccess_HighEntropyVsNone_NFLWide, defaultPageSize = 20, columns = map(PlaySuccess_HighEntropyVsNone_NFLWide, ~ if (is.numeric(.x) && max_decimals(.x) > 3) {
+  colDef(format = colFormat(digits = 3))
+} else {
+  colDef()
+}))
+
+Plot1B <- PlaySuccess_HighEntropyVsNone_NFLWide %>%
+  ggplot(aes(x = HighEntropy, y = AvgEPA)) +
+  geom_bar(stat = "identity", position = "dodge", fill = "red") +
+  labs(x = "Safety Entropy", y = "Avg EPA Allowed",
+       title = "Average EPA Allowed on Dropbacks, by Safety Entropy",
+       subtitle = "Weeks 1-9, 2022, Early Downs with 5+ Yards To Go (n = 4,381)",
+       caption = " ") +
+  geom_abline(intercept = 0, slope = 0, color = "darkgreen", lty = 2) +
+  # geom_errorbar(aes(ymin = LCI_EPA, ymax = UCI_EPA), position = "dodge", color = "black") +
+  #   scale_y_continuous(breaks = seq(3, 8, 1)) +
+  #   coord_cartesian(ylim = c(3, 8)) +
+  theme_bw() +
+  theme(plot.title = element_text(size = 10, hjust = 0.5),
+        plot.subtitle = element_text(size = 8, hjust = 0.5))
+
+Plot2B <- PlaySuccess_HighEntropyVsNone_NFLWide %>%
+  ggplot(aes(x = HighEntropy, y = EPSuccessRate)) +
+  geom_bar(stat = "identity", position = "dodge", fill = "black") +
+  labs(x = "Safety Entropy", y = "Success Rate Allowed",
+       title = "Success Rate Allowed on Dropbacks, by Safety Entropy",
+       subtitle = "Weeks 1-9, 2022, Early Downs with 5+ Yards To Go (n = 4,381)",
+       caption = "High Safety Entropy: entropy score above median (approx 0.79)") +
+  geom_abline(intercept = 0.5, slope = 0, color = "darkgreen", lty = 2) +
+  geom_errorbar(aes(ymin = LCI_EPSuccess, ymax = UCI_EPSuccess), position = "dodge", color = "red") +
+  scale_y_continuous(breaks = seq(0, 1, 0.2), labels = scales::percent_format(accuracy = 5L)) +
+  theme_bw() +
+  theme(plot.title = element_text(size = 10, hjust = 0.5),
+        plot.subtitle = element_text(size = 8, hjust = 0.5)) +
+  annotate("text", label = glue("Dotted Line: 50%"),
+           y = 0.51, x = 1, size = 3, color = "darkgreen")
+
+grid.arrange(Plot1B, Plot2B, ncol = 2)
+
+# And a similar version of that, which groups by HighEntropy AND # of pre-snap safeties
+PlaySuccess_HighEntropyAndSafeties_NFLWide <- Stats_ByFullPlay_Final %>% filter(!is.na(HighEntropy)) %>%
+  group_by(HighEntropy, num_safeties_pre_snap) %>%
+  summarize(Dropbacks = n(), YPP = mean(NetYardage), TD = sum(TeamTouchdown), AvgEPA = mean(EPA, na.rm = TRUE), EPSuccessRate = mean(EPSuccess, na.rm = TRUE), FirstDownRate = mean(first_down, na.rm = TRUE),
+            LCI_YPP = lower_Continuous(NetYardage), UCI_YPP = upper_Continuous(NetYardage),
+            LCI_EPA = lower_Continuous(EPA), UCI_EPA = upper_Continuous(EPA),
+            LCI_EPSuccess = ifelse(lower_Bernoulli(EPSuccess) >= 0, lower_Bernoulli(EPSuccess), 0), 
+            UCI_EPSuccess = ifelse(upper_Bernoulli(EPSuccess) <= 1, upper_Bernoulli(EPSuccess), 1),
+            LCI_FirstDown = ifelse(lower_Bernoulli(first_down) >= 0, lower_Bernoulli(first_down), 0), 
+            UCI_FirstDown = ifelse(upper_Bernoulli(first_down) <= 1, upper_Bernoulli(first_down), 1))
+# View(PlaySuccess_HighEntropyAndSafeties_NFLWide)
+
+PlaySuccess_HighEntropyAndSafeties_NFLWide <- PlaySuccess_HighEntropyAndSafeties_NFLWide %>% 
+  mutate(PreSnapSafeties_Graph = case_when(
+    num_safeties_pre_snap == 1 ~ "1 Pre-Snap Safety",
+    num_safeties_pre_snap == 2 ~ "2 Pre-Snap Safeties")) 
+
+Plot3B <- PlaySuccess_HighEntropyAndSafeties_NFLWide %>%
+  ggplot(aes(x = HighEntropy, y = AvgEPA)) +
+  geom_bar(stat = "identity", position = "dodge", fill = "red") +
+  labs(x = "Safety Entropy", y = "Avg EPA Allowed",
+       title = "Average EPA Allowed on Dropbacks, by Safety Entropy",
+       subtitle = "Weeks 1-9, 2022, Early Downs with 5+ Yards To Go (n = 4,381)",
+       caption = " ") +
+  geom_abline(intercept = 0, slope = 0, color = "darkgreen", lty = 2) +
+  # geom_errorbar(aes(ymin = LCI_EPA, ymax = UCI_EPA), position = "dodge", color = "black") +
+  #   scale_y_continuous(breaks = seq(3, 8, 1)) +
+  #   coord_cartesian(ylim = c(3, 8)) +
+  theme_bw() +
+  theme(plot.title = element_text(size = 10, hjust = 0.5),
+        plot.subtitle = element_text(size = 8, hjust = 0.5)) + facet_wrap(~PreSnapSafeties_Graph)
+
+Plot4B <- PlaySuccess_HighEntropyAndSafeties_NFLWide %>%
+  ggplot(aes(x = HighEntropy, y = EPSuccessRate)) +
+  geom_bar(stat = "identity", position = "dodge", fill = "black") +
+  labs(x = "Safety Entropy", y = "Success Rate Allowed",
+       title = "Success Rate Allowed on Dropbacks, by Safety Entropy",
+       subtitle = "Weeks 1-9, 2022, Early Downs with 5+ Yards To Go (n = 4,381)",
+       caption = "High Safety Entropy: entropy score above median (approx 0.79)") +
+  geom_abline(intercept = 0.5, slope = 0, color = "darkgreen", lty = 2) +
+  geom_errorbar(aes(ymin = LCI_EPSuccess, ymax = UCI_EPSuccess), position = "dodge", color = "red") +
+  scale_y_continuous(breaks = seq(0, 1, 0.2), labels = scales::percent_format(accuracy = 5L)) +
+  theme_bw() +
+  theme(plot.title = element_text(size = 10, hjust = 0.5),
+        plot.subtitle = element_text(size = 8, hjust = 0.5)) +
+  annotate("text", label = glue("Dotted Line: 50%"),
+           y = 0.51, x = 1, size = 3, color = "darkgreen") + facet_wrap(~PreSnapSafeties_Graph)
+
+grid.arrange(Plot3B, Plot4B, ncol = 2)
+
+# Now incorporate team defense into the equation
+PlaySuccess_HighEntropyVsNone_ByDefTeam <- Stats_ByFullPlay_Final %>% filter(!is.na(HighEntropy)) %>%
+  group_by(DefTeam, HighEntropy) %>% 
+  summarize(Dropbacks = n(), YPP = mean(NetYardage), TotYds = sum(NetYardage), TD = sum(TeamTouchdown), TotEPA = sum(EPA), AvgEPA = mean(EPA, na.rm = TRUE), EPSuccessRate = mean(EPSuccess), FirstDownRate = mean(first_down, na.rm = TRUE)) %>% arrange(DefTeam, HighEntropy)
+# View(PlaySuccess_HighEntropyVsNone_ByDefTeam)
+
+PlaySuccess_HighEntropy_ByTeam <- PlaySuccess_HighEntropyVsNone_ByDefTeam %>% filter(HighEntropy %in% "High Entropy")
+# View(PlaySuccess_HighEntropy_ByTeam)
+
+# For help with barplot + logos: https://nflplotr.nflverse.com/articles/nflplotR.html
+PlaySuccess_HighEntropy_ByTeam %>%
+  ggplot(aes(x = reorder(DefTeam, AvgEPA), y = AvgEPA)) +
+  # geom_bar(stat = "identity", position = "dodge", fill = "black") + ... that's how we would include bars and team logos
+  # geom_image(aes(x = reorder(DefTeam, AvgEPA), y = AvgEPA, image = Team), size = 0.05, asp = asp_ratio) + ... this line was to get images if we had NGS data
+  nflplotR::geom_nfl_logos(aes(team_abbr = DefTeam), width = 0.065, alpha = 1) +
+  # geom_text_repel(aes(x = reorder(DefTeam, AvgEPA), y = AvgEPA), size = 2.5) +
+  # scale_y_continuous(breaks = seq(30, 60, 10)) +
+  labs(x = "Team Logo", y = "Average EPA Allowed", 
+       title = "Average EPA Allowed on High-Entropy Dropbacks",
+       subtitle = "Weeks 1-9, 2022, Early Downs with 5+ Yards To Go (n = 4,381)",
+       caption = "High Safety Entropy: entropy score above median (approx 0.79)") +
+  theme_bw() +
+  theme(plot.title = element_text(size = 10, hjust = 0.5),
+        plot.subtitle = element_text(size = 8, hjust = 0.5),
+        axis.text.x = element_text(size = 0, face = "bold")) #, margin = margin(10, 0, 0, 0))) +
+annotate("text", label = glue("Negative Value is Good for Defense"),
+         y = 0.52, x = 1.5, size = 3, color = "darkgreen") 
+# The axis.text.x is so that the actual team names don't show up
+
+# Use tab_options() w/ gt package for fancy tables for highest average entropy rate and lowest EPA allowed on high-entropy dropbacks
+# First, gotta establish the "AvgEntropyRate" metric for each team, and sort in descending order
+AvgEntropy_Leaders <- Stats_ByFullPlay_Final %>% filter(!is.na(HighEntropy)) %>%
+  group_by(DefTeam) %>% 
+  summarize(Dropbacks = n(), AvgEntropy = mean(Snap_Entropy), YPP = mean(NetYardage), TotYds = sum(NetYardage), TD = sum(TeamTouchdown), 
+            TotEPA = sum(EPA), AvgEPA = mean(EPA, na.rm = TRUE), EPSuccessRate = mean(EPSuccess), FirstDownRate = mean(first_down, na.rm = TRUE)) %>% 
+  arrange(desc(AvgEntropy))
+
+class(AvgEntropy_Leaders) <- "data.frame"
+AvgEntropy_FancyTable <- AvgEntropy_Leaders %>%
+  select(c("DefTeam", "Dropbacks", "AvgEPA", "AvgEntropy")) %>%
+  head(20) %>% # this is how we limit to the top 20
+  mutate(Rank = row_number(desc(AvgEntropy))) %>%
+  select("Rank", 1:4)
+
+AvgEntropy_FancyTable <- AvgEntropy_FancyTable |>
+  # filter(officialPosition %in% c("OLB", "DE")) |> 
+  # mutate(rank = row_number()) |> 
+  # select(1:4, "Dropbacks", "AvgEPA", "AvgEntropy") |> 
+  head(20) |> 
+  gt() |>
+  tab_options(
+    table.border.top.color = "white",
+    row.striping.include_table_body = FALSE
+  ) |>
+  opt_table_font(
+    font = list(
+      google_font("Chivo"),
+      default_fonts()
+    )
+  ) |>
+  fmt_number(
+    columns = c(AvgEntropy),
+    decimals = 2,
+  ) |>
+  fmt_number(
+    columns = c(AvgEPA),
+    decimals = 3,
+  ) |>
+  data_color(
+    columns = c(AvgEntropy),
+    colors = scales::col_numeric(
+      palette = c("#FEE0D2", "#67000D"),
+      domain = NULL
+    )
+  ) |> 
+  cols_label(
+    Rank = md("**Rank**"), # the md is what makes the headers show up as bold
+    DefTeam = md("**Team**"),
+    # officialPosition = md("**Position**"),
+    Dropbacks = md("**Dropbacks**"),
+    AvgEPA = md("**Avg EPA on All Dropbacks**"),
+    AvgEntropy = html('<span style="text-decoration:overline; font-weight:bold">Avg Safety Entropy</span>')
+  ) |> 
+  cols_align(
+    align = "center",
+    columns = Dropbacks:AvgEntropy
+  ) |> 
+  tab_header(md("**Top 20 Teams in Mean Safety Entropy**"),
+             md("(Early Down Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022)")) |> # don't forget to adjust your minimum
+  tab_style(style = cell_borders(sides = "top"),
+            locations = cells_title("title")) |> 
+  tab_options(
+    table.border.top.style = "a"
+  ) |> 
+  tab_footnote(
+    footnote = "Low EPA: good for defense. Higher Safety Entropy: safeties are more disguised",
+    locations = cells_column_labels(
+      columns = AvgEntropy
+    )
+  )
+
+# Add now make it so that the team logos replace the tricodes
+AvgEntropy_FancyTable <- AvgEntropy_FancyTable %>%
+  nflplotR::gt_nfl_logos(columns = "DefTeam")
+
+gtsave(AvgEntropy_FancyTable, "AvgEntropy_FancyTable.png")
+
+# Now use gt package for lowest EPA allowed on high-entropy dropbacks
+# Recall that PlaySuccess_HighEntropy_ByTeam exists, but we still need to arrange it (ASCENDING in this case, b/c defense wants low EPA allowed)
+PlaySuccess_HighEntropy_Leaders <- PlaySuccess_HighEntropy_ByTeam %>% arrange(AvgEPA)
+
+class(PlaySuccess_HighEntropy_Leaders) <- "data.frame"
+HighEntropySuccess_FancyTable <- PlaySuccess_HighEntropy_Leaders %>%
+  select(c("DefTeam", "Dropbacks", "EPSuccessRate", "AvgEPA")) %>%
+  head(20) %>% # this is how we limit to the top 20
+  mutate(Rank = row_number(AvgEPA)) %>% # DON'T use desc() in this case
+  select("Rank", 1:4)
+
+HighEntropySuccess_FancyTable <- HighEntropySuccess_FancyTable |>
+  # filter(officialPosition %in% c("OLB", "DE")) |> 
+  # mutate(rank = row_number()) |> 
+  # select(1:4, "Dropbacks", "EPSuccessRate", "AvgEPA") |> 
+  head(20) |> 
+  gt() |>
+  tab_options(
+    table.border.top.color = "white",
+    row.striping.include_table_body = FALSE
+  ) |>
+  opt_table_font(
+    font = list(
+      google_font("Chivo"),
+      default_fonts()
+    )
+  ) |>
+  fmt_number(
+    columns = c(EPSuccessRate),
+    decimals = 2,
+  ) |>
+  fmt_number(
+    columns = c(AvgEPA),
+    decimals = 2,
+  ) |>
+  data_color(
+    columns = c(AvgEPA),
+    colors = scales::col_numeric(
+      palette = c("darkgreen", "lightgreen"), # Because we are going in ascending order, have dark column on the left
+      domain = NULL
+    )
+  ) |> 
+  cols_label(
+    Rank = md("**Rank**"), # the md is what makes the headers show up as bold
+    DefTeam = md("**Team**"),
+    # officialPosition = md("**Position**"),
+    Dropbacks = md("**High-Entropy Dropbacks**"),
+    EPSuccessRate = md("**Success Rate Allowed**"),
+    AvgEPA = html('<span style="text-decoration:overline; font-weight:bold">Avg EPA Allowed</span>')
+  ) |> 
+  cols_align(
+    align = "center",
+    columns = Dropbacks:AvgEPA
+  ) |> 
+  tab_header(md("**Top 20 Teams in Avg EPA Allowed on High-Entropy Coverages**"),
+             md("(Early Down Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022)")) |> # don't forget to adjust your minimum
+  tab_style(style = cell_borders(sides = "top"),
+            locations = cells_title("title")) |> 
+  tab_options(
+    table.border.top.style = "a"
+  ) |> 
+  tab_footnote(
+    footnote = "Low EPA: good for defense. High-Entropy: above median (approx 0.79)",
+    locations = cells_column_labels(
+      columns = AvgEPA
+    )
+  )
+
+# Add now make it so that the team logos replace the tricodes
+HighEntropySuccess_FancyTable <- HighEntropySuccess_FancyTable %>%
+  nflplotR::gt_nfl_logos(columns = "DefTeam")
+
+gtsave(HighEntropySuccess_FancyTable, "HighEntropySuccess_FancyTable.png")
+
+# And here's how to view both gt tables simultaneously
+combined_tables_entropy <- tags$div(
+  style = "display: flex; justify-content: space-between;",
+  tags$div(style = "margin-right: 20px;", AvgEntropy_FancyTable),
+  tags$div(HighEntropySuccess_FancyTable)
+)
+
+# View in RStudio's Viewer or save as HTML
+browsable(combined_tables_entropy)
+
+# Save the combined tables to an HTML file
+save_html(combined_tables_entropy, "combined_tables_entropy.html")
+
+# Take a screenshot of the HTML and save it as a PNG
+webshot("combined_tables_entropy.html", "combined_tables_entropy.png", vwidth = 1200, vheight = 600)
+
+# Let's also look into the high-entropy vs. low-entropy gap in performance for teams
+# Recall that PlaySuccess_HighEntropy_ByTeam already exists
+PlaySuccess_LowEntropy_ByTeam <- PlaySuccess_HighEntropyVsNone_ByDefTeam %>% filter(!HighEntropy %in% "High Entropy")
+# View(PlaySuccess_LowEntropy_ByTeam)
+
+# Get rid of "HighEntropy" column for each of them
+PlaySuccess_HighEntropy_ByTeam <- PlaySuccess_HighEntropy_ByTeam %>% select(-"HighEntropy")
+PlaySuccess_LowEntropy_ByTeam <- PlaySuccess_LowEntropy_ByTeam %>% select(-"HighEntropy")
+
+# Now merge() them by DefTeam
+PlaySuccess_HighVsLowEntropy_ByTeam <- 
+  merge(x = PlaySuccess_HighEntropy_ByTeam, y = PlaySuccess_LowEntropy_ByTeam, by = "DefTeam")
+
+PlaySuccess_HighVsLowEntropy_ByTeam <- PlaySuccess_HighVsLowEntropy_ByTeam %>%
+  rename(Dropbacks_HighEntropy = `Dropbacks.x`)
+PlaySuccess_HighVsLowEntropy_ByTeam <- PlaySuccess_HighVsLowEntropy_ByTeam %>%
+  rename(YPP_HighEntropy = `YPP.x`)
+PlaySuccess_HighVsLowEntropy_ByTeam <- PlaySuccess_HighVsLowEntropy_ByTeam %>%
+  rename(TotYds_HighEntropy = `TotYds.x`)
+PlaySuccess_HighVsLowEntropy_ByTeam <- PlaySuccess_HighVsLowEntropy_ByTeam %>%
+  rename(TD_HighEntropy = `TD.x`)
+PlaySuccess_HighVsLowEntropy_ByTeam <- PlaySuccess_HighVsLowEntropy_ByTeam %>%
+  rename(TotEPA_HighEntropy = `TotEPA.x`)
+PlaySuccess_HighVsLowEntropy_ByTeam <- PlaySuccess_HighVsLowEntropy_ByTeam %>%
+  rename(AvgEPA_HighEntropy = `AvgEPA.x`)
+PlaySuccess_HighVsLowEntropy_ByTeam <- PlaySuccess_HighVsLowEntropy_ByTeam %>%
+  rename(SuccessRate_HighEntropy = `EPSuccessRate.x`)
+PlaySuccess_HighVsLowEntropy_ByTeam <- PlaySuccess_HighVsLowEntropy_ByTeam %>%
+  rename(FirstDownRate_HighEntropy = `FirstDownRate.x`)
+
+PlaySuccess_HighVsLowEntropy_ByTeam <- PlaySuccess_HighVsLowEntropy_ByTeam %>%
+  rename(Dropbacks_LowEntropy = `Dropbacks.y`)
+PlaySuccess_HighVsLowEntropy_ByTeam <- PlaySuccess_HighVsLowEntropy_ByTeam %>%
+  rename(YPP_LowEntropy = `YPP.y`)
+PlaySuccess_HighVsLowEntropy_ByTeam <- PlaySuccess_HighVsLowEntropy_ByTeam %>%
+  rename(TotYds_LowEntropy = `TotYds.y`)
+PlaySuccess_HighVsLowEntropy_ByTeam <- PlaySuccess_HighVsLowEntropy_ByTeam %>%
+  rename(TD_LowEntropy = `TD.y`)
+PlaySuccess_HighVsLowEntropy_ByTeam <- PlaySuccess_HighVsLowEntropy_ByTeam %>%
+  rename(TotEPA_LowEntropy = `TotEPA.y`)
+PlaySuccess_HighVsLowEntropy_ByTeam <- PlaySuccess_HighVsLowEntropy_ByTeam %>%
+  rename(AvgEPA_LowEntropy = `AvgEPA.y`)
+PlaySuccess_HighVsLowEntropy_ByTeam <- PlaySuccess_HighVsLowEntropy_ByTeam %>%
+  rename(SuccessRate_LowEntropy = `EPSuccessRate.y`)
+PlaySuccess_HighVsLowEntropy_ByTeam <- PlaySuccess_HighVsLowEntropy_ByTeam %>%
+  rename(FirstDownRate_LowEntropy = `FirstDownRate.y`)
+
+PlaySuccess_HighVsLowEntropy_ByTeam <- PlaySuccess_HighVsLowEntropy_ByTeam %>%
+  mutate(YPPGap = YPP_HighEntropy - YPP_LowEntropy)
+PlaySuccess_HighVsLowEntropy_ByTeam <- PlaySuccess_HighVsLowEntropy_ByTeam %>%
+  mutate(AvgEPAGap = AvgEPA_HighEntropy - AvgEPA_LowEntropy)
+PlaySuccess_HighVsLowEntropy_ByTeam <- PlaySuccess_HighVsLowEntropy_ByTeam %>%
+  mutate(SuccessRateGap = SuccessRate_HighEntropy - SuccessRate_LowEntropy)
+
+# This is leaderboard of LOWEST YPP gap (b/c we want to look at which defenses have better numbers when disguising)
+# View(PlaySuccess_HighVsLowEntropy_ByTeam %>% arrange(YPPGap) %>% select(1:3, "YPP_HighEntropy", "YPP_LowEntropy", "YPPGap"))
+
+# This is leaderboard of LOWEST AvgEPA gap (b/c we want to look at which defenses have better numbers when disguising)
+# View(PlaySuccess_HighVsLowEntropy_ByTeam %>% arrange(AvgEPAGap) %>% select(1:3, "AvgEPA_HighEntropy", "AvgEPA_LowEntropy", "AvgEPAGap"))
+
+# Now use gt package for which defenses improve the most when disguising, via AvgEPA
+# Arrange PlaySuccess_HighVsLowEntropy_ByTeam (ASCENDING in this case, b/c we want to see which defenses get better when disguising)
+PlaySuccess_HighVsLowEntropy_ByTeam <- PlaySuccess_HighVsLowEntropy_ByTeam %>% arrange(AvgEPAGap)
+
+class(PlaySuccess_HighVsLowEntropy_ByTeam) <- "data.frame"
+HighVsLowEntropy_ByTeam_FancyTable <- PlaySuccess_HighVsLowEntropy_ByTeam %>%
+  select(c("DefTeam", "Dropbacks_HighEntropy", "Dropbacks_LowEntropy", "AvgEPA_HighEntropy", "AvgEPA_LowEntropy", "AvgEPAGap")) %>%
+  head(20) %>% # this is how we limit to the top 20
+  mutate(Rank = row_number(AvgEPAGap)) %>% # DON'T use desc() in this case
+  select("Rank", 1:6)
+
+HighVsLowEntropy_ByTeam_FancyTable <- HighVsLowEntropy_ByTeam_FancyTable |>
+  # filter(officialPosition %in% c("OLB", "DE")) |> 
+  # mutate(rank = row_number()) |> 
+  # select(1:4, "DefTeam", "Dropbacks_HighEntropy", "Dropbacks_LowEntropy", "AvgEPA_HighEntropy", "AvgEPA_LowEntropy", "AvgEPAGap") |> 
+  head(20) |> 
+  gt() |>
+  tab_options(
+    table.border.top.color = "white",
+    row.striping.include_table_body = FALSE
+  ) |>
+  opt_table_font(
+    font = list(
+      google_font("Chivo"),
+      default_fonts()
+    )
+  ) |>
+  fmt_number(
+    columns = c(AvgEPA_HighEntropy),
+    decimals = 2,
+  ) |>
+  fmt_number(
+    columns = c(AvgEPA_LowEntropy),
+    decimals = 2,
+  ) |>
+  fmt_number(
+    columns = c(AvgEPAGap),
+    decimals = 2,
+  ) |>
+  data_color(
+    columns = c(AvgEPAGap),
+    colors = scales::col_numeric(
+      palette = c("darkred", "pink"), # Because we are going in ascending order, have dark column on the left
+      domain = NULL
+    )
+  ) |> 
+  cols_label(
+    Rank = md("**Rank**"), # the md is what makes the headers show up as bold
+    DefTeam = md("**Team**"),
+    # officialPosition = md("**Position**"),
+    Dropbacks_HighEntropy = md("**High-Entropy Dropbacks**"),
+    Dropbacks_LowEntropy = md("**Low-Entropy Dropbacks**"),
+    AvgEPA_HighEntropy = md("**Avg High-Entropy EPA**"),
+    AvgEPA_LowEntropy = md("**Avg Low-Entropy EPA**"),
+    AvgEPAGap = html('<span style="text-decoration:overline; font-weight:bold">Difference</span>')
+  ) |> 
+  cols_align(
+    align = "center",
+    columns = Dropbacks_HighEntropy:AvgEPAGap
+  ) |> 
+  tab_header(md("**Top 20 Gaps in Avg EPA Allowed With vs. Without High Entropy**"),
+             md("(Early Down Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022)")) |> # don't forget to adjust your minimum
+  tab_style(style = cell_borders(sides = "top"),
+            locations = cells_title("title")) |> 
+  tab_options(
+    table.border.top.style = "a"
+  ) |> 
+  tab_footnote(
+    footnote = "Lower gap: better with high entropy. High Safety Entropy: entropy score above median (approx 0.79)",
+    locations = cells_column_labels(
+      columns = AvgEPAGap
+    )
+  )
+
+# Add now make it so that the team logos replace the tricodes
+HighVsLowEntropy_ByTeam_FancyTable <- HighVsLowEntropy_ByTeam_FancyTable %>%
+  nflplotR::gt_nfl_logos(columns = "DefTeam")
+
+gtsave(HighVsLowEntropy_ByTeam_FancyTable, "HighVsLowEntropy_ByTeam_FancyTable.png")
+
 
 # If we need to export to CSV
 write.csv(final_dropbacks_merged, "final_dropbacks_merged.csv")
