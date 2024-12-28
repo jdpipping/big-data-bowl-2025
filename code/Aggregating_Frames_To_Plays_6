@@ -793,6 +793,10 @@ DisguiseVsNoDisguise_ByTeam_FancyTable <- DisguiseVsNoDisguise_ByTeam_FancyTable
     columns = c(AvgEPA_NoDisguise),
     decimals = 2,
   ) |>
+ fmt_number(
+    columns = c(AvgEPAGap),
+    decimals = 2,
+  ) |>
   data_color(
     columns = c(AvgEPAGap),
     colors = scales::col_numeric(
