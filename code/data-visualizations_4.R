@@ -283,8 +283,8 @@ all_dat_joined_2 <- all_dat_joined_2 %>%
 # attributes used for plot. first is away, second is football, third is home
 cols_fill <- c('Offense' = "red", 'Defense'="blue", 'football'="brown", 'Pre-Snap Safety'='goldenrod')
 cols_col <- c('Offense' = "red", 'Defense'="blue", 'football'="brown", 'Pre-Snap Safety'='goldenrod')
-size_vals <- c(8, 6, 8, 8, 8)
-shape_vals <- c(21, 16, 21, 21, 21)
+size_vals <- c(8, 6, 8, 8)
+shape_vals <- c(21, 16, 21, 21)
 plot_title <- all_dat_joined_2[1, "playDescription"]
 nFrames <- max(all_dat_joined_2$frameId)
 
@@ -445,8 +445,8 @@ all_dat_joined_3 <- all_dat_joined_3 %>%
 # attributes used for plot. first is away, second is football, third is home
 cols_fill <- c('Offense' = "red", 'Defense'="black", 'football'="brown", 'Pre-Snap Safety'='goldenrod')
 cols_col <- c('Offense' = "red", 'Defense'="black", 'football'="brown", 'Pre-Snap Safety'='goldenrod')
-size_vals <- c(8, 6, 8, 8, 8)
-shape_vals <- c(21, 16, 21, 21, 21)
+size_vals <- c(8, 6, 8, 8)
+shape_vals <- c(21, 16, 21, 21)
 plot_title <- all_dat_joined_3[1, "playDescription"]
 nFrames <- max(all_dat_joined_3$frameId)
 
@@ -607,8 +607,8 @@ all_dat_joined_4 <- all_dat_joined_4 %>%
 # attributes used for plot. first is away, second is football, third is home
 cols_fill <- c('Offense' = "black", 'Defense'="orange", 'football'="brown", 'Pre-Snap Safety'='goldenrod')
 cols_col <- c('Offense' = "black", 'Defense'="orange", 'football'="brown", 'Pre-Snap Safety'='goldenrod')
-size_vals <- c(8, 6, 8, 8, 8)
-shape_vals <- c(21, 16, 21, 21, 21)
+size_vals <- c(8, 6, 8, 8)
+shape_vals <- c(21, 16, 21, 21)
 plot_title <- all_dat_joined_4[1, "playDescription"]
 nFrames <- max(all_dat_joined_4$frameId)
 
