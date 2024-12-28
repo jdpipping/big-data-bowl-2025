@@ -102,7 +102,7 @@ all_dat_joined_1 <- all_dat_joined_1 %>%
 all_dat_joined_1 <- all_dat_joined_1 %>%
   mutate(club = case_when(
     displayName == 'football' ~ 'football',
-    displayName == displayName_p1 ~ 'Safety #1', # Recall that only the 2-high plays have displayName_p1 and displayName_p2
+    displayName == displayName_p1 ~ 'Pre-Snap Safety', # Recall that only the 2-high plays have displayName_p1 and displayName_p2
     # Could add a separate one here for ball-carrier
     teamAbbr == possessionTeam ~ 'Offense',
     teamAbbr == defensiveTeam ~ 'Defense'
@@ -116,8 +116,8 @@ all_dat_joined_1 <- all_dat_joined_1 %>%
                                ifelse(!is.na(mofo_postsnap) & mofo_postsnap %in% 0, "MOF Closed", NA)))
 
 # attributes used for plot. first is away, second is football, third is home
-cols_fill <- c('Offense' = "black", 'Defense'="blue", 'football'="brown", 'Safety #1'='red') #, 'Safety #2'='red')
-cols_col <- c('Offense' = "black", 'Defense'="blue", 'football'="brown", 'Safety #1'='red') #, 'Safety #2'='red')
+cols_fill <- c('Offense' = "black", 'Defense'="blue", 'football'="brown", 'Pre-Snap Safety'='red')
+cols_col <- c('Offense' = "black", 'Defense'="blue", 'football'="brown", 'Pre-Snap Safety'='red')
 size_vals <- c(8, 6, 8, 8)
 shape_vals <- c(21, 16, 21, 21)
 plot_title <- all_dat_joined_1[1, "playDescription"]
@@ -160,7 +160,7 @@ anim_func <- function(dataset, play, game) {
                                         y = y,
                                         shape = club,
                                         fill = club,
-                                        #group = nflId,
+                                        # group = nflId,
                                         size = club,
                                         colour = club),
                alpha = 0.7) +
@@ -169,15 +169,17 @@ anim_func <- function(dataset, play, game) {
     geom_text(data = all_dat_joined_1, aes(x = x, y = y, label = jerseyNumber), colour = "white",
               vjust = 0.36, size = 4.5) +
     
-    #titling plot with play description
-    #setting animation parameters
+    # titling plot with play description
+    # setting animation parameters
     transition_time(t_after_snap)  +
     ease_aes("linear") +
     labs(title = plot_title,
          caption = 'Time Since Snap: {frame_time}')  +
-    theme(plot.title = element_text(size = 14, hjust = 0.5),
-          plot.subtitle = element_text(size = 14, hjust = 0.5),
-          plot.caption = element_text(size = 12))
+    theme(plot.title = element_text(size = 14, hjust = 0.5), # Keep title centered
+      plot.margin = unit(c(5, 0, 0, 0), "lines"), # Increase top margin if title is too high (first value in `c(...)`)
+      plot.subtitle = element_text(size = 14, hjust = 0.5),
+      plot.caption = element_text(size = 12),
+      legend.position = "none") # obviously scrap this if we want to keep the "club" legend
   
 }
 
@@ -265,8 +267,7 @@ all_dat_joined_2 <- all_dat_joined_2 %>%
 all_dat_joined_2 <- all_dat_joined_2 %>%
   mutate(club = case_when(
     displayName == 'football' ~ 'football',
-    displayName == displayName_p1 ~ 'Safety #1',
-    displayName == displayName_p2 ~ 'Safety #2',
+    (displayName == displayName_p1 | displayName == displayName_p2) ~ 'Pre-Snap Safety',
     # Could add a separate one here for ball-carrier
     teamAbbr == possessionTeam ~ 'Offense',
     teamAbbr == defensiveTeam ~ 'Defense'
@@ -280,8 +281,8 @@ all_dat_joined_2 <- all_dat_joined_2 %>%
                                ifelse(!is.na(mofo_postsnap) & mofo_postsnap %in% 0, "MOF Closed", NA)))
 
 # attributes used for plot. first is away, second is football, third is home
-cols_fill <- c('Offense' = "red", 'Defense'="blue", 'football'="brown", 'Safety #1'='goldenrod', 'Safety #2'='goldenrod')
-cols_col <- c('Offense' = "red", 'Defense'="blue", 'football'="brown", 'Safety #1'='goldenrod', 'Safety #2'='goldenrod')
+cols_fill <- c('Offense' = "red", 'Defense'="blue", 'football'="brown", 'Pre-Snap Safety'='goldenrod')
+cols_col <- c('Offense' = "red", 'Defense'="blue", 'football'="brown", 'Pre-Snap Safety'='goldenrod')
 size_vals <- c(8, 6, 8, 8, 8)
 shape_vals <- c(21, 16, 21, 21, 21)
 plot_title <- all_dat_joined_2[1, "playDescription"]
@@ -339,9 +340,11 @@ anim_func <- function(dataset, play, game) {
     ease_aes("linear") +
     labs(title = plot_title,
          caption = 'Time Since Snap: {frame_time}') + 
-    theme(plot.title = element_text(size = 14, hjust = 0.5),
-        plot.subtitle = element_text(size = 14, hjust = 0.5),
-        plot.caption = element_text(size = 12))
+    theme(plot.title = element_text(size = 14, hjust = 0.5), # Keep title centered
+          plot.margin = unit(c(5, 0, 0, 0), "lines"), # Increase top margin if title is too high (first value in `c(...)`)
+          plot.subtitle = element_text(size = 14, hjust = 0.5),
+          plot.caption = element_text(size = 12),
+          legend.position = "none") # obviously scrap this if we want to keep the "club" legend
   
 }
 
@@ -367,7 +370,335 @@ gif_animation_2 <- animate(animation_2,
 # Save the GIF to a file
 anim_save("play_animation_2.gif", animation = gif_animation_2)
 
-rm(df_C_players, df_C_plays, df_C_tracking, df_C_tracking_1, df_C_tracking_2, df_safety_movement_1, df_safety_movement_2, out_of_sample_preds, all_dat_joined_1, all_dat_joined_2, comp_df)
+# Now repeat for gameId 2022091804, playId 2572 (Week 2)
+tracking_week_2 <- fread("tracking_week_2.csv")
+Week2_NamesAndNumbers <- tracking_week_2 %>% select(c(nflId, displayName, jerseyNumber))
+Week2_NamesAndNumbers <- unique(Week2_NamesAndNumbers)
+df_C_tracking_3 <- df_C_tracking %>% left_join(Week2_NamesAndNumbers, by = c("nflId", "displayName"))  
+rm(tracking_week_2, Week2_NamesAndNumbers)
+
+all_dat_joined_3 <- df_C_tracking_3 %>% 
+  left_join(df_safety_movement_2, by = c('gameId', 'playId'))
+
+# Now pick the specific play(s) we want
+all_dat_joined_3 <- all_dat_joined_3 %>% filter(gameId %in% c(2022091804) & playId %in% c(2572))
+
+# Then add MOFO probability for the eventual data visualization
+all_dat_joined_3 <- all_dat_joined_3 %>%
+  left_join(out_of_sample_preds %>% select(playId, gameId, p, expectedPoints, winProbability), by = c('playId', 'gameId'))
+
+# Now join the other DFs in
+# 2-high: gameId == 2022091804, playId == 2572
+all_dat_joined_3 <- all_dat_joined_3 %>% 
+  left_join(df_C_players %>%
+              filter(gameId %in% c(2022091804) &
+                       playId %in% c(2572)) %>%
+              select(gameId,
+                     playId,
+                     nflId,
+                     pos_official,
+                     posGroup,
+                     is_pre_safety,
+                     x_postsnap,
+                     y_postsnap), by = c('gameId', 'playId', 'nflId')) %>%
+  left_join(df_C_plays %>%
+              filter(gameId %in% c(2022091804) &
+                       playId %in% c(2572)) %>%
+              select(gameId,
+                     playId,
+                     xpass,
+                     down,
+                     yardsToGo,
+                     time_left_half,
+                     pre_score_diff,
+                     ball_y_snap,
+                     mofo_postsnap), by = c('gameId', 'playId', 'mofo_postsnap')) %>%
+  left_join(player_play %>% 
+              filter(gameId %in% c(2022091804) &
+                       playId %in% c(2572)) %>%
+              select(gameId,
+                     playId,
+                     nflId,
+                     teamAbbr), by = c('gameId', 'playId', 'nflId')) %>%
+  left_join(plays %>%
+              select(gameId,
+                     playId,
+                     playDescription),
+            by = c('gameId', 'playId'))
+
+all_dat_joined_3 <- all_dat_joined_3 %>%
+  mutate(club = case_when(
+    displayName == 'football' ~ 'football',
+    (displayName == displayName_p1 | displayName == displayName_p2) ~ 'Pre-Snap Safety',
+    # Could add a separate one here for ball-carrier
+    teamAbbr == possessionTeam ~ 'Offense',
+    teamAbbr == defensiveTeam ~ 'Defense'
+  ),
+  t_after_snap = round(t_after_snap,3))
+#mutate(teamAbbr = ifelse(displayName == 'football', 'football', teamAbbr))
+
+# Also add a verbal "MOFO" column for graph purposes
+all_dat_joined_3 <- all_dat_joined_3 %>% 
+  mutate(PostSnap_MOF = ifelse(!is.na(mofo_postsnap) & mofo_postsnap %in% 1, "MOF Open",
+                               ifelse(!is.na(mofo_postsnap) & mofo_postsnap %in% 0, "MOF Closed", NA)))
+
+# attributes used for plot. first is away, second is football, third is home
+cols_fill <- c('Offense' = "red", 'Defense'="black", 'football'="brown", 'Pre-Snap Safety'='goldenrod')
+cols_col <- c('Offense' = "red", 'Defense'="black", 'football'="brown", 'Pre-Snap Safety'='goldenrod')
+size_vals <- c(8, 6, 8, 8, 8)
+shape_vals <- c(21, 16, 21, 21, 21)
+plot_title <- all_dat_joined_3[1, "playDescription"]
+nFrames <- max(all_dat_joined_3$frameId)
+
+#setting the field:
+anim <- ggplot() +
+  
+  #creating field underlay
+  gg_field(yardmin = 0, yardmax = 120) +
+  
+  #filling forest green for behind back of endzone
+  theme(panel.background = element_rect(fill = "forestgreen",
+                                        color = "forestgreen"),
+        panel.grid = element_blank()) +
+  
+  #setting size and color parameters
+  scale_size_manual(values = size_vals, guide = F) + 
+  scale_shape_manual(values = shape_vals, guide = F) +
+  scale_fill_manual(values = cols_fill) + 
+  scale_colour_manual(values = cols_col) 
+
+anim_func <- function(dataset, play, game) {
+  
+  data_for_viz <- dataset %>%
+    filter(gameId==game & playId==play) %>%
+    group_by(gameId, playId, nflId) %>%
+    mutate(frameId=row_number()) %>%
+    ungroup()
+  
+  plot_title <- paste0(data_for_viz$playDescription[1], 
+                       '\n', 'MOFO Probability: ', round(100*data_for_viz$p[1], 2), '%',
+                       '\n', 'Pre-Snap Safeties (in Gold): ',data_for_viz$num_safeties[1],
+                       '\n', 'Actual MOFO vs. MOFC: ',data_for_viz$PostSnap_MOF[1],
+                       '\n', 'Coverage Scheme: ', 'Tampa 2')
+  
+  anim +
+    #adding players
+    geom_point(data = data_for_viz, aes(x = x,
+                                        y = y,
+                                        shape = club,
+                                        fill = club,
+                                        #group = nflId,
+                                        size = club,
+                                        colour = club),
+               alpha = 0.7) +
+    
+    # adding jersey numbers
+    geom_text(data = all_dat_joined_3, aes(x = x, y = y, label = jerseyNumber), colour = "white",
+              vjust = 0.36, size = 4.5) +
+    
+    #titling plot with play description
+    #setting animation parameters
+    transition_time(t_after_snap)  +
+    ease_aes("linear") +
+    labs(title = plot_title,
+         caption = 'Time Since Snap: {frame_time}') + 
+    theme(plot.title = element_text(size = 14, hjust = 0.5), # Keep title centered
+          plot.margin = unit(c(5, 0, 0, 0), "lines"), # Increase top margin if title is too high (first value in `c(...)`)
+          plot.subtitle = element_text(size = 14, hjust = 0.5),
+          plot.caption = element_text(size = 12),
+          legend.position = "none") # obviously scrap this if we want to keep the "club" legend
+  
+}
+
+comp_df <- all_dat_joined_3 %>%
+  filter(gameId %in% c(2022091804) &
+           playId %in% c(2572))
+
+anim_func(dataset = comp_df, game = 2022091804, play = 2572)  
+# animate(anim_func(dataset = comp_df, game = 2022091804, play = 2572), duration = 30)
+# animate(anim_func(dataset = comp_df, game = 2022091804, play = 2572), duration = 30)
+
+# Now here's how to save it as a GIF
+animation_3 <- anim_func(dataset = comp_df, game = 2022091804, play = 2572)
+
+# Use animate to create the GIF object
+gif_animation_3 <- animate(animation_3, 
+                           nframes = nFrames,       # Number of frames
+                           fps = 10,               # Frames per second
+                           width = 800,            # Width of the output GIF
+                           height = 600,           # Height of the output GIF
+                           renderer = gifski_renderer())
+
+# Save the GIF to a file
+anim_save("play_animation_3.gif", animation = gif_animation_3)
+
+# Now repeat for gameId 2022092200, playId 2112 (Week 3)
+tracking_week_3 <- fread("tracking_week_3.csv")
+Week3_NamesAndNumbers <- tracking_week_3 %>% select(c(nflId, displayName, jerseyNumber))
+Week3_NamesAndNumbers <- unique(Week3_NamesAndNumbers)
+df_C_tracking_4 <- df_C_tracking %>% left_join(Week3_NamesAndNumbers, by = c("nflId", "displayName"))  
+rm(tracking_week_3, Week3_NamesAndNumbers)
+
+all_dat_joined_4 <- df_C_tracking_4 %>% 
+  left_join(df_safety_movement_2, by = c('gameId', 'playId'))
+
+# Now pick the specific play(s) we want
+all_dat_joined_4 <- all_dat_joined_4 %>% filter(gameId %in% c(2022092200) & playId %in% c(2112))
+
+# Then add MOFO probability for the eventual data visualization
+all_dat_joined_4 <- all_dat_joined_4 %>%
+  left_join(out_of_sample_preds %>% select(playId, gameId, p, expectedPoints, winProbability), by = c('playId', 'gameId'))
+
+# Now join the other DFs in
+# 2-high: gameId == 2022092200, playId == 2112
+all_dat_joined_4 <- all_dat_joined_4 %>% 
+  left_join(df_C_players %>%
+              filter(gameId %in% c(2022092200) &
+                       playId %in% c(2112)) %>%
+              select(gameId,
+                     playId,
+                     nflId,
+                     pos_official,
+                     posGroup,
+                     is_pre_safety,
+                     x_postsnap,
+                     y_postsnap), by = c('gameId', 'playId', 'nflId')) %>%
+  left_join(df_C_plays %>%
+              filter(gameId %in% c(2022092200) &
+                       playId %in% c(2112)) %>%
+              select(gameId,
+                     playId,
+                     xpass,
+                     down,
+                     yardsToGo,
+                     time_left_half,
+                     pre_score_diff,
+                     ball_y_snap,
+                     mofo_postsnap), by = c('gameId', 'playId', 'mofo_postsnap')) %>%
+  left_join(player_play %>% 
+              filter(gameId %in% c(2022092200) &
+                       playId %in% c(2112)) %>%
+              select(gameId,
+                     playId,
+                     nflId,
+                     teamAbbr), by = c('gameId', 'playId', 'nflId')) %>%
+  left_join(plays %>%
+              select(gameId,
+                     playId,
+                     playDescription),
+            by = c('gameId', 'playId'))
+
+all_dat_joined_4 <- all_dat_joined_4 %>%
+  mutate(club = case_when(
+    displayName == 'football' ~ 'football',
+    (displayName == displayName_p1 | displayName == displayName_p2) ~ 'Pre-Snap Safety',
+    # Could add a separate one here for ball-carrier
+    teamAbbr == possessionTeam ~ 'Offense',
+    teamAbbr == defensiveTeam ~ 'Defense'
+  ),
+  t_after_snap = round(t_after_snap,3))
+#mutate(teamAbbr = ifelse(displayName == 'football', 'football', teamAbbr))
+
+# Also add a verbal "MOFO" column for graph purposes
+all_dat_joined_4 <- all_dat_joined_4 %>% 
+  mutate(PostSnap_MOF = ifelse(!is.na(mofo_postsnap) & mofo_postsnap %in% 1, "MOF Open",
+                               ifelse(!is.na(mofo_postsnap) & mofo_postsnap %in% 0, "MOF Closed", NA)))
+
+# attributes used for plot. first is away, second is football, third is home
+cols_fill <- c('Offense' = "black", 'Defense'="orange", 'football'="brown", 'Pre-Snap Safety'='goldenrod')
+cols_col <- c('Offense' = "black", 'Defense'="orange", 'football'="brown", 'Pre-Snap Safety'='goldenrod')
+size_vals <- c(8, 6, 8, 8, 8)
+shape_vals <- c(21, 16, 21, 21, 21)
+plot_title <- all_dat_joined_4[1, "playDescription"]
+nFrames <- max(all_dat_joined_4$frameId)
+
+#setting the field:
+anim <- ggplot() +
+  
+  #creating field underlay
+  gg_field(yardmin = 0, yardmax = 120) +
+  
+  #filling forest green for behind back of endzone
+  theme(panel.background = element_rect(fill = "forestgreen",
+                                        color = "forestgreen"),
+        panel.grid = element_blank()) +
+  
+  #setting size and color parameters
+  scale_size_manual(values = size_vals, guide = F) + 
+  scale_shape_manual(values = shape_vals, guide = F) +
+  scale_fill_manual(values = cols_fill) + 
+  scale_colour_manual(values = cols_col) 
+
+anim_func <- function(dataset, play, game) {
+  
+  data_for_viz <- dataset %>%
+    filter(gameId==game & playId==play) %>%
+    group_by(gameId, playId, nflId) %>%
+    mutate(frameId=row_number()) %>%
+    ungroup()
+  
+  plot_title <- paste0(data_for_viz$playDescription[1], 
+                       '\n', 'MOFO Probability: ', round(100*data_for_viz$p[1], 2), '%',
+                       '\n', 'Pre-Snap Safeties (in Gold): ',data_for_viz$num_safeties[1],
+                       '\n', 'Actual MOFO vs. MOFC: ',data_for_viz$PostSnap_MOF[1],
+                       '\n', 'Coverage Scheme: ', 'Cover 1')
+  
+  anim +
+    #adding players
+    geom_point(data = data_for_viz, aes(x = x,
+                                        y = y,
+                                        shape = club,
+                                        fill = club,
+                                        #group = nflId,
+                                        size = club,
+                                        colour = club),
+               alpha = 0.7) +
+    
+    # adding jersey numbers
+    geom_text(data = all_dat_joined_4, aes(x = x, y = y, label = jerseyNumber), colour = "white",
+              vjust = 0.36, size = 4.5) +
+    
+    #titling plot with play description
+    #setting animation parameters
+    transition_time(t_after_snap)  +
+    ease_aes("linear") +
+    labs(title = plot_title,
+         caption = 'Time Since Snap: {frame_time}') + 
+    theme(plot.title = element_text(size = 14, hjust = 0.5), # Keep title centered
+          plot.margin = unit(c(5, 0, 0, 0), "lines"), # Increase top margin if title is too high (first value in `c(...)`)
+          plot.subtitle = element_text(size = 14, hjust = 0.5),
+          plot.caption = element_text(size = 12),
+          legend.position = "none") # obviously scrap this if we want to keep the "club" legend
+  
+}
+
+comp_df <- all_dat_joined_4 %>%
+  filter(gameId %in% c(2022092200) &
+           playId %in% c(2112))
+
+anim_func(dataset = comp_df, game = 2022092200, play = 2112)  
+# animate(anim_func(dataset = comp_df, game = 2022092200, play = 2112), duration = 30)
+# animate(anim_func(dataset = comp_df, game = 2022092200, play = 2112), duration = 30)
+
+# Now here's how to save it as a GIF
+animation_4 <- anim_func(dataset = comp_df, game = 2022092200, play = 2112)
+
+# Use animate to create the GIF object
+gif_animation_4 <- animate(animation_4, 
+                           nframes = nFrames,       # Number of frames
+                           fps = 10,               # Frames per second
+                           width = 800,            # Width of the output GIF
+                           height = 600,           # Height of the output GIF
+                           renderer = gifski_renderer())
+
+# Save the GIF to a file
+anim_save("play_animation_4.gif", animation = gif_animation_4)
+
+rm(df_C_players, df_C_plays, df_C_tracking, 
+   df_C_tracking_1, df_C_tracking_2, df_C_tracking_3, df_C_tracking_4,
+   df_safety_movement_1, df_safety_movement_2, out_of_sample_preds, 
+   all_dat_joined_1, all_dat_joined_2, all_dat_joined_3, all_dat_joined_4, comp_df)
+
 
 ######## DIFFERENT ANIMATION EXAMPLES THAT AREN'T DIRECTLY USED IN FINAL PROJECT #########
 
