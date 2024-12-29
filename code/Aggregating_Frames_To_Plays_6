@@ -36,7 +36,7 @@ Stats_ByPlayerAndPlay_Final <- final_dropbacks_merged %>% filter(club != "footba
             ManVsZone = max(pff_manZone), PostSnap_MOF = max(PostSnap_MOF), PostSnap_MOF_Num = max(PostSnap_MOF_Num),
             PlayClock_AtSnap = max(playClockAtSnap), no_huddle = max(no_huddle),
             pass_horiz_location = max(pass_location), air_yards = max(air_yards), team_yards_after_catch = max(yards_after_catch), 
-            Team_PassTD = max(pass_touchdown), Touchdown = max(touchdown), Off_TD = max(pass_touchdown) + max(rush_touchdown),
+            Team_PassTD = max(pass_touchdown), Touchdown = max(touchdown), 
             Team_RushTD = max(rush_touchdown), Team_ReturnTD = max(return_touchdown), 
             td_team = max(td_team), WP = max(wp), WPA = max(wpa), DefWPA = max(DefWPA), WPSuccess = max(WPSuccess),
             OffTeam_Fumble = max(fumble), OffTeam_LostFumble = max(fumble_lost), 
@@ -211,7 +211,7 @@ Stats_ByFullPlay_Final <- final_dropbacks_merged %>%
             ManVsZone = max(pff_manZone), PostSnap_MOF = max(PostSnap_MOF), PostSnap_MOF_Num = max(PostSnap_MOF_Num),
             PlayClock_AtSnap = max(playClockAtSnap), no_huddle = max(no_huddle),
             pass_horiz_location = max(pass_location), air_yards = max(air_yards), team_yards_after_catch = max(yards_after_catch), 
-            Team_PassTD = max(pass_touchdown), Touchdown = max(touchdown), Off_TD = max(pass_touchdown) + max(rush_touchdown),
+            Team_PassTD = max(pass_touchdown), Touchdown = max(touchdown), 
             Team_RushTD = max(rush_touchdown), Team_ReturnTD = max(return_touchdown), 
             td_team = max(td_team), WP = max(wp), WPA = max(wpa), DefWPA = max(DefWPA), WPSuccess = max(WPSuccess),
             OffTeam_Fumble = max(fumble), OffTeam_LostFumble = max(fumble_lost), 
@@ -319,6 +319,10 @@ Stats_ByFullPlay_Final <- final_dropbacks_merged %>%
             y_spline_basis5_p2 = max(y_spline_basis5_p2), y_spline_basis6_p2 = max(y_spline_basis6_p2),                 
             y_spline_basis7_p2 = max(y_spline_basis7_p2), y_spline_basis8_p2 = max(y_spline_basis8_p2),                  
             y_spline_basis9_p2 = max(y_spline_basis9_p2), y_spline_basis10_p2 = max(y_spline_basis10_p2))
+
+Stats_ByFullPlay_Final <- Stats_ByFullPlay_Final %>%
+  mutate(Off_TD = ifelse(!is.na(td_team) & td_team == PosTeam, 1,
+                              ifelse(is.na(td_team) | td_team != PosTeam), 0, NA))
 
 # And add the single-snap entropy value to both data sets
 Stats_ByPlayerAndPlay_Final <- Stats_ByPlayerAndPlay_Final %>% 
