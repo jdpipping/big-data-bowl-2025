@@ -322,7 +322,7 @@ Stats_ByFullPlay_Final <- final_dropbacks_merged %>%
 
 Stats_ByFullPlay_Final <- Stats_ByFullPlay_Final %>%
   mutate(Off_TD = ifelse(!is.na(td_team) & td_team == PosTeam, 1,
-                              ifelse(is.na(td_team) | td_team != PosTeam), 0, NA))
+                              ifelse(is.na(td_team) | td_team != PosTeam, 0, NA)))
 
 # And add the single-snap entropy value to both data sets
 Stats_ByPlayerAndPlay_Final <- Stats_ByPlayerAndPlay_Final %>% 
