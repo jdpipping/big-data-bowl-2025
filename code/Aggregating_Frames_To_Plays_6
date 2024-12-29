@@ -1356,7 +1356,7 @@ HighVsLowEntropy_NFLWide_FancyTable <- HighVsLowEntropy_NFLWide_FancyTable |>
     align = "center",
     columns = Dropbacks:AvgEPA
   ) |> 
-  tab_header(md("**How Defenses Performed With vs. Without High Safety Entropy**"),
+  tab_header(md("**Base Rate Across NFL: How Defenses Performed With vs. Without High Safety Entropy**"),
              md("(Early Down Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022)")) |> # don't forget to adjust your minimum
   tab_style(style = cell_borders(sides = "top"),
             locations = cells_title("title")) |> 
