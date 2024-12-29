@@ -36,8 +36,8 @@ Stats_ByPlayerAndPlay_Final <- final_dropbacks_merged %>% filter(club != "footba
             ManVsZone = max(pff_manZone), PostSnap_MOF = max(PostSnap_MOF), PostSnap_MOF_Num = max(PostSnap_MOF_Num),
             PlayClock_AtSnap = max(playClockAtSnap), no_huddle = max(no_huddle),
             pass_horiz_location = max(pass_location), air_yards = max(air_yards), team_yards_after_catch = max(yards_after_catch), 
-            Team_PassTD = max(pass_touchdown), TeamTouchdown = max(touchdown), 
-            TeamRushTD = max(rush_touchdown), TeamReturnTD = max(return_touchdown), 
+            Team_PassTD = max(pass_touchdown), Touchdown = max(touchdown), Off_TD = max(pass_touchdown) + max(rush_touchdown),
+            Team_RushTD = max(rush_touchdown), Team_ReturnTD = max(return_touchdown), 
             td_team = max(td_team), WP = max(wp), WPA = max(wpa), DefWPA = max(DefWPA), WPSuccess = max(WPSuccess),
             OffTeam_Fumble = max(fumble), OffTeam_LostFumble = max(fumble_lost), 
             penalty_team = max(penalty_team), penalty_type = max(penalty_type), 
@@ -211,8 +211,8 @@ Stats_ByFullPlay_Final <- final_dropbacks_merged %>%
             ManVsZone = max(pff_manZone), PostSnap_MOF = max(PostSnap_MOF), PostSnap_MOF_Num = max(PostSnap_MOF_Num),
             PlayClock_AtSnap = max(playClockAtSnap), no_huddle = max(no_huddle),
             pass_horiz_location = max(pass_location), air_yards = max(air_yards), team_yards_after_catch = max(yards_after_catch), 
-            Team_PassTD = max(pass_touchdown), TeamTouchdown = max(touchdown), 
-            TeamRushTD = max(rush_touchdown), TeamReturnTD = max(return_touchdown), 
+            Team_PassTD = max(pass_touchdown), Touchdown = max(touchdown), Off_TD = max(pass_touchdown) + max(rush_touchdown),
+            Team_RushTD = max(rush_touchdown), Team_ReturnTD = max(return_touchdown), 
             td_team = max(td_team), WP = max(wp), WPA = max(wpa), DefWPA = max(DefWPA), WPSuccess = max(WPSuccess),
             OffTeam_Fumble = max(fumble), OffTeam_LostFumble = max(fumble_lost), 
             penalty_team = max(penalty_team), penalty_type = max(penalty_type), 
@@ -386,7 +386,7 @@ Stats_ByFullPlay_Final <- Stats_ByFullPlay_Final %>% mutate(Disguise_Num = ifels
 # Start out with basic performance on disguised vs. non-disguised dropbacks ... don't group by team to start
 PlaySuccess_DisguiseVsNone_NFLWide <- Stats_ByFullPlay_Final %>% filter(!is.na(Disguise)) %>%
   group_by(Disguise) %>%
-  summarize(Dropbacks = n(), YPP = mean(NetYardage), TD = sum(TeamTouchdown), AvgEPA = mean(EPA, na.rm = TRUE), EPSuccessRate = mean(EPSuccess, na.rm = TRUE), FirstDownRate = mean(first_down, na.rm = TRUE),
+  summarize(Dropbacks = n(), YPP = mean(NetYardage), TD = sum(Off_TD), AvgEPA = mean(EPA, na.rm = TRUE), EPSuccessRate = mean(EPSuccess, na.rm = TRUE), FirstDownRate = mean(first_down, na.rm = TRUE),
             LCI_YPP = lower_Continuous(NetYardage), UCI_YPP = upper_Continuous(NetYardage),
             LCI_EPA = lower_Continuous(EPA), UCI_EPA = upper_Continuous(EPA),
             LCI_EPSuccess = ifelse(lower_Bernoulli(EPSuccess) >= 0, lower_Bernoulli(EPSuccess), 0), 
@@ -453,7 +453,7 @@ grid.arrange(Plot1, Plot2, ncol = 2)
 # And a similar version of that, which groups by disguise AND # of pre-snap safeties
 PlaySuccess_DisguiseAndSafeties_NFLWide <- Stats_ByFullPlay_Final %>% filter(!is.na(Disguise)) %>%
   group_by(Disguise, num_safeties_pre_snap) %>%
-  summarize(Dropbacks = n(), YPP = mean(NetYardage), TD = sum(TeamTouchdown), AvgEPA = mean(EPA, na.rm = TRUE), EPSuccessRate = mean(EPSuccess, na.rm = TRUE), FirstDownRate = mean(first_down, na.rm = TRUE),
+  summarize(Dropbacks = n(), YPP = mean(NetYardage), TD = sum(Off_TD), AvgEPA = mean(EPA, na.rm = TRUE), EPSuccessRate = mean(EPSuccess, na.rm = TRUE), FirstDownRate = mean(first_down, na.rm = TRUE),
             LCI_YPP = lower_Continuous(NetYardage), UCI_YPP = upper_Continuous(NetYardage),
             LCI_EPA = lower_Continuous(EPA), UCI_EPA = upper_Continuous(EPA),
             LCI_EPSuccess = ifelse(lower_Bernoulli(EPSuccess) >= 0, lower_Bernoulli(EPSuccess), 0), 
@@ -503,7 +503,7 @@ grid.arrange(Plot3, Plot4, ncol = 2)
 # Now incorporate team defense into the equation
 PlaySuccess_DisguiseVsNone_ByDefTeam <- Stats_ByFullPlay_Final %>% filter(!is.na(Disguise)) %>%
   group_by(DefTeam, Disguise) %>% 
-  summarize(Dropbacks = n(), YPP = mean(NetYardage), TotYds = sum(NetYardage), TD = sum(TeamTouchdown), TotEPA = sum(EPA), AvgEPA = mean(EPA, na.rm = TRUE), EPSuccessRate = mean(EPSuccess), FirstDownRate = mean(first_down, na.rm = TRUE)) %>% arrange(DefTeam, Disguise)
+  summarize(Dropbacks = n(), YPP = mean(NetYardage), TotYds = sum(NetYardage), TD = sum(Off_TD), TotEPA = sum(EPA), AvgEPA = mean(EPA, na.rm = TRUE), EPSuccessRate = mean(EPSuccess), FirstDownRate = mean(first_down, na.rm = TRUE)) %>% arrange(DefTeam, Disguise)
 # View(PlaySuccess_DisguiseVsNone_ByDefTeam)
 
 PlaySuccess_OnDisguises_ByTeam <- PlaySuccess_DisguiseVsNone_ByDefTeam %>% filter(Disguise %in% "Disguise")
@@ -533,7 +533,7 @@ Plot5 <- PlaySuccess_OnDisguises_ByTeam %>%
 # First, gotta establish the "DisguiseRate" metric for each team, and sort in descending order
 DisguiseRate_Leaders <- Stats_ByFullPlay_Final %>% filter(!is.na(Disguise)) %>%
   group_by(DefTeam) %>% 
-  summarize(Dropbacks = n(), DisguiseRate = mean(Disguise_Num), YPP = mean(NetYardage), TotYds = sum(NetYardage), TD = sum(TeamTouchdown), 
+  summarize(Dropbacks = n(), DisguiseRate = mean(Disguise_Num), YPP = mean(NetYardage), TotYds = sum(NetYardage), TD = sum(Off_TD), 
             TotEPA = sum(EPA), AvgEPA = mean(EPA, na.rm = TRUE), EPSuccessRate = mean(EPSuccess), FirstDownRate = mean(first_down, na.rm = TRUE)) %>% 
   arrange(desc(DisguiseRate))
 
@@ -842,7 +842,7 @@ gtsave(DisguiseVsNoDisguise_ByTeam_FancyTable, "DisguiseVsNoDisguise_ByTeam_Fanc
 # Start out with basic performance on disguised vs. non-disguised dropbacks ... don't group by team to start
 PlaySuccess_HighEntropyVsNone_NFLWide <- Stats_ByFullPlay_Final %>% filter(!is.na(HighEntropy)) %>%
   group_by(HighEntropy) %>%
-  summarize(Dropbacks = n(), YPP = mean(NetYardage), TD = sum(TeamTouchdown), AvgEPA = mean(EPA, na.rm = TRUE), EPSuccessRate = mean(EPSuccess, na.rm = TRUE), FirstDownRate = mean(first_down, na.rm = TRUE),
+  summarize(Dropbacks = n(), YPP = mean(NetYardage), TD = sum(Off_TD), AvgEPA = mean(EPA, na.rm = TRUE), EPSuccessRate = mean(EPSuccess, na.rm = TRUE), FirstDownRate = mean(first_down, na.rm = TRUE),
             LCI_YPP = lower_Continuous(NetYardage), UCI_YPP = upper_Continuous(NetYardage),
             LCI_EPA = lower_Continuous(EPA), UCI_EPA = upper_Continuous(EPA),
             LCI_EPSuccess = ifelse(lower_Bernoulli(EPSuccess) >= 0, lower_Bernoulli(EPSuccess), 0), 
@@ -909,7 +909,7 @@ grid.arrange(Plot1B, Plot2B, ncol = 2)
 # And a similar version of that, which groups by HighEntropy AND # of pre-snap safeties
 PlaySuccess_HighEntropyAndSafeties_NFLWide <- Stats_ByFullPlay_Final %>% filter(!is.na(HighEntropy)) %>%
   group_by(HighEntropy, num_safeties_pre_snap) %>%
-  summarize(Dropbacks = n(), YPP = mean(NetYardage), TD = sum(TeamTouchdown), AvgEPA = mean(EPA, na.rm = TRUE), EPSuccessRate = mean(EPSuccess, na.rm = TRUE), FirstDownRate = mean(first_down, na.rm = TRUE),
+  summarize(Dropbacks = n(), YPP = mean(NetYardage), TD = sum(Off_TD), AvgEPA = mean(EPA, na.rm = TRUE), EPSuccessRate = mean(EPSuccess, na.rm = TRUE), FirstDownRate = mean(first_down, na.rm = TRUE),
             LCI_YPP = lower_Continuous(NetYardage), UCI_YPP = upper_Continuous(NetYardage),
             LCI_EPA = lower_Continuous(EPA), UCI_EPA = upper_Continuous(EPA),
             LCI_EPSuccess = ifelse(lower_Bernoulli(EPSuccess) >= 0, lower_Bernoulli(EPSuccess), 0), 
@@ -959,7 +959,7 @@ grid.arrange(Plot3B, Plot4B, ncol = 2)
 # Now incorporate team defense into the equation
 PlaySuccess_HighEntropyVsNone_ByDefTeam <- Stats_ByFullPlay_Final %>% filter(!is.na(HighEntropy)) %>%
   group_by(DefTeam, HighEntropy) %>% 
-  summarize(Dropbacks = n(), YPP = mean(NetYardage), TotYds = sum(NetYardage), TD = sum(TeamTouchdown), TotEPA = sum(EPA), AvgEPA = mean(EPA, na.rm = TRUE), EPSuccessRate = mean(EPSuccess), FirstDownRate = mean(first_down, na.rm = TRUE)) %>% arrange(DefTeam, HighEntropy)
+  summarize(Dropbacks = n(), YPP = mean(NetYardage), TotYds = sum(NetYardage), TD = sum(Off_TD), TotEPA = sum(EPA), AvgEPA = mean(EPA, na.rm = TRUE), EPSuccessRate = mean(EPSuccess), FirstDownRate = mean(first_down, na.rm = TRUE)) %>% arrange(DefTeam, HighEntropy)
 # View(PlaySuccess_HighEntropyVsNone_ByDefTeam)
 
 PlaySuccess_HighEntropy_ByTeam <- PlaySuccess_HighEntropyVsNone_ByDefTeam %>% filter(HighEntropy %in% "High Entropy")
@@ -989,7 +989,7 @@ annotate("text", label = glue("Negative Value is Good for Defense"),
 # First, gotta establish the "AvgEntropyRate" metric for each team, and sort in descending order
 AvgEntropy_Leaders <- Stats_ByFullPlay_Final %>% filter(!is.na(HighEntropy)) %>%
   group_by(DefTeam) %>% 
-  summarize(Dropbacks = n(), AvgEntropy = mean(Snap_Entropy), YPP = mean(NetYardage), TotYds = sum(NetYardage), TD = sum(TeamTouchdown), 
+  summarize(Dropbacks = n(), AvgEntropy = mean(Snap_Entropy), YPP = mean(NetYardage), TotYds = sum(NetYardage), TD = sum(Off_TD), 
             TotEPA = sum(EPA), AvgEPA = mean(EPA, na.rm = TRUE), EPSuccessRate = mean(EPSuccess), FirstDownRate = mean(first_down, na.rm = TRUE)) %>% 
   arrange(desc(AvgEntropy))
 
