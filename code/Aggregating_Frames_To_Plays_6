@@ -1293,6 +1293,86 @@ HighVsLowEntropy_ByTeam_FancyTable <- HighVsLowEntropy_ByTeam_FancyTable %>%
 
 gtsave(HighVsLowEntropy_ByTeam_FancyTable, "HighVsLowEntropy_ByTeam_FancyTable.png")
 
+# For the hell of it, also try a gt table with View(PlaySuccess_HighEntropyVsNone_NFLWide)
+PlaySuccess_HighEntropyVsNone_NFLWide <- PlaySuccess_HighEntropyVsNone_NFLWide %>% arrange(AvgEPA)
+
+class(PlaySuccess_HighEntropyVsNone_NFLWide) <- "data.frame"
+HighVsLowEntropy_NFLWide_FancyTable <- PlaySuccess_HighEntropyVsNone_NFLWide %>%
+  select(c("HighEntropy", "Dropbacks", "YPP", "EPSuccessRate", "FirstDownRate", "AvgEPA"))
+  # head(20) %>% # this is how we would limit to the top 20
+  # mutate(Rank = row_number(AvgEPA)) %>% # DON'T use desc() in this case
+  # select("Rank", 1:6)
+
+HighVsLowEntropy_NFLWide_FancyTable <- HighVsLowEntropy_NFLWide_FancyTable |>
+  # filter(officialPosition %in% c("OLB", "DE")) |> 
+  # mutate(rank = row_number()) |> 
+  # select(1:4, "HighEntropy", "Dropbacks", "YPP", "EPSuccessRate", "FirstDownRate", "AvgEPA") |> 
+  head(20) |>
+  gt() |>
+  tab_options(
+    table.border.top.color = "white",
+    row.striping.include_table_body = FALSE
+  ) |>
+  opt_table_font(
+    font = list(
+      google_font("Chivo"),
+      default_fonts()
+    )
+  ) |>
+  fmt_number(
+    columns = c(YPP),
+    decimals = 2,
+  ) |>
+  fmt_number(
+    columns = c(EPSuccessRate),
+    decimals = 2,
+  ) |>
+  fmt_number(
+    columns = c(FirstDownRate),
+    decimals = 2,
+  ) |>
+  fmt_number(
+    columns = c(AvgEPA),
+    decimals = 2,
+  ) |>
+  data_color(
+    columns = c(AvgEPA),
+    colors = scales::col_numeric(
+      palette = c("darkred", "pink"), # Because we are going in ascending order, have dark column on the left
+      domain = NULL
+    )
+  ) |> 
+  cols_label(
+   # Rank = md("**Rank**"), # the md is what makes the headers show up as bold
+    HighEntropy = md("**Entropy Level**"),
+    # officialPosition = md("**Position**"),
+    Dropbacks = md("**Dropbacks**"),
+    YPP = md("**Yards Per Play**"),
+    EPSuccessRate = md("**Success Rate Allowed**"),
+    FirstDownRate = md("**First Down Rate**"),
+    AvgEPA = html('<span style="text-decoration:overline; font-weight:bold">Avg EPA Allowed</span>')
+  ) |> 
+  cols_align(
+    align = "center",
+    columns = Dropbacks:AvgEPA
+  ) |> 
+  tab_header(md("**How Defenses Performed With vs. Without High Safety Entropy**"),
+             md("(Early Down Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022)")) |> # don't forget to adjust your minimum
+  tab_style(style = cell_borders(sides = "top"),
+            locations = cells_title("title")) |> 
+  tab_options(
+    table.border.top.style = "a"
+  ) |> 
+  tab_footnote(
+    footnote = "Low EPA is good for defense. High Safety Entropy: entropy score above median (approx 0.79)",
+    locations = cells_column_labels(
+      columns = AvgEPA
+    )
+  )
+
+gtsave(HighVsLowEntropy_NFLWide_FancyTable, "HighVsLowEntropy_NFLWide_FancyTable.png")
+
+
 
 # If we need to export to CSV
 write.csv(final_dropbacks_merged, "final_dropbacks_merged.csv")
