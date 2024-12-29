@@ -330,15 +330,17 @@ Stats_ByPlayerAndPlay_Final <- Stats_ByPlayerAndPlay_Final %>%
 Stats_ByFullPlay_Final <- Stats_ByFullPlay_Final %>% 
   mutate(Snap_Entropy = -MOFO_probability_FDA*log(MOFO_probability_FDA, 2) - (1 - MOFO_probability_FDA)*log((1-MOFO_probability_FDA), 2))
 
-Stats_ByPlayerAndPlay_Final <- Stats_ByPlayerAndPlay_Final %>% 
-  mutate(HighEntropy = ifelse(Snap_Entropy >= 0.8, "High Entropy", "Low Entropy"))
-Stats_ByFullPlay_Final <- Stats_ByFullPlay_Final %>% 
-  mutate(HighEntropy = ifelse(Snap_Entropy >= 0.8, "High Entropy", "Low Entropy"))
+Median_Entropy <- median(Stats_ByFullPlay_Final$Snap_Entropy)
 
 Stats_ByPlayerAndPlay_Final <- Stats_ByPlayerAndPlay_Final %>% 
-  mutate(HighEntropy_Num = ifelse(Snap_Entropy >= 0.8, 1, 0))
+  mutate(HighEntropy = ifelse(Snap_Entropy > Median_Entropy, "High Entropy", "Low Entropy"))
 Stats_ByFullPlay_Final <- Stats_ByFullPlay_Final %>% 
-  mutate(HighEntropy_Num = ifelse(Snap_Entropy >= 0.8, 1, 0))
+  mutate(HighEntropy = ifelse(Snap_Entropy > Median_Entropy, "High Entropy", "Low Entropy"))
+
+Stats_ByPlayerAndPlay_Final <- Stats_ByPlayerAndPlay_Final %>% 
+  mutate(HighEntropy_Num = ifelse(Snap_Entropy > Median_Entropy, 1, 0))
+Stats_ByFullPlay_Final <- Stats_ByFullPlay_Final %>% 
+  mutate(HighEntropy_Num = ifelse(Snap_Entropy > Median_Entropy, 1, 0))
 
 # These are for if/when we want to make confidence intervals
 # Recall, Bernoulli is binary variable (i.e. use for proportions)
@@ -898,7 +900,7 @@ Plot2B <- PlaySuccess_HighEntropyVsNone_NFLWide %>%
   labs(x = "Safety Entropy", y = "Success Rate Allowed",
        title = "Success Rate Allowed on Dropbacks, by Safety Entropy",
        subtitle = "Weeks 1-9, 2022, Early Downs with 5+ Yards To Go (n = 4,381)",
-       caption = "High Safety Entropy: entropy score above median (approx 0.79)") +
+       caption = "High Safety Entropy: entropy score above median") +
   geom_abline(intercept = 0.5, slope = 0, color = "darkgreen", lty = 2) +
   geom_errorbar(aes(ymin = LCI_EPSuccess, ymax = UCI_EPSuccess), position = "dodge", color = "red") +
   scale_y_continuous(breaks = seq(0, 1, 0.2), labels = scales::percent_format(accuracy = 5L)) +
@@ -948,7 +950,7 @@ Plot4B <- PlaySuccess_HighEntropyAndSafeties_NFLWide %>%
   labs(x = "Safety Entropy", y = "Success Rate Allowed",
        title = "Success Rate Allowed on Dropbacks, by Safety Entropy",
        subtitle = "Weeks 1-9, 2022, Early Downs with 5+ Yards To Go (n = 4,381)",
-       caption = "High Safety Entropy: entropy score above median (approx 0.79)") +
+       caption = "High Safety Entropy: entropy score above median") +
   geom_abline(intercept = 0.5, slope = 0, color = "darkgreen", lty = 2) +
   geom_errorbar(aes(ymin = LCI_EPSuccess, ymax = UCI_EPSuccess), position = "dodge", color = "red") +
   scale_y_continuous(breaks = seq(0, 1, 0.2), labels = scales::percent_format(accuracy = 5L)) +
@@ -980,7 +982,7 @@ Plot5B <- PlaySuccess_HighEntropy_ByTeam %>%
   labs(x = "Team Logo", y = "Average EPA Allowed", 
        title = "Average EPA Allowed on High-Entropy Dropbacks",
        subtitle = "Weeks 1-9, 2022, Early Downs with 5+ Yards To Go (n = 4,381)",
-       caption = "High Safety Entropy: entropy score above median (approx 0.79)") +
+       caption = "High Safety Entropy: entropy score above median") +
   theme_bw() +
   theme(plot.title = element_text(size = 10, hjust = 0.5),
         plot.subtitle = element_text(size = 8, hjust = 0.5),
@@ -1129,7 +1131,7 @@ HighEntropySuccess_FancyTable <- HighEntropySuccess_FancyTable |>
     table.border.top.style = "a"
   ) |> 
   tab_footnote(
-    footnote = "Low EPA: good for defense. High-Entropy: above median (approx 0.79)",
+    footnote = "Low EPA: good for defense. High-Entropy: above median",
     locations = cells_column_labels(
       columns = AvgEPA
     )
@@ -1285,7 +1287,7 @@ HighVsLowEntropy_ByTeam_FancyTable <- HighVsLowEntropy_ByTeam_FancyTable |>
     table.border.top.style = "a"
   ) |> 
   tab_footnote(
-    footnote = "Lower gap: better with high entropy. High Safety Entropy: entropy score above median (approx 0.79)",
+    footnote = "Lower gap: better with high entropy. High Safety Entropy: entropy score above median",
     locations = cells_column_labels(
       columns = AvgEPAGap
     )
@@ -1368,7 +1370,7 @@ HighVsLowEntropy_NFLWide_FancyTable <- HighVsLowEntropy_NFLWide_FancyTable |>
     table.border.top.style = "a"
   ) |> 
   tab_footnote(
-    footnote = "Low EPA is good for defense. High Safety Entropy: entropy score above median (approx 0.79)",
+    footnote = "Low EPA is good for defense. High Safety Entropy: entropy score above median",
     locations = cells_column_labels(
       columns = AvgEPA
     )
