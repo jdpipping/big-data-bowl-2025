@@ -213,7 +213,7 @@ sample_data_3 <- sample_data_3 %>%
          text_for_anim = case_when(
            t_after_snap < start_of_model_time ~ 'Before Line is Set',
            t_after_snap == start_of_model_time ~ 'Start of Model Window',
-           t_after_snap > start_of_model_time & t_after_snap< -0.1 ~'Tracking Safety Movement',
+           t_after_snap > start_of_model_time & t_after_snap< -0.1 ~'Tracking Safety Pre-Snap Movement',
            t_after_snap == -0.1 ~ 'End of Model Window (0.1 Sec Before Snap)',
            t_after_snap > -0.1 ~ 'Play in Progress'
          )) %>%
@@ -281,7 +281,7 @@ sample_data_4 <- sample_data_4 %>%
          text_for_anim = case_when(
            t_after_snap < start_of_model_time ~ 'Before Line is Set',
            t_after_snap == start_of_model_time ~ 'Start of Model Window',
-           t_after_snap > start_of_model_time & t_after_snap< -0.1 ~'Tracking Safety Movement',
+           t_after_snap > start_of_model_time & t_after_snap< -0.1 ~'Tracking Safety Pre-Snap Movement',
            t_after_snap == -0.1 ~ 'End of Model Window (0.1 Sec Before Snap)',
            t_after_snap > -0.1 ~ 'Play in Progress'
          )) %>%
