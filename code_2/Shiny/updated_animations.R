@@ -181,12 +181,12 @@ Week3_NamesAndNumbers <- tracking_week_3 %>% select(c(nflId, displayName, jersey
 Week3_NamesAndNumbers <- unique(Week3_NamesAndNumbers)
 rm(tracking_week_3)
 
-tracking_week_1 <- data.table::fread("tracking_week_1.csv")
-Week1_NamesAndNumbers <- tracking_week_3 %>% select(c(nflId, displayName, jerseyNumber))
-Week1_NamesAndNumbers <- unique(Week3_NamesAndNumbers)
-rm(tracking_week_1)
+tracking_week_2 <- data.table::fread("tracking_week_2.csv")
+Week2_NamesAndNumbers <- tracking_week_2 %>% select(c(nflId, displayName, jerseyNumber))
+Week2_NamesAndNumbers <- unique(Week2_NamesAndNumbers)
+rm(tracking_week_2)
 
-names_and_nums <- rbind(Week1_NamesAndNumbers, Week3_NamesAndNumbers) %>%
+names_and_nums <- rbind(Week2_NamesAndNumbers, Week3_NamesAndNumbers) %>%
   unique()
 #81%
 #anim_save('high_prob_2.gif', anim_func(all_data_joined,game=2022091804, play=2572))
@@ -244,7 +244,7 @@ plot_title <- paste0(sample_data$playDescription[1],
 anim <- ggplot() +
   
   #creating field underlay
-  gg_field(yardmin = 0, yardmax = 122) +
+  gg_field(yardmin = 0, yardmax = 120) +
   
   #filling forest green for behind back of endzone
   theme(panel.background = element_rect(fill = "forestgreen",
