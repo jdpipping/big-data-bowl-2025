@@ -265,8 +265,8 @@ anim <- ggplot() +
   theme(plot.title = element_text(size = 14, hjust = 0.5), # Keep title centered
         plot.margin = unit(c(5, 0, 0, 0), "lines"), # Increase top margin if title is too high (first value in `c(...)`)
         plot.subtitle = element_text(size = 14, hjust = 0.5),
-        plot.caption = element_text(size = 12))
-       #  legend.position = "none") # obviously scrap this if we want to keep the "club" legend
+        plot.caption = element_text(size = 12),
+        legend.position = "none") # obviously scrap this if we want to keep the "club" legend
 
 anim_save('play_animation_3_pauses.gif', play_animation_3_pauses)
 
@@ -333,8 +333,8 @@ play_animation_4_pauses <- anim +
   theme(plot.title = element_text(size = 14, hjust = 0.5), # Keep title centered
         plot.margin = unit(c(5, 0, 0, 0), "lines"), # Increase top margin if title is too high (first value in `c(...)`)
         plot.subtitle = element_text(size = 14, hjust = 0.5),
-        plot.caption = element_text(size = 12))
-#  legend.position = "none") # obviously scrap this if we want to keep the "club" legend
+        plot.caption = element_text(size = 12),
+        legend.position = "none") # obviously scrap this if we want to keep the "club" legend
 
 anim_save('play_animation_4_pauses.gif', play_animation_4_pauses)
 
