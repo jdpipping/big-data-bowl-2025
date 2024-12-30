@@ -272,7 +272,7 @@ anim <- ggplot() +
         legend.position = "none") # obviously scrap this if we want to keep the "club" legend
 
 gif_animation_3_pauses <- animate(play_animation_3_pauses, duration = 15)
-# Note: we don't want duration to be 10 * amount of frames, because of the built-in pauses
+# Note: we don't want duration to be 0.1 * amount of frames, because of the built-in pauses
   
 anim_save('play_animation_3_pauses.gif', gif_animation_3_pauses)
 
@@ -348,7 +348,7 @@ play_animation_4_pauses <- anim +
         legend.position = "none") # obviously scrap this if we want to keep the "club" legend
 
 gif_animation_4_pauses <- animate(play_animation_4_pauses, duration = 15)
-# Note: we don't want duration to be 10 * amount of frames, because of the built-in pauses
+# Note: we don't want duration to be 0.1 * amount of frames, because of the built-in pauses
 
 anim_save('play_animation_4_pauses.gif', gif_animation_4_pauses)
 
