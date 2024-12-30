@@ -357,6 +357,9 @@ MergedData <- MergedData %>% left_join(Safety_2_AtSnap, by = c("gameId", "playId
 rm(Safety_1_AtSnap, Safety_2_AtSnap)
 
 MergedData <- MergedData %>% mutate(X_Diff_BetweenSafeties_AtSnap = abs(pre_snap_safety_1_X_AtSnap - pre_snap_safety_2_X_AtSnap))
+MergedData <- MergedData %>% mutate(Y_Diff_BetweenSafeties_AtSnap = abs(pre_snap_safety_1_Y_AtSnap - pre_snap_safety_2_Y_AtSnap))
+MergedData <- MergedData %>% mutate(TotDist_BetweenSafeties_AtSnap =
+     (sqrt((pre_snap_safety_1_X_AtSnap - pre_snap_safety_2_X_AtSnap)^2 + (pre_snap_safety_1_Y_AtSnap - pre_snap_safety_2_Y_AtSnap)^2)))
 
 # Also get post_snap_safety_1_name and post_snap_safety_2_name using merge()
 players <- fread("players.csv")
