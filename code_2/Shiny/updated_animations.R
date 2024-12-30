@@ -164,8 +164,7 @@ names_and_nums <- rbind(Week2_NamesAndNumbers, Week3_NamesAndNumbers) %>%
   unique()
 rm(Week2_NamesAndNumbers, Week3_NamesAndNumbers)
 
-# NOTE: high_prob is the Week 2 TB-NO play, i.e. gameId == 2022091804, playId -- 2572
-
+# NOTE: high_prob is the Week 2 TB-NO play, i.e. gameId == 2022091804, playId == 2572
 # low_prob is the Week 3 PIT-CLE play, i.e. gameId =- 2022092200, playId == 21112
 
 all_data_joined <- all_data_joined %>%
