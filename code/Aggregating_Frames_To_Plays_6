@@ -1219,7 +1219,7 @@ PlaySuccess_HighVsLowEntropy_ByTeam <- PlaySuccess_HighVsLowEntropy_ByTeam %>%
 # This is leaderboard of LOWEST AvgEPA gap (b/c we want to look at which defenses have better numbers when disguising)
 # View(PlaySuccess_HighVsLowEntropy_ByTeam %>% arrange(AvgEPAGap) %>% select(1:3, "AvgEPA_HighEntropy", "AvgEPA_LowEntropy", "AvgEPAGap"))
 
-# Now use gt package for which defenses improve the most when disguising, via AvgEPA
+# Now use gt package for which defenses improve the most with high entropy, via AvgEPA
 # Arrange PlaySuccess_HighVsLowEntropy_ByTeam (ASCENDING in this case, b/c we want to see which defenses get better when disguising)
 PlaySuccess_HighVsLowEntropy_ByTeam <- PlaySuccess_HighVsLowEntropy_ByTeam %>% arrange(AvgEPAGap)
 
