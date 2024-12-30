@@ -824,7 +824,13 @@ colnames(MergedData)
 MergedData <- MergedData %>% 
   select(-c("week", "collegeName", "rushLocationType", "height_inches", "temp", "Season_MaxSpeed", "qbSneak",
             "drive", "run_location", "run_gap", "home_coach", "away_coach", "teamAbbr",
-            "air_epa", "yac_epa", "rush_attempt", "order_sequence", "stadium", "stadium_id"))
+            "air_epa", "yac_epa", "rush_attempt", "order_sequence", "stadium", "stadium_id",
+            "playClockAtSnap", "no_huddle", "passTippedAtLine", "sp", "qb_scramble", "shotgun",
+            "third_down_converted", "third_down_failed", "fourth_down_converted", "fourth_down_failed",
+            "lateral_reception", "lateral_rush", "lateral_return", "lateral_recovery", "replay_or_challenge",
+            "replay_or_challenge_result", "series", "series_success", "nfl_api_id", "play_deleted", "play_type_nfl",
+            "Temperature", "surface", "roof", "wind", "total_line", "spread_line", "location", "game_stadium",
+            "pass", "rush", "play", "penaltyNames", "blockedPlayerNFLId1", "blockedPlayerNFLId2", "blockedPlayerNFLId3"))
 setDT(MergedData)
 setkey(MergedData, gameId, playId, nflId, frameId)
 
