@@ -206,7 +206,7 @@ sample_data_4 <- sample_data_4 %>%
 
 # adding in pauses, starting with sample_data_3:
 sample_data_3 <- sample_data_3 %>%
-  mutate(show_time = case_when(start_indicator == 'Model Start' | t_after_snap==-0.1 ~ 100,
+  mutate(show_time = case_when(start_indicator == 'Model Start' | t_after_snap==-0.1 ~ 50,
                                TRUE ~ 1),
          text_for_anim = case_when(
            t_after_snap < start_of_model_time ~ 'Before Line is Set',
@@ -222,7 +222,7 @@ sample_data_3 <- sample_data_3 %>%
   mutate(reveal_time = row_number()) %>%
   ungroup()
 
-# nFrames <- max(sample_data_3$frameId)
+nFrames <- max(sample_data_3$reveal_time)
 
 plot_title <- paste0(sample_data_3$playDescription[1], 
                           '\n', 'MOFO Probability: ', round(100*sample_data_3$p[1], 1), '%',
@@ -273,8 +273,7 @@ anim <- ggplot() +
         plot.caption = element_text(size = 12),
         legend.position = "none") # obviously scrap this if we want to keep the "club" legend
 
-gif_animation_3_pauses <- animate(play_animation_3_pauses, duration = 15)
-# Note: we don't want duration to be 0.1 * amount of frames, because of the built-in pauses
+gif_animation_3_pauses <- animate(play_animation_3_pauses, duration = 0.1 * nFrames)
   
 anim_save('play_animation_3_pauses.gif', gif_animation_3_pauses)
 
@@ -282,7 +281,7 @@ rm(sample_data_3)
 
 # Now repeat it all for sample_data_4
 sample_data_4 <- sample_data_4 %>%
-  mutate(show_time = case_when(start_indicator == 'Model Start' | t_after_snap==-0.1 ~ 100,
+  mutate(show_time = case_when(start_indicator == 'Model Start' | t_after_snap==-0.1 ~ 500,
                                TRUE ~ 1),
          text_for_anim = case_when(
            t_after_snap < start_of_model_time ~ 'Before Line is Set',
@@ -298,7 +297,7 @@ sample_data_4 <- sample_data_4 %>%
   mutate(reveal_time = row_number()) %>%
   ungroup()
 
-# nFrames <- max(sample_data_4$frameId)
+nFrames <- max(sample_data_4$reveal_time)
 
 plot_title <- paste0(sample_data_4$playDescription[1], 
                      '\n', 'MOFO Probability: ', round(100*sample_data_4$p[1], 1), '%',
@@ -349,8 +348,7 @@ play_animation_4_pauses <- anim +
         plot.caption = element_text(size = 12),
         legend.position = "none") # obviously scrap this if we want to keep the "club" legend
 
-gif_animation_4_pauses <- animate(play_animation_4_pauses, duration = 15)
-# Note: we don't want duration to be 0.1 * amount of frames, because of the built-in pauses
+gif_animation_4_pauses <- animate(play_animation_4_pauses, duration = 0.1 * nFrames)
 
 anim_save('play_animation_4_pauses.gif', gif_animation_4_pauses)
 
