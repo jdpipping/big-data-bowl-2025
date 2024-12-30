@@ -6,18 +6,25 @@ source("https://raw.githubusercontent.com/mlfurman3/gg_field/main/gg_field.R")
 memory.limit(size=10000)
 
 
-#these are the files related directly to the 
+# these are the files related directly to the visualizations
 safety_movement1 <- read_csv('df_safety_movement_1.csv')
 safety_movement2 <- read_csv('df_safety_movement_2.csv')
 out_of_sample_preds <- read_csv('results_df_preds_outOfSample.csv')
 
-#tracking the entire plays:
-df_C_players <- read_csv('df_C_players.csv')
-df_C_plays <- read_csv('df_C_plays.csv')
+# tracking the entire plays:
+# df_C_players <- read_csv('df_C_players.csv')
+# df_C_plays <- read_csv('df_C_plays.csv')
 df_C_tracking <- read_csv('df_C_tracking.csv')
 player_play <- read_csv('player_play.csv')
-all_players <- read_csv('players.csv')
+players <- read_csv('players.csv')
 plays <- read_csv('plays.csv')
+
+# Add frameId to df_C_tracking
+df_C_tracking <- df_C_tracking %>%
+  group_by(gameId, playId, nflId, displayName) %>%
+  mutate(frameId = rank(t_after_snap, ties.method = "first")) %>%
+  ungroup() 
+table(df_C_tracking$frameId)
 
 all_safety_movements_preds1 <- out_of_sample_preds %>%
   filter(num_safeties==1) %>%
@@ -97,41 +104,7 @@ all_safety_movements_preds2 <- all_safety_movements_preds2 %>%
          
   )
 
-View(all_safety_movements_preds1 %>%
-       group_by(
-         x_first_binned,
-         y_first_binned,
-         x_last_binned,
-         y_last_binned) %>%
-       summarize(count = n(),
-                 min_p = min(p),
-                 max_p = max(p),
-                 max_game = gameId[which.max(p)],
-                 max_play = playId[which.max(p)],
-                 min_game = gameId[which.min(p)],
-                 min_play = playId[which.min(p)]) %>%
-       ungroup())
-
-View(all_safety_movements_preds2 %>%
-       group_by(
-         x_first_binned_p1,
-         y_first_binned_p1,
-         x_last_binned_p1,
-         y_last_binned_p1,
-         x_first_binned_p2,
-         y_first_binned_p2,
-         x_last_binned_p2,
-         y_last_binned_p2) %>%
-       summarize(count = n(),
-                 min_p = min(p),
-                 max_p = max(p),
-                 max_game = gameId[which.max(p)],
-                 max_play = playId[which.max(p)],
-                 min_game = gameId[which.min(p)],
-                 min_play = playId[which.min(p)]
-       ) %>%
-       ungroup())
-
+rm(all_safety_movements_preds1, all_safety_movements_preds2)
 
 #############################################################
 # data for the animations:
@@ -166,13 +139,15 @@ all_data_joined <- all_data_joined %>%
                      playDescription),
             by = c('gameId', 'playId'))
 
+rm(plays, player_play)
+
 all_data_joined <- all_data_joined %>%
   mutate(club = case_when(
-    displayName=='football' ~ 'football',
-    displayName==displayName_p1 ~ 'Safety #1',
-    displayName==displayName_p2 ~ 'Safety #2',
-    teamAbbr==possessionTeam ~ 'Offense',
-    teamAbbr==defensiveTeam ~ 'Defense'
+    displayName == 'football' ~ 'football',
+    displayName == displayName_p1 ~ 'Safety #1',
+    displayName == displayName_p2 ~ 'Safety #2', # Make sure these lines are separate b/c we want different red lines for their paths
+    teamAbbr == possessionTeam ~ 'Offense',
+    teamAbbr == defensiveTeam ~ 'Defense'
   ),
   t_after_snap=round(t_after_snap,3))
 
@@ -188,11 +163,11 @@ rm(tracking_week_2)
 
 names_and_nums <- rbind(Week2_NamesAndNumbers, Week3_NamesAndNumbers) %>%
   unique()
-#81%
-#anim_save('high_prob_2.gif', anim_func(all_data_joined,game=2022091804, play=2572))
+rm(Week2_NamesAndNumbers, Week3_NamesAndNumbers)
 
-#18%:
-#anim_save('low_prob_2.gif',anim_func(all_data_joined,game=2022092200, play=2112))
+# NOTE: high_prob is the Week 2 TB-NO play, i.e. gameId == 2022091804, playId -- 2572
+
+# low_prob is the Week 3 PIT-CLE play, i.e. gameId =- 2022092200, playId == 21112
 
 all_data_joined <- all_data_joined %>%
   group_by(gameId, playId) %>%
@@ -206,25 +181,41 @@ all_data_joined <- all_data_joined %>%
   mutate(start_of_model_time = ifelse(first_t> -3, first_t, -3)) %>%
   ungroup()
 
-
-sample_data <- all_data_joined %>%
+sample_data_3 <- all_data_joined %>%
   filter(gameId==2022091804,
          playId==2572)
 
-
-sample_data <- sample_data %>%
+sample_data_3 <- sample_data_3 %>%
   left_join(names_and_nums, by = c('nflId', 'displayName'))
 
-#adding in pauses:
-sample_data <- sample_data %>%
+sample_data_4 <- all_data_joined %>%
+  filter(gameId==2022092200,
+         playId==2112)
+
+sample_data_4 <- sample_data_4 %>%
+  left_join(names_and_nums, by = c('nflId', 'displayName'))
+
+rm(all_data_joined)
+
+# Add verbal versions of PostSnap_MOF for graphing purposes
+sample_data_3 <- sample_data_3 %>% 
+  mutate(PostSnap_MOF = ifelse(!is.na(mofo_postsnap) & mofo_postsnap %in% 1, "MOF Open",
+                               ifelse(!is.na(mofo_postsnap) & mofo_postsnap %in% 0, "MOF Closed", NA)))
+
+sample_data_4 <- sample_data_4 %>% 
+  mutate(PostSnap_MOF = ifelse(!is.na(mofo_postsnap) & mofo_postsnap %in% 1, "MOF Open",
+                               ifelse(!is.na(mofo_postsnap) & mofo_postsnap %in% 0, "MOF Closed", NA)))
+
+# adding in pauses, starting with sample_data_3:
+sample_data_3 <- sample_data_3 %>%
   mutate(show_time = case_when(start_indicator == 'Model Start' | t_after_snap==-0.1 ~ 100,
                                TRUE ~ 1),
          text_for_anim = case_when(
-           t_after_snap<start_of_model_time ~ 'Before Line is Set',
-           t_after_snap==start_of_model_time ~ 'Start of Model Window',
-           t_after_snap>start_of_model_time & t_after_snap< -0.1 ~'Tracking Safety Movement',
-           t_after_snap==-0.1 ~ 'End of Model Window',
-           t_after_snap>-0.1 ~ 'Play in Progress'
+           t_after_snap < start_of_model_time ~ 'Before Line is Set',
+           t_after_snap == start_of_model_time ~ 'Start of Model Window',
+           t_after_snap > start_of_model_time & t_after_snap< -0.1 ~'Tracking Safety Movement',
+           t_after_snap == -0.1 ~ 'End of Model Window (0.1 Sec Before Snap)',
+           t_after_snap > -0.1 ~ 'Play in Progress'
          )) %>%
   uncount(show_time) %>%
   group_by(gameId,
@@ -233,13 +224,13 @@ sample_data <- sample_data %>%
   mutate(reveal_time = row_number()) %>%
   ungroup()
 
-View(sample_data %>%
-       filter(club %in% c('Safety #1', 'Safety #2')))
+nFrames <- max(sample_data_3$frameId)
 
-
-plot_title <- paste0(sample_data$playDescription[1], 
-                     '\n', 'Probability: ', round(100*sample_data$p[1], 1), '%',
-                     '\n', 'MOFO Open: ',sample_data$mofo_postsnap[1])
+plot_title <- paste0(sample_data_3$playDescription[1], 
+                          '\n', 'MOFO Probability: ', round(100*sample_data_3$p[1], 2), '%',
+                          '\n', 'Pre-Snap Safeties (in Gold): ',sample_data_3$num_safeties[1],
+                          '\n', 'Actual MOFO vs. MOFC: ',sample_data_3$PostSnap_MOF[1],
+                          '\n', 'Coverage Scheme: ', 'Tampa 2')
 
 anim <- ggplot() +
   
@@ -251,27 +242,104 @@ anim <- ggplot() +
                                         color = "forestgreen"),
         panel.grid = element_blank())
 
-high_prob <- anim +
-  geom_point(data = sample_data,
+  play_animation_3_pauses <- anim +
+  geom_point(data = sample_data_3,
              aes(x = x,
                  y = y,
                  colour = club,
                  group = nflId,
                  size = club)) +
-  geom_line(data = sample_data %>%
-              filter(club %in% c('Safety #1', 'Safety #2')),
+    geom_line(data = sample_data_3 %>%
+                filter(club %in% c('Safety #1', 'Safety #2')),
             aes(x = x,
                 y = y,
                 group = club),
             color = 'red')+
-  geom_text(data = sample_data,aes(x = 60, y = 55, label = text_for_anim), color = 'white') +
-  geom_text(data = sample_data, aes(x = x, y = y, group = nflId, label = jerseyNumber), colour = "white",
+  geom_text(data = sample_data_3,aes(x = 60, y = 55, label = text_for_anim), color = 'white') +
+  geom_text(data = sample_data_3, aes(x = x, y = y, group = nflId, label = jerseyNumber), colour = "white",
             vjust = 0.36, size = 4.5) +
-  scale_color_manual(values = c('Offense' = "dodgerblue", 'Defense'="red", 'football'="brown", 'Safety #1'='navyblue', 'Safety #2'='navyblue'))+
-  scale_size_manual(values = c('Offense' = 6, 'Defense' = 6, 'football' = 4, 'Safety #1' = 7, 'Safety #2' = 7)) +
-  transition_reveal(reveal_time)  +
-  labs(title = plot_title)
+  scale_color_manual(values = c('Offense' = "red", 'Defense'="black", 'football'="brown", 'Safety #1'='goldenrod', 'Safety #2'='goldenrod'))+
+  scale_size_manual(values = c('Offense' = 7, 'Defense' = 7, 'football' = 5, 'Safety #1'= 7, 'Safety #2'= 7)) +
+  transition_reveal(reveal_time) +
+    labs(title = plot_title) +
+  theme(plot.title = element_text(size = 14, hjust = 0.5), # Keep title centered
+        plot.margin = unit(c(5, 0, 0, 0), "lines"), # Increase top margin if title is too high (first value in `c(...)`)
+        plot.subtitle = element_text(size = 14, hjust = 0.5),
+        plot.caption = element_text(size = 12))
+       #  legend.position = "none") # obviously scrap this if we want to keep the "club" legend
 
-anim_save('high_prob_2.gif', high_prob)
+anim_save('play_animation_3_pauses.gif', play_animation_3_pauses)
 
-unique(sample_data$nflId)  
+unique(sample_data_3$nflId)
+
+rm(sample_data_3)
+
+# Now repeat it all for sample_data_4
+sample_data_4 <- sample_data_4 %>%
+  mutate(show_time = case_when(start_indicator == 'Model Start' | t_after_snap==-0.1 ~ 100,
+                               TRUE ~ 1),
+         text_for_anim = case_when(
+           t_after_snap < start_of_model_time ~ 'Before Line is Set',
+           t_after_snap == start_of_model_time ~ 'Start of Model Window',
+           t_after_snap > start_of_model_time & t_after_snap< -0.1 ~'Tracking Safety Movement',
+           t_after_snap == -0.1 ~ 'End of Model Window (0.1 Sec Before Snap)',
+           t_after_snap > -0.1 ~ 'Play in Progress'
+         )) %>%
+  uncount(show_time) %>%
+  group_by(gameId,
+           playId,
+           nflId) %>%
+  mutate(reveal_time = row_number()) %>%
+  ungroup()
+
+nFrames <- max(sample_data_4$frameId)
+
+plot_title <- paste0(sample_data_4$playDescription[1], 
+                     '\n', 'MOFO Probability: ', round(100*sample_data_4$p[1], 2), '%',
+                     '\n', 'Pre-Snap Safeties (in Gold): ',sample_data_4$num_safeties[1],
+                     '\n', 'Actual MOFO vs. MOFC: ',sample_data_4$PostSnap_MOF[1],
+                     '\n', 'Coverage Scheme: ', 'Cover 1')
+
+anim <- ggplot() +
+  
+  #creating field underlay
+  gg_field(yardmin = 0, yardmax = 120) +
+  
+  #filling forest green for behind back of endzone
+  theme(panel.background = element_rect(fill = "forestgreen",
+                                        color = "forestgreen"),
+        panel.grid = element_blank())
+
+play_animation_4_pauses <- anim +
+  geom_point(data = sample_data_4,
+             aes(x = x,
+                 y = y,
+                 colour = club,
+                 group = nflId,
+                 size = club)) +
+  geom_line(data = sample_data_4 %>%
+              filter(club %in% c('Safety #1', 'Safety #2')),
+            aes(x = x,
+                y = y,
+                group = club),
+            color = 'black')+
+  geom_text(data = sample_data_4,aes(x = 60, y = 55, label = text_for_anim), color = 'white') +
+  geom_text(data = sample_data_4, aes(x = x, y = y, group = nflId, label = jerseyNumber), colour = "white",
+            vjust = 0.36, size = 4.5) +
+  scale_color_manual(values = c('Offense' = "black", 'Defense'="orange", 'football'="brown", 'Safety #1'='red', 'Safety #2'='red'))+
+  scale_size_manual(values = c('Offense' = 7, 'Defense' = 7, 'football' = 5, 'Safety #1'= 7, 'Safety #2'= 7)) +
+  transition_reveal(reveal_time) +
+  labs(title = plot_title) +
+  theme(plot.title = element_text(size = 14, hjust = 0.5), # Keep title centered
+        plot.margin = unit(c(5, 0, 0, 0), "lines"), # Increase top margin if title is too high (first value in `c(...)`)
+        plot.subtitle = element_text(size = 14, hjust = 0.5),
+        plot.caption = element_text(size = 12))
+#  legend.position = "none") # obviously scrap this if we want to keep the "club" legend
+
+anim_save('play_animation_4_pauses.gif', play_animation_4_pauses)
+
+unique(sample_data_4$nflId)
+
+rm(sample_data_4)
+
+  
