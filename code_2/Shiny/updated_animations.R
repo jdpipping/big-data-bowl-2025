@@ -246,7 +246,7 @@ anim <- ggplot() +
                  y = y,
                  colour = club,
                  group = nflId,
-                 size = club)) +
+                 size = club)) + 
     geom_line(data = sample_data_3 %>%
                 filter(club %in% c('Safety #1', 'Safety #2')),
             aes(x = x,
@@ -260,8 +260,10 @@ anim <- ggplot() +
               color = 'black') +
   geom_text(data = sample_data_3, aes(x = x, y = y, group = nflId, label = jerseyNumber), colour = "white",
             vjust = 0.36, size = 4.5) +
-  scale_color_manual(values = c('Offense' = "red", 'Defense'="black", 'football'="brown", 'Safety #1'='goldenrod', 'Safety #2'='goldenrod'))+
-  scale_size_manual(values = c('Offense' = 7, 'Defense' = 7, 'football' = 5, 'Safety #1'= 7, 'Safety #2'= 7)) +
+  scale_color_manual(values = c('Offense' = "red", 'Defense'="black", 'football'="brown", 'Safety #1'='goldenrod', 'Safety #2'='goldenrod')) +
+    scale_fill_manual(values = c('Offense' = "red", 'Defense'="black", 'football'="brown", 'Safety #1'='goldenrod', 'Safety #2'='goldenrod')) +
+    scale_size_manual(values = c('Offense' = 8, 'Defense' = 8, 'football' = 6, 'Safety #1'= 8, 'Safety #2'= 8)) +
+    scale_shape_manual(values = c('Offense' = 21, 'Defense' = 21, 'football' = 16, 'Safety #1'= 21, 'Safety #2'= 21)) +
   transition_reveal(reveal_time) +
     labs(title = plot_title) + 
     ease_aes("linear") +
@@ -275,8 +277,6 @@ gif_animation_3_pauses <- animate(play_animation_3_pauses, duration = 15)
 # Note: we don't want duration to be 0.1 * amount of frames, because of the built-in pauses
   
 anim_save('play_animation_3_pauses.gif', gif_animation_3_pauses)
-
-unique(sample_data_3$nflId)
 
 rm(sample_data_3)
 
@@ -302,7 +302,7 @@ sample_data_4 <- sample_data_4 %>%
 
 plot_title <- paste0(sample_data_4$playDescription[1], 
                      '\n', 'MOFO Probability: ', round(100*sample_data_4$p[1], 1), '%',
-                     '\n', 'Pre-Snap Safeties (in Gold): ',sample_data_4$num_safeties[1],
+                     '\n', 'Pre-Snap Safeties (in Red): ',sample_data_4$num_safeties[1],
                      '\n', 'Actual MOFO vs. MOFC: ',sample_data_4$PostSnap_MOF[1],
                      '\n', 'Coverage Scheme: ', 'Cover 1')
 
@@ -337,7 +337,9 @@ play_animation_4_pauses <- anim +
   geom_text(data = sample_data_4, aes(x = x, y = y, group = nflId, label = jerseyNumber), colour = "white",
             vjust = 0.36, size = 4.5) +
   scale_color_manual(values = c('Offense' = "black", 'Defense'="orange", 'football'="brown", 'Safety #1'='red', 'Safety #2'='red'))+
-  scale_size_manual(values = c('Offense' = 7, 'Defense' = 7, 'football' = 5, 'Safety #1'= 7, 'Safety #2'= 7)) +
+  scale_fill_manual(values = c('Offense' = "black", 'Defense'="orange", 'football'="brown", 'Safety #1'='red', 'Safety #2'='red')) +
+  scale_size_manual(values = c('Offense' = 8, 'Defense' = 8, 'football' = 6, 'Safety #1'= 8, 'Safety #2'= 8)) +
+  scale_shape_manual(values = c('Offense' = 21, 'Defense' = 21, 'football' = 16, 'Safety #1'= 21, 'Safety #2'= 21)) +
   transition_reveal(reveal_time) +
   labs(title = plot_title) +
   ease_aes("linear") +
