@@ -106,7 +106,8 @@ plot_entropy_graph =
   mutate(entropy = ifelse(p==0,0,entropy)) %>%
   mutate(entropy = ifelse(p==1,0,entropy)) %>%
   ggplot(aes(x=p,y=entropy)) +
-  geom_line(linewidth=1)
+  geom_line(linewidth=1) +
+  labs(title = "entropy versus p")
 ggsave("results_plot_entropy_v_prob.png",plot_entropy_graph,width=6,height=5)
 
 # plot mean entropy by team
@@ -160,14 +161,41 @@ df_boot_result
 
 # plot mean entropy by team with boot CI
 plot_team_mean_entropy_boot =
-  df_boot_result %>%
-  ggplot(aes(y = reorder(defensiveTeam, mean_entropy))) +
+  df_boot_result %>% 
+  arrange(-mean_entropy) %>%
+  mutate(
+    rank = rank(-mean_entropy),
+    y = reorder(defensiveTeam, mean_entropy),
+    y_rank = paste0(y," (",rank,")"),
+    y_rank = reorder(y_rank, mean_entropy)
+  ) %>%
+  ggplot(aes(x = mean_entropy, y = y_rank, team_abbr = y)) +
   geom_errorbar(aes(xmin = mean_entropy_L, xmax = mean_entropy_U)) +
-  geom_point(aes(x = mean_entropy), size=4) +
+  geom_nfl_logos(width=0.08) +
   ylab("defensive team") +
-  xlab("mean safety entropy")
-plot_team_mean_entropy_boot
-ggsave("results_plot_team_mean_entropy_boot.png", width=6, height=8)
+  xlab("mean safety entropy") +
+  labs(title = "Ranking teams by safety entropy")
+# plot_team_mean_entropy_boot
+ggsave("results_plot_team_mean_entropy_boot.png", width=6, height=9)
+
+plot_team_mean_entropy_boot_1 =
+  df_boot_result %>% 
+  arrange(-mean_entropy) %>%
+  mutate(
+    rank = rank(-mean_entropy),
+    y = reorder(defensiveTeam, mean_entropy),
+    y_rank = paste0(y," (",rank,")"),
+    y_rank = reorder(y_rank, mean_entropy)
+  ) %>%
+  ggplot(aes(x = mean_entropy, y = y_rank, team_abbr = y)) +
+  geom_errorbar(aes(xmin = mean_entropy_L, xmax = mean_entropy_U)) +
+  geom_nfl_logos(width=0.08) +
+  geom_text(aes(x = mean_entropy_U+0.02, label = paste0(round(mean_entropy,2)))) +
+  ylab("defensive team") +
+  xlab("mean safety entropy") +
+  labs(title = "Ranking teams by safety entropy")
+# plot_team_mean_entropy_boot_1
+ggsave("results_plot_team_mean_entropy_boot1.png", width=6, height=9)
 
 #######################################################
 ### correlation between safety entropy and EPA/play ###
@@ -231,6 +259,7 @@ for (j in 1:length(dfs_for_lm)) {
       "text", x = 0.61, y = -0.15, hjust=0, vjust = -0.5, size = 4,
       label = "more efficient defenses", color = "firebrick", angle = 90
     ) +
+    labs(title = "Defensive Success vs. Mean Safety Entropy") +
     ylab("EPA/play") +
     xlab("mean safety entropy")
   ggsave(paste0("results_plot_epa_entropy_corr",j,".png"), df_plot_cor, width=8, height=5)
@@ -399,7 +428,10 @@ df_for_lm_all_vs_highEntropy %>%
 ###########################################################################
 
 #
-entropy_cutoff_L = .79; entropy_cutoff_U = .79;
+med_entropy = median(df_eval$entropy)
+med_entropy
+# entropy_cutoff_L = .79; entropy_cutoff_U = .79;
+entropy_cutoff_L = med_entropy; entropy_cutoff_U = med_entropy;
 
 #
 p_cutoff_L = uniroot(function(p) entropy(p) - entropy_cutoff_L, c(0.00000001, 0.5))$root
@@ -473,6 +505,7 @@ df_plot_cor_lowHighEntropy =
     "text", x = -0.3, y = -0.55, hjust=0, vjust = -0.5, size = 4,
     label = "better defensive outcomes", color = "firebrick", angle = 90
   ) +
+  labs(title = "Defensive Performance on High- vs. Low-Entropy Plays") +
   xlab(paste0("EPA/play on low entropy plays")) +
   ylab(paste0("EPA/play on high entropy plays"))
 ggsave(paste0("results_plot_epa_lowHighEntropy_corr.png"), df_plot_cor_lowHighEntropy, width=8, height=5)
