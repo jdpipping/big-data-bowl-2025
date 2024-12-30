@@ -5,7 +5,6 @@ library(gganimate)
 source("https://raw.githubusercontent.com/mlfurman3/gg_field/main/gg_field.R")
 memory.limit(size=10000)
 
-
 # these are the files related directly to the visualizations
 safety_movement1 <- read_csv('df_safety_movement_1.csv')
 safety_movement2 <- read_csv('df_safety_movement_2.csv')
@@ -224,10 +223,10 @@ sample_data_3 <- sample_data_3 %>%
   mutate(reveal_time = row_number()) %>%
   ungroup()
 
-nFrames <- max(sample_data_3$frameId)
+# nFrames <- max(sample_data_3$frameId)
 
 plot_title <- paste0(sample_data_3$playDescription[1], 
-                          '\n', 'MOFO Probability: ', round(100*sample_data_3$p[1], 2), '%',
+                          '\n', 'MOFO Probability: ', round(100*sample_data_3$p[1], 1), '%',
                           '\n', 'Pre-Snap Safeties (in Gold): ',sample_data_3$num_safeties[1],
                           '\n', 'Actual MOFO vs. MOFC: ',sample_data_3$PostSnap_MOF[1],
                           '\n', 'Coverage Scheme: ', 'Tampa 2')
@@ -255,20 +254,28 @@ anim <- ggplot() +
                 y = y,
                 group = club),
             color = 'red')+
-  geom_text(data = sample_data_3,aes(x = 60, y = 55, label = text_for_anim), color = 'white') +
+  geom_text(data = sample_data_3, aes(x = 60, y = 55, label = text_for_anim), color = 'white') +
+    geom_text(aes(x = 100, y = -2, label = paste0("Time Since Snap: ", t_after_snap)), 
+              data = sample_data_3, 
+              inherit.aes = FALSE, 
+              color = 'black') +
   geom_text(data = sample_data_3, aes(x = x, y = y, group = nflId, label = jerseyNumber), colour = "white",
             vjust = 0.36, size = 4.5) +
   scale_color_manual(values = c('Offense' = "red", 'Defense'="black", 'football'="brown", 'Safety #1'='goldenrod', 'Safety #2'='goldenrod'))+
   scale_size_manual(values = c('Offense' = 7, 'Defense' = 7, 'football' = 5, 'Safety #1'= 7, 'Safety #2'= 7)) +
   transition_reveal(reveal_time) +
-    labs(title = plot_title) +
+    labs(title = plot_title) + 
+    ease_aes("linear") +
   theme(plot.title = element_text(size = 14, hjust = 0.5), # Keep title centered
         plot.margin = unit(c(5, 0, 0, 0), "lines"), # Increase top margin if title is too high (first value in `c(...)`)
         plot.subtitle = element_text(size = 14, hjust = 0.5),
         plot.caption = element_text(size = 12),
         legend.position = "none") # obviously scrap this if we want to keep the "club" legend
 
-anim_save('play_animation_3_pauses.gif', play_animation_3_pauses)
+gif_animation_3_pauses <- animate(play_animation_3_pauses, duration = 15)
+# Note: we don't want duration to be 10 * amount of frames, because of the built-in pauses
+  
+anim_save('play_animation_3_pauses.gif', gif_animation_3_pauses)
 
 unique(sample_data_3$nflId)
 
@@ -292,10 +299,10 @@ sample_data_4 <- sample_data_4 %>%
   mutate(reveal_time = row_number()) %>%
   ungroup()
 
-nFrames <- max(sample_data_4$frameId)
+# nFrames <- max(sample_data_4$frameId)
 
 plot_title <- paste0(sample_data_4$playDescription[1], 
-                     '\n', 'MOFO Probability: ', round(100*sample_data_4$p[1], 2), '%',
+                     '\n', 'MOFO Probability: ', round(100*sample_data_4$p[1], 1), '%',
                      '\n', 'Pre-Snap Safeties (in Gold): ',sample_data_4$num_safeties[1],
                      '\n', 'Actual MOFO vs. MOFC: ',sample_data_4$PostSnap_MOF[1],
                      '\n', 'Coverage Scheme: ', 'Cover 1')
@@ -324,22 +331,32 @@ play_animation_4_pauses <- anim +
                 group = club),
             color = 'black')+
   geom_text(data = sample_data_4,aes(x = 60, y = 55, label = text_for_anim), color = 'white') +
+  geom_text(aes(x = 100, y = -2, label = paste0("Time Since Snap: ", t_after_snap)), 
+            data = sample_data_4, 
+            inherit.aes = FALSE, 
+            color = 'black') +
   geom_text(data = sample_data_4, aes(x = x, y = y, group = nflId, label = jerseyNumber), colour = "white",
             vjust = 0.36, size = 4.5) +
   scale_color_manual(values = c('Offense' = "black", 'Defense'="orange", 'football'="brown", 'Safety #1'='red', 'Safety #2'='red'))+
   scale_size_manual(values = c('Offense' = 7, 'Defense' = 7, 'football' = 5, 'Safety #1'= 7, 'Safety #2'= 7)) +
   transition_reveal(reveal_time) +
   labs(title = plot_title) +
+  ease_aes("linear") +
   theme(plot.title = element_text(size = 14, hjust = 0.5), # Keep title centered
         plot.margin = unit(c(5, 0, 0, 0), "lines"), # Increase top margin if title is too high (first value in `c(...)`)
         plot.subtitle = element_text(size = 14, hjust = 0.5),
         plot.caption = element_text(size = 12),
         legend.position = "none") # obviously scrap this if we want to keep the "club" legend
 
-anim_save('play_animation_4_pauses.gif', play_animation_4_pauses)
+gif_animation_4_pauses <- animate(play_animation_4_pauses, duration = 15)
+# Note: we don't want duration to be 10 * amount of frames, because of the built-in pauses
+
+anim_save('play_animation_4_pauses.gif', gif_animation_4_pauses)
 
 unique(sample_data_4$nflId)
 
 rm(sample_data_4)
+
+
 
   
