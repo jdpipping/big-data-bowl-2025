@@ -900,7 +900,7 @@ Plot2B <- PlaySuccess_HighEntropyVsNone_NFLWide %>%
   labs(x = "Safety Entropy", y = "Success Rate Allowed",
        title = "Success Rate Allowed on Dropbacks, by Safety Entropy",
        subtitle = "Weeks 1-9, 2022, Early Downs with 5+ Yards To Go (n = 4,381)",
-       caption = "High Safety Entropy: entropy score above median") +
+       caption = "High Safety Entropy: entropy higher than median") +
   geom_abline(intercept = 0.5, slope = 0, color = "darkgreen", lty = 2) +
   geom_errorbar(aes(ymin = LCI_EPSuccess, ymax = UCI_EPSuccess), position = "dodge", color = "red") +
   scale_y_continuous(breaks = seq(0, 1, 0.2), labels = scales::percent_format(accuracy = 5L)) +
@@ -950,7 +950,7 @@ Plot4B <- PlaySuccess_HighEntropyAndSafeties_NFLWide %>%
   labs(x = "Safety Entropy", y = "Success Rate Allowed",
        title = "Success Rate Allowed on Dropbacks, by Safety Entropy",
        subtitle = "Weeks 1-9, 2022, Early Downs with 5+ Yards To Go (n = 4,381)",
-       caption = "High Safety Entropy: entropy score above median") +
+       caption = "High Safety Entropy: entropy higher than median") +
   geom_abline(intercept = 0.5, slope = 0, color = "darkgreen", lty = 2) +
   geom_errorbar(aes(ymin = LCI_EPSuccess, ymax = UCI_EPSuccess), position = "dodge", color = "red") +
   scale_y_continuous(breaks = seq(0, 1, 0.2), labels = scales::percent_format(accuracy = 5L)) +
@@ -982,7 +982,7 @@ Plot5B <- PlaySuccess_HighEntropy_ByTeam %>%
   labs(x = "Team Logo", y = "Average EPA Allowed", 
        title = "Average EPA Allowed on High-Entropy Dropbacks",
        subtitle = "Weeks 1-9, 2022, Early Downs with 5+ Yards To Go (n = 4,381)",
-       caption = "High Safety Entropy: entropy score above median") +
+       caption = "High Safety Entropy: entropy higher than median") +
   theme_bw() +
   theme(plot.title = element_text(size = 10, hjust = 0.5),
         plot.subtitle = element_text(size = 8, hjust = 0.5),
@@ -1287,7 +1287,7 @@ HighVsLowEntropy_ByTeam_FancyTable <- HighVsLowEntropy_ByTeam_FancyTable |>
     table.border.top.style = "a"
   ) |> 
   tab_footnote(
-    footnote = "Lower gap: better with high entropy. High Safety Entropy: entropy score above median",
+    footnote = "Lower gap: better with high entropy. High Safety Entropy: entropy higher than median",
     locations = cells_column_labels(
       columns = AvgEPAGap
     )
@@ -1350,7 +1350,7 @@ HighVsLowEntropy_NFLWide_FancyTable <- HighVsLowEntropy_NFLWide_FancyTable |>
   ) |> 
   cols_label(
    # Rank = md("**Rank**"), # the md is what makes the headers show up as bold
-    HighEntropy = md("**Entropy Level**"),
+    HighEntropy = md("**Entropy**"),
     # officialPosition = md("**Position**"),
     Dropbacks = md("**Dropbacks**"),
     YPP = md("**Yards Per Play**"),
@@ -1370,7 +1370,7 @@ HighVsLowEntropy_NFLWide_FancyTable <- HighVsLowEntropy_NFLWide_FancyTable |>
     table.border.top.style = "a"
   ) |> 
   tab_footnote(
-    footnote = "Low EPA is good for defense. High Safety Entropy: entropy score above median",
+    footnote = "Low EPA is good for defense. High Safety Entropy: entropy higher than median",
     locations = cells_column_labels(
       columns = AvgEPA
     )
