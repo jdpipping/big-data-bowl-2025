@@ -1457,8 +1457,611 @@ HighVsLowEntropy_NFLWide_FancyTable <- HighVsLowEntropy_NFLWide_FancyTable |>
 
 gtsave(HighVsLowEntropy_NFLWide_FancyTable, "HighVsLowEntropy_NFLWide_FancyTable.png")
 
-
 # If we need to export to CSV
 write.csv(final_dropbacks_merged, "final_dropbacks_merged.csv")
 write.csv(Stats_ByPlayerAndPlay_Final, "Stats_ByPlayerAndPlay_Final.csv")
 write.csv(Stats_ByFullPlay_Final, "Stats_ByFullPlay_Final.csv")
+
+########################### FASTER WAY TO GET "gt" TABLES WITHOUT NEEDING TO READ IN TRACKING DATA ##############################
+games <- fread("games.csv")
+plays <- fread("plays.csv")
+
+# Convert down into an ordinal factor variable, rather than numeric
+# I.e., 2nd down + 2nd down doesn't equal 4th down, the way 2 TD + 2 TD = 4 TD
+class(plays$down)
+plays <- plays %>% mutate(down = factor(down, ordered = TRUE, levels = c("1", "2", "3", "4")))
+
+nflverse_pbp <- nflfastR::load_pbp(2022)
+nflverse_pbp <- nflverse_pbp %>% filter(week %in% 1:9)
+# This gives descriptions of NFLVerse columns: View(field_descriptions)
+
+# View(nflverse_pbp %>% filter(run_location == "middle" & !is.na(run_gap)))
+# This is empty, meaning all "middle" runs have NA for run_gap - adjust this
+nflverse_pbp <- nflverse_pbp %>% mutate(
+  run_gap = ifelse(run_location == "middle", "center", run_gap))
+
+table(plays$passResult)
+# C means complete, R means scramble, S means sack, IN means interception, I means incomplete
+# All others are designed runs
+plays <- plays %>% mutate(passResult = 
+                            ifelse(passResult %in% c("C", "R", "IN", "I", "S"), passResult, NA))
+
+# Arrange plays so they are sorted chronologically
+plays <- plays %>% arrange(gameId, playId)
+
+# The absoluteYardlineNumber is not accurate, just use nflverse's yardline_100
+# And yardlineNumber doesn't give full field picture, e.g. -35 and +35 both say 35
+# View(plays %>% filter(possessionTeam == yardlineSide & yardlineNumber < 20))
+# This shows us all plays when the offensive team is inside its own 20
+# Sometimes absoluteYardlineNumber is under 30, sometimes it's more than 100
+plays <- plays %>% select(-"absoluteYardlineNumber", -"yardlineNumber", -"yardlineSide")
+
+# Fix one column that is spelled wrong
+plays <- plays %>% rename(visitorTeamWinProbabilityAdded = `visitorTeamWinProbilityAdded`)
+
+# View(plays %>% filter(is.na(homeTeamWinProbabilityAdded))) - it's empty
+# View(plays %>% filter(is.na(visitorTeamWinProbabilityAdded))) - it's empty
+
+# View(plays %>% filter(is.na(expectedPointsAdded)))
+# One play to fix here, a David Montgomery run on 10/09/22
+# Since it's only one play, just find the right answer from nflverse
+# View(nflverse_pbp %>% filter(old_game_id == 2022100904, qtr == 2))
+plays <- plays %>% mutate(expectedPointsAdded =
+                            ifelse(is.na(expectedPointsAdded), -0.29447450, expectedPointsAdded))  
+
+# Get rid of all QB kneels and spikes
+plays <- plays %>% filter(qbSpike == FALSE | is.na(qbSpike))
+plays <- plays %>% filter(qbKneel == 0 | is.na(qbKneel))
+
+# And fix the Cover-6 Right vs. Cover 6-Left error
+table(plays$pff_passCoverage)
+plays <- plays %>% mutate(pff_passCoverage = 
+                            ifelse(!is.na(pff_passCoverage) & pff_passCoverage %in% "Cover 6-Left", "Cover-6 Left", pff_passCoverage))
+# View(plays %>% filter(is.na(pff_passCoverage))) ... none of these are dropbacks, and they're mostly QB sneaks
+
+# Mutate whether post-snap safeties were middle-of-field-open (MOFO) or closed (MOFC)
+plays <- plays %>% mutate(PostSnap_MOF =
+                            ifelse(!is.na(pff_passCoverage) & pff_passCoverage %in% c("Cover-1", "Cover-1 Double", "Cover-3", "Cover-3 Cloud Left", "Cover-3 Cloud Right", "Cover-3 Double Cloud", "Cover-3 Seam"), "MOF Closed",
+                                   ifelse(!is.na(pff_passCoverage) & pff_passCoverage %in% c("Cover-0", "Cover-2", "Quarters", "Cover-4", "2-Man", "Cover-6", "Cover-6 Left", "Cover-6 Right"), "MOF Open", 
+                                          ifelse(!is.na(pff_passCoverage) & pff_passCoverage %in% c("Bracket", "Goal Line", "Miscellaneous", "Prevent", "Red Zone"), "Ambiguous", NA))))
+table(plays$PostSnap_MOF)
+# View(plays %>% filter(is.na(PostSnap_MOF)))
+
+# Turn receiver alignment into numeric variable(s), rather than character
+table(plays$receiverAlignment) # all have exactly three characters
+# Glance at an example of 3x0 so we can diagnose if the numbers mean wide receivers, or eligible receivers
+# View(plays %>% filter(receiverAlignment %in% "3x0")); clearly it means eligible receivers, i.e. TEs are included
+# Use text analysis to extract from the formations; substr() syntax is substr(x, start, stop)
+plays <- plays %>% 
+  mutate(aligned_left_receivers = substr(receiverAlignment, 1, 1))
+plays <- plays %>% 
+  mutate(aligned_right_receivers = substr(receiverAlignment, 3, 3))
+class(plays$aligned_left_receivers) <- "numeric"
+class(plays$aligned_right_receivers) <- "numeric"
+plays <- plays %>% mutate(aligned_total_receivers = aligned_left_receivers + aligned_right_receivers)
+plays <- plays %>% relocate(aligned_left_receivers, aligned_right_receivers, aligned_total_receivers, .after = offenseFormation)
+
+# For the sake of simplicity, let's get rid of weird plays with more than 5
+# View(plays %>% filter(receiverAlignment %in% "4x2")) ... direct snap to RB can make weird numbers show up
+plays <- plays %>% filter(aligned_total_receivers <= 5)
+
+# Then, next obligation is to properly merge everything
+# Must change the class of nflverse_pbp to make it compatible with the rest
+class(nflverse_pbp) <- c("data.table", "data.frame")
+
+# Also must coerce old_game_id in nflverse into a numeric variable
+nflverse_pbp$old_game_id <- as.numeric(nflverse_pbp$old_game_id)
+
+# And coerce down in nflverse to an ordered factor
+nflverse_pbp <- nflverse_pbp %>% mutate(down = factor(down, ordered = TRUE, levels = c("1", "2", "3", "4")))
+
+PlaysAndGames <- merge(x = games, y = plays, by = "gameId") 
+PlaysAndGames_NFLVerse <- merge(x = PlaysAndGames, y = nflverse_pbp, 
+                                by.x = c("gameId", "playId", "season", "week", "down"), 
+                                by.y = c("old_game_id", "play_id",  "season", "week", "down")) 
+rm(games, plays, nflverse_pbp, PlaysAndGames)
+
+colnames(PlaysAndGames_NFLVerse)
+# Make a new version of PlaysAndGames_NFLVerse with fewer columns, to save memory space 
+# Note that home_score and away_score in NFLVerse refer to final scores
+# Whereas total_home_score and total_away_score are entering that specific play
+# Also passLocationType refers to QB's location, pass_location refers to where ball was thrown
+# Note that "time" includes game date for the tracking version, but just game clock for NFLVerse version
+NFLVerse_Reduced <- PlaysAndGames_NFLVerse %>% 
+  select(-c(3, 7, 10:11, 15:19, 31, 43:44, 54:55, 60:63, 67, 69, 73:74, 77, 79:85, 88:90, 
+            98:105, 109:112, 119:135, 138:147, 149:151, 153:175, 184, 186:195, 204:205,
+            214:218, 226:325, 329:331, 335:340, 347:348, 352, 355:377, 382, 385, 396:401,
+            405, 407:416, 418:424))
+
+rm(PlaysAndGames_NFLVerse)
+results_df_preds_outOfSample <- fread("results_df_preds_outOfSample.csv")
+colnames(results_df_preds_outOfSample)
+results_df_preds_outOfSample <- results_df_preds_outOfSample %>% select(-"expectedPoints") # this already exists in NFLVerse
+RyanModel_Merged <- merge(x = NFLVerse_Reduced, y = results_df_preds_outOfSample,
+                          by = c("gameId", "playId"))
+rm(results_df_preds_outOfSample, NFLVerse_Reduced)
+
+# Arrange it by game ID, play ID
+# But turn it into a data table so that it takes up less memory space
+# RyanModel_Merged <- RyanModel_Merged %>% arrange(gameId, playId)
+setDT(RyanModel_Merged)
+setkey(RyanModel_Merged, gameId, playId)
+RyanModel_Merged <- RyanModel_Merged %>% relocate("gameId", "playId")
+
+# Add a column for offensive TDs
+RyanModel_Merged <- RyanModel_Merged %>%
+  mutate(Off_TD = ifelse(!is.na(td_team) & td_team == posteam, 1,
+                         ifelse(is.na(td_team) | td_team != posteam, 0, NA)))
+
+# And add one for number of post-snap safeties
+table(RyanModel_Merged$pff_passCoverage)
+
+RyanModel_Merged <- RyanModel_Merged %>% mutate(num_safeties_post_snap = case_when(
+  pff_passCoverage %in% c("Cover-0") ~ 0,
+  pff_passCoverage %in% c("Cover-1", "Cover-1 Double", "Cover-3", "Cover-3 Cloud Left", "Cover-3 Cloud Right", "Cover-3 Seam") ~ 1,
+  pff_passCoverage %in% c("2-Man", "Cover-2", "Cover-4", "Quarters", "Cover-6 Left", "Cover-6 Right") ~ 2))
+
+RyanModel_Merged <- RyanModel_Merged %>% 
+  mutate(Snap_Entropy = -p*log(p, 2) - (1 - p)*log((1-p), 2))
+
+Median_Entropy <- median(RyanModel_Merged$Snap_Entropy)
+
+RyanModel_Merged <- RyanModel_Merged %>% 
+  mutate(HighEntropy = ifelse(Snap_Entropy > Median_Entropy, "High Entropy", "Low Entropy"))
+
+RyanModel_Merged <- RyanModel_Merged %>% 
+  mutate(HighEntropy_Num = ifelse(Snap_Entropy > Median_Entropy, 1, 0))
+
+RyanModel_Merged <- RyanModel_Merged %>% rename(num_safeties_pre_snap = `num_safeties`)
+colnames(RyanModel_Merged)
+
+# These are for if/when we want to make confidence intervals
+# Recall, Bernoulli is binary variable (i.e. use for proportions)
+SD_Bernoulli <- function(x){
+  mu <- mean(x, na.rm = TRUE)
+  return( sqrt( (mu*(1 - mu)) ))
+}
+
+SE_Bernoulli <- function(x){
+  mu <- mean(x, na.rm = TRUE)
+  return( sqrt( (mu*(1 - mu))/(length(x)) ) )
+}
+
+ConfBand_Bernoulli <- function(x) {
+  return(1.96*SE_Bernoulli(x))
+}
+
+upper_Bernoulli <- function(x) {
+  mean(x, na.rm = TRUE) + ConfBand_Bernoulli(x)
+}
+
+lower_Bernoulli <- function(x) {
+  mean(x, na.rm = TRUE) - ConfBand_Bernoulli(x)
+}
+
+# Make separate formula for continuous variables
+SE_Continuous <- function(x){
+  SD <- sd(x, na.rm = TRUE)
+  return( SD/sqrt((length(x))) )
+}
+
+ConfBand_Continuous <- function(x) {
+  return(1.96*SE_Continuous(x))
+}
+
+upper_Continuous <- function(x) {
+  mean(x, na.rm = TRUE) + ConfBand_Continuous(x)
+}
+
+lower_Continuous <- function(x) {
+  mean(x, na.rm = TRUE) - ConfBand_Continuous(x)
+}
+
+# First, gotta establish the "AvgEntropyRate" metric for each team, and sort in descending order
+AvgEntropy_Leaders_FULL <- RyanModel_Merged %>% filter(!is.na(HighEntropy)) %>%
+  group_by(defteam) %>% 
+  summarize(Dropbacks = n(), AvgEntropy = mean(Snap_Entropy), YPP = mean(yardsGained), TotYds = sum(yardsGained), TD = sum(Off_TD), 
+            TotEPA = sum(expectedPointsAdded), AvgEPA = mean(expectedPointsAdded, na.rm = TRUE), EPSuccessRate = mean(success), FirstDownRate = mean(first_down, na.rm = TRUE)) %>% 
+  arrange(desc(AvgEntropy))
+
+class(AvgEntropy_Leaders_FULL) <- "data.frame"
+AvgEntropy_FancyTable_FULL <- AvgEntropy_Leaders_FULL %>%
+  select(c("defteam", "Dropbacks", "AvgEPA", "AvgEntropy")) %>%
+  head(20) %>% # this is how we limit to the top 20
+  mutate(Rank = row_number(desc(AvgEntropy))) %>%
+  select("Rank", 1:4)
+
+AvgEntropy_FancyTable_FULL <- AvgEntropy_FancyTable_FULL |>
+  # filter(officialPosition %in% c("OLB", "DE")) |> 
+  # mutate(rank = row_number()) |> 
+  # select(1:4, "Dropbacks", "AvgEPA", "AvgEntropy") |> 
+  head(20) |> 
+  gt() |>
+  tab_options(
+    table.border.top.color = "white",
+    row.striping.include_table_body = FALSE
+  ) |>
+  opt_table_font(
+    font = list(
+      google_font("Chivo"),
+      default_fonts()
+    )
+  ) |>
+  fmt_number(
+    columns = c(AvgEntropy),
+    decimals = 2,
+  ) |>
+  fmt_number(
+    columns = c(AvgEPA),
+    decimals = 3,
+  ) |>
+  data_color(
+    columns = c(AvgEntropy),
+    colors = scales::col_numeric(
+      palette = c("#FEE0D2", "#67000D"),
+      domain = NULL
+    )
+  ) |> 
+  cols_label(
+    Rank = md("**Rank**"), # the md is what makes the headers show up as bold
+    defteam = md("**Team**"),
+    # officialPosition = md("**Position**"),
+    Dropbacks = md("**Dropbacks**"),
+    AvgEPA = md("**Avg EPA on All Dropbacks**"),
+    AvgEntropy = html('<span style="text-decoration:overline; font-weight:bold">Avg Safety Entropy</span>')
+  ) |> 
+  cols_align(
+    align = "center",
+    columns = Dropbacks:AvgEntropy
+  ) |> 
+  tab_header(md("**Top 20 Teams in Mean Safety Entropy**"),
+             md("(Early Down Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022)")) |> # don't forget to adjust your minimum
+  tab_style(style = cell_borders(sides = "top"),
+            locations = cells_title("title")) |> 
+  tab_options(
+    table.border.top.style = "a"
+  ) |> 
+  tab_footnote(
+    footnote = "Low EPA: good for defense. Higher Safety Entropy: safeties are more disguised",
+    locations = cells_column_labels(
+      columns = AvgEntropy
+    )
+  )
+
+# Add now make it so that the team logos replace the tricodes
+AvgEntropy_FancyTable_FULL <- AvgEntropy_FancyTable_FULL %>%
+  nflplotR::gt_nfl_logos(columns = "defteam")
+
+gtsave(AvgEntropy_FancyTable_FULL, "AvgEntropy_FancyTable_FULL.png")
+
+# Now use gt package for lowest EPA allowed on high-entropy dropbacks across FULL nine weeks
+PlaySuccess_HighEntropyVsNone_ByDefTeam_FULL <- RyanModel_Merged %>% filter(!is.na(HighEntropy)) %>%
+  group_by(defteam, HighEntropy) %>% 
+  summarize(Dropbacks = n(), YPP = mean(yardsGained), TotYds = sum(yardsGained), TD = sum(Off_TD), 
+            TotEPA = sum(expectedPointsAdded), AvgEPA = mean(expectedPointsAdded, na.rm = TRUE), EPSuccessRate = mean(success), FirstDownRate = mean(first_down, na.rm = TRUE)) %>% arrange(defteam, HighEntropy)
+# View(PlaySuccess_HighEntropyVsNone_ByDefTeam_FULL)
+
+PlaySuccess_HighEntropy_ByTeam_FULL <- PlaySuccess_HighEntropyVsNone_ByDefTeam_FULL %>% filter(HighEntropy %in% "High Entropy")
+# View(PlaySuccess_HighEntropy_ByTeam_FULL)
+
+# Now arrange it (ASCENDING in this case)
+PlaySuccess_HighEntropy_Leaders_FULL <- PlaySuccess_HighEntropy_ByTeam_FULL %>% arrange(AvgEPA)
+
+class(PlaySuccess_HighEntropy_Leaders_FULL) <- "data.frame"
+HighEntropySuccess_FancyTable_FULL <- PlaySuccess_HighEntropy_Leaders_FULL %>%
+  select(c("defteam", "Dropbacks", "EPSuccessRate", "AvgEPA")) %>%
+  head(20) %>% # this is how we limit to the top 20
+  mutate(Rank = row_number(AvgEPA)) %>% # DON'T use desc() in this case
+  select("Rank", 1:4)
+
+HighEntropySuccess_FancyTable_FULL <- HighEntropySuccess_FancyTable_FULL |>
+  # filter(officialPosition %in% c("OLB", "DE")) |> 
+  # mutate(rank = row_number()) |> 
+  # select(1:4, "Dropbacks", "EPSuccessRate", "AvgEPA") |> 
+  head(20) |> 
+  gt() |>
+  tab_options(
+    table.border.top.color = "white",
+    row.striping.include_table_body = FALSE
+  ) |>
+  opt_table_font(
+    font = list(
+      google_font("Chivo"),
+      default_fonts()
+    )
+  ) |>
+  fmt_number(
+    columns = c(EPSuccessRate),
+    decimals = 2,
+  ) |>
+  fmt_number(
+    columns = c(AvgEPA),
+    decimals = 2,
+  ) |>
+  data_color(
+    columns = c(AvgEPA),
+    colors = scales::col_numeric(
+      palette = c("darkgreen", "lightgreen"), # Because we are going in ascending order, have dark column on the left
+      domain = NULL
+    )
+  ) |> 
+  cols_label(
+    Rank = md("**Rank**"), # the md is what makes the headers show up as bold
+    defteam = md("**Team**"),
+    # officialPosition = md("**Position**"),
+    Dropbacks = md("**High-Entropy Dropbacks**"),
+    EPSuccessRate = md("**Success Rate Allowed**"),
+    AvgEPA = html('<span style="text-decoration:overline; font-weight:bold">Avg EPA Allowed</span>')
+  ) |> 
+  cols_align(
+    align = "center",
+    columns = Dropbacks:AvgEPA
+  ) |> 
+  tab_header(md("**Top 20 Teams in Avg EPA Allowed on High-Entropy Coverages**"),
+             md("(Early Down Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022)")) |> # don't forget to adjust your minimum
+  tab_style(style = cell_borders(sides = "top"),
+            locations = cells_title("title")) |> 
+  tab_options(
+    table.border.top.style = "a"
+  ) |> 
+  tab_footnote(
+    footnote = "Low EPA: good for defense. High-Entropy: above median",
+    locations = cells_column_labels(
+      columns = AvgEPA
+    )
+  )
+
+# Add now make it so that the team logos replace the tricodes
+HighEntropySuccess_FancyTable_FULL <- HighEntropySuccess_FancyTable_FULL %>%
+  nflplotR::gt_nfl_logos(columns = "defteam")
+
+gtsave(HighEntropySuccess_FancyTable_FULL, "HighEntropySuccess_FancyTable_FULL.png")
+
+# And here's how to view both gt tables simultaneously
+combined_tables_entropy_FULL <- tags$div(
+  style = "display: flex; justify-content: space-between;",
+  tags$div(style = "margin-right: 20px;", AvgEntropy_FancyTable_FULL),
+  tags$div(HighEntropySuccess_FancyTable_FULL)
+)
+
+# View in RStudio's Viewer or save as HTML
+browsable(combined_tables_entropy_FULL)
+
+# Save the combined tables to an HTML file
+save_html(combined_tables_entropy_FULL, "combined_tables_entropy_FULL.html")
+
+# Take a screenshot of the HTML and save it as a PNG
+webshot("combined_tables_entropy_FULL.html", "combined_tables_entropy_FULL.png", vwidth = 1200, vheight = 600)
+
+# Let's also look into the high-entropy vs. low-entropy gap in performance for teams
+# Recall that PlaySuccess_HighEntropy_ByTeam_FULL already exists
+PlaySuccess_LowEntropy_ByTeam_FULL <- PlaySuccess_HighEntropyVsNone_ByDefTeam_FULL %>% filter(!HighEntropy %in% "High Entropy")
+# View(PlaySuccess_LowEntropy_ByTeam_FULL)
+
+# Get rid of "HighEntropy" column for each of them
+PlaySuccess_HighEntropy_ByTeam_FULL <- PlaySuccess_HighEntropy_ByTeam_FULL %>% select(-"HighEntropy")
+PlaySuccess_LowEntropy_ByTeam_FULL <- PlaySuccess_LowEntropy_ByTeam_FULL %>% select(-"HighEntropy")
+
+# Now merge() them by defteam
+PlaySuccess_HighVsLowEntropy_ByTeam_FULL <- 
+  merge(x = PlaySuccess_HighEntropy_ByTeam_FULL, y = PlaySuccess_LowEntropy_ByTeam_FULL, by = "defteam")
+
+PlaySuccess_HighVsLowEntropy_ByTeam_FULL <- PlaySuccess_HighVsLowEntropy_ByTeam_FULL %>%
+  rename(Dropbacks_HighEntropy = `Dropbacks.x`)
+PlaySuccess_HighVsLowEntropy_ByTeam_FULL <- PlaySuccess_HighVsLowEntropy_ByTeam_FULL %>%
+  rename(YPP_HighEntropy = `YPP.x`)
+PlaySuccess_HighVsLowEntropy_ByTeam_FULL <- PlaySuccess_HighVsLowEntropy_ByTeam_FULL %>%
+  rename(TotYds_HighEntropy = `TotYds.x`)
+PlaySuccess_HighVsLowEntropy_ByTeam_FULL <- PlaySuccess_HighVsLowEntropy_ByTeam_FULL %>%
+  rename(TD_HighEntropy = `TD.x`)
+PlaySuccess_HighVsLowEntropy_ByTeam_FULL <- PlaySuccess_HighVsLowEntropy_ByTeam_FULL %>%
+  rename(TotEPA_HighEntropy = `TotEPA.x`)
+PlaySuccess_HighVsLowEntropy_ByTeam_FULL <- PlaySuccess_HighVsLowEntropy_ByTeam_FULL %>%
+  rename(AvgEPA_HighEntropy = `AvgEPA.x`)
+PlaySuccess_HighVsLowEntropy_ByTeam_FULL <- PlaySuccess_HighVsLowEntropy_ByTeam_FULL %>%
+  rename(SuccessRate_HighEntropy = `EPSuccessRate.x`)
+PlaySuccess_HighVsLowEntropy_ByTeam_FULL <- PlaySuccess_HighVsLowEntropy_ByTeam_FULL %>%
+  rename(FirstDownRate_HighEntropy = `FirstDownRate.x`)
+
+PlaySuccess_HighVsLowEntropy_ByTeam_FULL <- PlaySuccess_HighVsLowEntropy_ByTeam_FULL %>%
+  rename(Dropbacks_LowEntropy = `Dropbacks.y`)
+PlaySuccess_HighVsLowEntropy_ByTeam_FULL <- PlaySuccess_HighVsLowEntropy_ByTeam_FULL %>%
+  rename(YPP_LowEntropy = `YPP.y`)
+PlaySuccess_HighVsLowEntropy_ByTeam_FULL <- PlaySuccess_HighVsLowEntropy_ByTeam_FULL %>%
+  rename(TotYds_LowEntropy = `TotYds.y`)
+PlaySuccess_HighVsLowEntropy_ByTeam_FULL <- PlaySuccess_HighVsLowEntropy_ByTeam_FULL %>%
+  rename(TD_LowEntropy = `TD.y`)
+PlaySuccess_HighVsLowEntropy_ByTeam_FULL <- PlaySuccess_HighVsLowEntropy_ByTeam_FULL %>%
+  rename(TotEPA_LowEntropy = `TotEPA.y`)
+PlaySuccess_HighVsLowEntropy_ByTeam_FULL <- PlaySuccess_HighVsLowEntropy_ByTeam_FULL %>%
+  rename(AvgEPA_LowEntropy = `AvgEPA.y`)
+PlaySuccess_HighVsLowEntropy_ByTeam_FULL <- PlaySuccess_HighVsLowEntropy_ByTeam_FULL %>%
+  rename(SuccessRate_LowEntropy = `EPSuccessRate.y`)
+PlaySuccess_HighVsLowEntropy_ByTeam_FULL <- PlaySuccess_HighVsLowEntropy_ByTeam_FULL %>%
+  rename(FirstDownRate_LowEntropy = `FirstDownRate.y`)
+
+PlaySuccess_HighVsLowEntropy_ByTeam_FULL <- PlaySuccess_HighVsLowEntropy_ByTeam_FULL %>%
+  mutate(YPPGap = YPP_HighEntropy - YPP_LowEntropy)
+PlaySuccess_HighVsLowEntropy_ByTeam_FULL <- PlaySuccess_HighVsLowEntropy_ByTeam_FULL %>%
+  mutate(AvgEPAGap = AvgEPA_HighEntropy - AvgEPA_LowEntropy)
+PlaySuccess_HighVsLowEntropy_ByTeam_FULL <- PlaySuccess_HighVsLowEntropy_ByTeam_FULL %>%
+  mutate(SuccessRateGap = SuccessRate_HighEntropy - SuccessRate_LowEntropy)
+
+# This is leaderboard of LOWEST YPP gap (b/c we want to look at which defenses have better numbers when disguising)
+# View(PlaySuccess_HighVsLowEntropy_ByTeam_FULL %>% arrange(YPPGap) %>% select(1:3, "YPP_HighEntropy", "YPP_LowEntropy", "YPPGap"))
+
+# This is leaderboard of LOWEST AvgEPA gap (b/c we want to look at which defenses have better numbers when disguising)
+# View(PlaySuccess_HighVsLowEntropy_ByTeam_FULL %>% arrange(AvgEPAGap) %>% select(1:3, "AvgEPA_HighEntropy", "AvgEPA_LowEntropy", "AvgEPAGap"))
+
+# Now use gt package for which defenses improve the most with high entropy, via AvgEPA
+# Arrange PlaySuccess_HighVsLowEntropy_ByTeam_FULL (ASCENDING in this case, b/c we want to see which defenses get better when disguising)
+PlaySuccess_HighVsLowEntropy_ByTeam_FULL <- PlaySuccess_HighVsLowEntropy_ByTeam_FULL %>% arrange(AvgEPAGap)
+
+class(PlaySuccess_HighVsLowEntropy_ByTeam_FULL) <- "data.frame"
+HighVsLowEntropy_ByTeam_FancyTable_FULL <- PlaySuccess_HighVsLowEntropy_ByTeam_FULL %>%
+  select(c("defteam", "Dropbacks_HighEntropy", "Dropbacks_LowEntropy", "AvgEPA_HighEntropy", "AvgEPA_LowEntropy", "AvgEPAGap")) %>%
+  head(20) %>% # this is how we limit to the top 20
+  mutate(Rank = row_number(AvgEPAGap)) %>% # DON'T use desc() in this case
+  select("Rank", 1:6)
+
+HighVsLowEntropy_ByTeam_FancyTable_FULL <- HighVsLowEntropy_ByTeam_FancyTable_FULL |>
+  # filter(officialPosition %in% c("OLB", "DE")) |> 
+  # mutate(rank = row_number()) |> 
+  # select(1:4, "defteam", "Dropbacks_HighEntropy", "Dropbacks_LowEntropy", "AvgEPA_HighEntropy", "AvgEPA_LowEntropy", "AvgEPAGap") |> 
+  head(20) |> 
+  gt() |>
+  tab_options(
+    table.border.top.color = "white",
+    row.striping.include_table_body = FALSE
+  ) |>
+  opt_table_font(
+    font = list(
+      google_font("Chivo"),
+      default_fonts()
+    )
+  ) |>
+  fmt_number(
+    columns = c(AvgEPA_HighEntropy),
+    decimals = 2,
+  ) |>
+  fmt_number(
+    columns = c(AvgEPA_LowEntropy),
+    decimals = 2,
+  ) |>
+  fmt_number(
+    columns = c(AvgEPAGap),
+    decimals = 2,
+  ) |>
+  data_color(
+    columns = c(AvgEPAGap),
+    colors = scales::col_numeric(
+      palette = c("darkred", "pink"), # Because we are going in ascending order, have dark column on the left
+      domain = NULL
+    )
+  ) |> 
+  cols_label(
+    Rank = md("**Rank**"), # the md is what makes the headers show up as bold
+    defteam = md("**Team**"),
+    # officialPosition = md("**Position**"),
+    Dropbacks_HighEntropy = md("**High-Entropy Dropbacks**"),
+    Dropbacks_LowEntropy = md("**Low-Entropy Dropbacks**"),
+    AvgEPA_HighEntropy = md("**Avg High-Entropy EPA**"),
+    AvgEPA_LowEntropy = md("**Avg Low-Entropy EPA**"),
+    AvgEPAGap = html('<span style="text-decoration:overline; font-weight:bold">Difference</span>')
+  ) |> 
+  cols_align(
+    align = "center",
+    columns = Dropbacks_HighEntropy:AvgEPAGap
+  ) |> 
+  tab_header(md("**Top 20 Gaps in Avg EPA Allowed With vs. Without High Entropy**"),
+             md("(Early Down Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022)")) |> # don't forget to adjust your minimum
+  tab_style(style = cell_borders(sides = "top"),
+            locations = cells_title("title")) |> 
+  tab_options(
+    table.border.top.style = "a"
+  ) |> 
+  tab_footnote(
+    footnote = "Lower gap: better with high entropy. High Safety Entropy: entropy higher than median",
+    locations = cells_column_labels(
+      columns = AvgEPAGap
+    )
+  )
+
+# Add now make it so that the team logos replace the tricodes
+HighVsLowEntropy_ByTeam_FancyTable_FULL <- HighVsLowEntropy_ByTeam_FancyTable_FULL %>%
+  nflplotR::gt_nfl_logos(columns = "defteam")
+
+gtsave(HighVsLowEntropy_ByTeam_FancyTable_FULL, "HighVsLowEntropy_ByTeam_FancyTable_FULL.png")
+
+# Create "FULL" data for how NFL teams performed with vs. without high entropy
+PlaySuccess_HighEntropyVsNone_NFLWide_FULL <- RyanModel_Merged %>% filter(!is.na(HighEntropy)) %>%
+  group_by(HighEntropy) %>%
+  summarize(Dropbacks = n(), YPP = mean(yardsGained), TD = sum(Off_TD), AvgEPA = mean(expectedPointsAdded, na.rm = TRUE), 
+            EPSuccessRate = mean(success, na.rm = TRUE), FirstDownRate = mean(first_down, na.rm = TRUE),
+            LCI_YPP = lower_Continuous(yardsGained), UCI_YPP = upper_Continuous(yardsGained),
+            LCI_EPA = lower_Continuous(expectedPointsAdded), UCI_EPA = upper_Continuous(expectedPointsAdded),
+            LCI_EPSuccess = ifelse(lower_Bernoulli(success) >= 0, lower_Bernoulli(success), 0), 
+            UCI_EPSuccess = ifelse(upper_Bernoulli(success) <= 1, upper_Bernoulli(success), 1),
+            LCI_FirstDown = ifelse(lower_Bernoulli(first_down) >= 0, lower_Bernoulli(first_down), 0), 
+            UCI_FirstDown = ifelse(upper_Bernoulli(first_down) <= 1, upper_Bernoulli(first_down), 1))
+# View(PlaySuccess_HighEntropyVsNone_NFLWide_FULL)
+
+# Now use that "FULL" data to make gt table about high-entropy vs. low-entropy plays across the league
+PlaySuccess_HighEntropyVsNone_NFLWide_FULL <- PlaySuccess_HighEntropyVsNone_NFLWide_FULL %>% arrange(AvgEPA)
+
+class(PlaySuccess_HighEntropyVsNone_NFLWide_FULL) <- "data.frame"
+HighVsLowEntropy_NFLWide_FancyTable_FULL <- PlaySuccess_HighEntropyVsNone_NFLWide_FULL %>%
+  select(c("HighEntropy", "Dropbacks", "YPP", "EPSuccessRate", "FirstDownRate", "AvgEPA"))
+# head(20) %>% # this is how we would limit to the top 20
+# mutate(Rank = row_number(AvgEPA)) %>% # DON'T use desc() in this case
+# select("Rank", 1:6)
+
+HighVsLowEntropy_NFLWide_FancyTable_FULL <- HighVsLowEntropy_NFLWide_FancyTable_FULL |>
+  # filter(officialPosition %in% c("OLB", "DE")) |> 
+  # mutate(rank = row_number()) |> 
+  # select(1:4, "HighEntropy", "Dropbacks", "YPP", "EPSuccessRate", "FirstDownRate", "AvgEPA") |> 
+  head(20) |>
+  gt() |>
+  tab_options(
+    table.border.top.color = "white",
+    row.striping.include_table_body = FALSE
+  ) |>
+  opt_table_font(
+    font = list(
+      google_font("Chivo"),
+      default_fonts()
+    )
+  ) |>
+  fmt_number(
+    columns = c(YPP),
+    decimals = 2,
+  ) |>
+  fmt_number(
+    columns = c(EPSuccessRate),
+    decimals = 2,
+  ) |>
+  fmt_number(
+    columns = c(FirstDownRate),
+    decimals = 2,
+  ) |>
+  fmt_number(
+    columns = c(AvgEPA),
+    decimals = 2,
+  ) |>
+  data_color(
+    columns = c(AvgEPA),
+    colors = scales::col_numeric(
+      palette = c("darkred", "pink"), # Because we are going in ascending order, have dark column on the left
+      domain = NULL
+    )
+  ) |> 
+  cols_label(
+    # Rank = md("**Rank**"), # the md is what makes the headers show up as bold
+    HighEntropy = md("**Entropy**"),
+    # officialPosition = md("**Position**"),
+    Dropbacks = md("**Dropbacks**"),
+    YPP = md("**Yards Per Play**"),
+    EPSuccessRate = md("**Success Rate Allowed**"),
+    FirstDownRate = md("**First Down Rate**"),
+    AvgEPA = html('<span style="text-decoration:overline; font-weight:bold">Avg EPA Allowed</span>')
+  ) |> 
+  cols_align(
+    align = "center",
+    columns = Dropbacks:AvgEPA
+  ) |> 
+  tab_header(md("**Base Rate Across NFL: How Defenses Performed With vs. Without High Safety Entropy**"),
+             md("(Early Down Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022)")) |> # don't forget to adjust your minimum
+  tab_style(style = cell_borders(sides = "top"),
+            locations = cells_title("title")) |> 
+  tab_options(
+    table.border.top.style = "a"
+  ) |> 
+  tab_footnote(
+    footnote = "Low EPA is good for defense. High Safety Entropy: entropy higher than median",
+    locations = cells_column_labels(
+      columns = AvgEPA
+    )
+  )
+
+gtsave(HighVsLowEntropy_NFLWide_FancyTable_FULL, "HighVsLowEntropy_NFLWide_FancyTable_FULL.png")
+
