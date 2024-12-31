@@ -4,7 +4,7 @@ library(tidyverse)
 Dropbacks_Merged <- read_csv("Dropbacks_Merged.csv")
 
 # Likewise, here's how to read in the data that resulted from the neutral network model's code (see 2_modeling file within code_2 GitHub folder)
-NN_model_results_DF <- fread("results_df_preds_outOfSample.csv")
+NN_model_results_DF <- fread("results_df_preds.csv")
 # Recall that "p" means probability of MOFO coverage
 
 # For the sake of formality, get the column names here to align with those of Dropbacks_Merged
