@@ -17,7 +17,7 @@ Dropbacks_Merged <- read_csv("Dropbacks_Merged.csv")
 # these are files related directly to the animation code (get these from Google Drive if needed)
 df_safety_movement_1 <- read_csv('df_safety_movement_1.csv') # Recall this refers to plays with 1 pre-snap safety
 df_safety_movement_2 <- read_csv('df_safety_movement_2.csv') # 2 pre-snap safeties
-out_of_sample_preds <- read_csv('results_df_preds_outOfSample.csv') # Neural network model's predictions
+out_of_sample_preds <- read_csv('results_df_preds.csv') # Neural network model's predictions
 
 # tracking the entire plays:
 df_C_players <- fread('df_C_players.csv')
@@ -902,7 +902,7 @@ ggplot() +
 # these are files related directly to the animation code
 df_safety_movement_1 <- read_csv('df_safety_movement_1.csv')
 df_safety_movement_2 <- read_csv('df_safety_movement_2.csv')
-out_of_sample_preds <- read_csv('results_df_preds_outOfSample.csv')
+out_of_sample_preds <- read_csv('results_df_preds.csv')
 
 # tracking the entire plays:
 df_C_players <- read_csv('df_C_players.csv')
