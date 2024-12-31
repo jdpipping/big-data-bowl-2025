@@ -830,7 +830,8 @@ MergedData <- MergedData %>%
             "lateral_reception", "lateral_rush", "lateral_return", "lateral_recovery", "replay_or_challenge",
             "replay_or_challenge_result", "series", "series_success", "nfl_api_id", "play_deleted", "play_type_nfl",
             "Temperature", "surface", "roof", "wind", "total_line", "spread_line", "location", "game_stadium",
-            "pass", "rush", "play", "penaltyNames", "blockedPlayerNFLId1", "blockedPlayerNFLId2", "blockedPlayerNFLId3"))
+            "pass", "rush", "play", "penaltyNames", "blockedPlayerNFLId1", "blockedPlayerNFLId2", "blockedPlayerNFLId3",
+            "Ball_DistFromGoalLine", "Ball_DistFromSideline", "BallNearGoalLine", "BallNearSideline", "weight"))
 setDT(MergedData)
 setkey(MergedData, gameId, playId, nflId, frameId)
 
