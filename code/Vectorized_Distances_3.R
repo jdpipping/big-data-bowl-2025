@@ -533,7 +533,7 @@ MergedData <- MergedData %>% mutate(Min_PreSnap_X_acc_component_AnySafety = min(
 # With 1-high plays in mind, add Max_Y_AbsSpeed_AtSnap_AnySafety, Max_Y_AbsAcc_AtSnap_AnySafety, and Max_Y_AbsDistFromBall_AtSnapAnySafety
 MergedData <- MergedData %>% mutate(Max_Y_AbsSpeed_AtSnap_AnySafety = max(abs(Safety1_y_vel_component_AtSnap), abs(Safety2_y_vel_component_AtSnap), na.rm = TRUE))
 MergedData <- MergedData %>% mutate(Max_Y_AbsAcc_AtSnap_AnySafety = max(abs(Safety1_y_acc_component_AtSnap), abs(Safety2_y_acc_component_AtSnap), na.rm = TRUE))
-MergedData <- MergedData %>% mutate(Max_Y_AbsDistFromBall_AtSnapAnySafety = max(Safety1_Y_AbsDistFromBall_AtSnap, Safety2_Y_AbsDistFromBall_AtSnap, na.rm = TRUE))
+MergedData <- MergedData %>% mutate(Max_Y_AbsDistFromBall_AtSnap_AnySafety = max(Safety1_Y_AbsDistFromBall_AtSnap, Safety2_Y_AbsDistFromBall_AtSnap, na.rm = TRUE))
 
 # AND don't forget difference in the absolute distances from MOF between the safeties at the snap
 # In other words, if one safety is 2 yards to his left of the ball, and other is 12 yards to his right, that's 10, not 14
