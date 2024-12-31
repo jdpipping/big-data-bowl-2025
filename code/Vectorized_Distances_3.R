@@ -525,7 +525,7 @@ MergedData <- MergedData %>% mutate(Max_VertCreptDistance_AnySafety = max(Safety
 MergedData <- MergedData %>% mutate(Max_TotalCreptDistance_ToBall_AnySafety = max(Safety1_TotalCreptDistance_TowardBall, Safety2_TotalCreptDistance_TowardBall, na.rm = TRUE))
 
 # Add Min_PreSnap_X_vel_component_AnySafety and Min_PreSnap_X_acc_component_AnySafety
-# In other words, were either safeties moving quickly toward the ball (i.e., smaller X) at some point before snap?
+# In other words, was either safety moving quickly toward the ball (i.e., smaller X) at some point before snap?
 # Don't bother doing this for Y, since a negative "Y" value doesn't tell the same story
 MergedData <- MergedData %>% mutate(Min_PreSnap_X_vel_component_AnySafety = min(Safety1_Min_PreSnap_x_vel_component, Safety2_Min_PreSnap_x_vel_component, na.rm = TRUE))
 MergedData <- MergedData %>% mutate(Min_PreSnap_X_acc_component_AnySafety = min(Safety1_Min_PreSnap_x_acc_component, Safety2_Min_PreSnap_x_acc_component, na.rm = TRUE))
