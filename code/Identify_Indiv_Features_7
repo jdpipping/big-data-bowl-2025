@@ -28,7 +28,7 @@ corr_df_MOFO_AllPlays <- corr_df_MOFO_AllPlays[-1, ] # this gets rid of gameId r
 rm(corr_matrix_MOFO_AllPlays)
 
 # Now take all variables with at least a correlation of 0.25 in either direction
-top_variables_MOFO_AllPlays <- corr_df %>% filter(abs(PostSnap_MOF_Num) >= 0.25)
+top_variables_MOFO_AllPlays <- corr_df_MOFO_AllPlays %>% filter(abs(PostSnap_MOF_Num) >= 0.25)
 rownames(top_variables_MOFO_AllPlays) # keep in mind PostSnap_MOF_Num obviously isn't a predictor variable
 # And make it so the only columns in this new DF align with the rows in that DF
 top_variables_MOFO_AllPlays <- top_variables[, colnames(top_variables_MOFO_AllPlays) %in% rownames(top_variables_MOFO_AllPlays)]
@@ -55,7 +55,7 @@ corr_df_MOFO_2High <- corr_df_MOFO_2High[-1, ] # this gets rid of gameId row
 rm(corr_matrix_MOFO_2High)
 
 # Now take all variables with at least a correlation of 0.25 in either direction
-top_variables_MOFO_2High <- corr_df %>% filter(abs(PostSnap_MOF_Num) >= 0.25)
+top_variables_MOFO_2High <- corr_df_MOFO_2High %>% filter(abs(PostSnap_MOF_Num) >= 0.25)
 rownames(top_variables_MOFO_2High) # keep in mind PostSnap_MOF_Num obviously isn't a predictor variable
 # And make it so the only columns in this new DF align with the rows in that DF
 top_variables_MOFO_2High <- top_variables[, colnames(top_variables_MOFO_2High) %in% rownames(top_variables_MOFO_2High)]
@@ -78,7 +78,7 @@ corr_df_MOFO_1High <- corr_df_MOFO_1High[-1, ] # this gets rid of gameId row
 rm(corr_matrix_MOFO_1High)
 
 # Now take all variables with at least a correlation of 0.25 in either direction
-top_variables_MOFO_1High <- corr_df %>% filter(abs(PostSnap_MOF_Num) >= 0.25)
+top_variables_MOFO_1High <- corr_df_MOFO_1High %>% filter(abs(PostSnap_MOF_Num) >= 0.25)
 rownames(top_variables_MOFO_1High) # keep in mind PostSnap_MOF_Num obviously isn't a predictor variable
 # And make it so the only columns in this new DF align with the rows in that DF
 top_variables_MOFO_1High <- top_variables[, colnames(top_variables_MOFO_1High) %in% rownames(top_variables_MOFO_1High)]
@@ -105,7 +105,7 @@ corr_df_Entropy_AllPlays <- corr_df_Entropy_AllPlays[-1, ] # this gets rid of ga
 rm(corr_matrix_Entropy_AllPlays)
 
 # Now take all variables with at least a correlation of 0.25 in either direction
-top_variables_Entropy_AllPlays <- corr_df %>% filter(abs(Snap_Entropy) >= 0.25)
+top_variables_Entropy_AllPlays <- corr_df_Entropy_AllPlays %>% filter(abs(Snap_Entropy) >= 0.25)
 rownames(top_variables_Entropy_AllPlays) # keep in mind Snap_Entropy obviously isn't a predictor variable
 # And make it so the only columns in this new DF align with the rows in that DF
 top_variables_Entropy_AllPlays <- top_variables[, colnames(top_variables_Entropy_AllPlays) %in% rownames(top_variables_Entropy_AllPlays)]
@@ -132,7 +132,7 @@ corr_df_Entropy_2High <- corr_df_Entropy_2High[-1, ] # this gets rid of gameId r
 rm(corr_matrix_Entropy_2High)
 
 # Now take all variables with at least a correlation of 0.25 in either direction
-top_variables_Entropy_2High <- corr_df %>% filter(abs(Snap_Entropy) >= 0.25)
+top_variables_Entropy_2High <- corr_df_Entropy_2High %>% filter(abs(Snap_Entropy) >= 0.25)
 rownames(top_variables_Entropy_2High) # keep in mind Snap_Entropy obviously isn't a predictor variable
 # And make it so the only columns in this new DF align with the rows in that DF
 top_variables_Entropy_2High <- top_variables[, colnames(top_variables_Entropy_2High) %in% rownames(top_variables_Entropy_2High)]
@@ -155,7 +155,7 @@ corr_df_Entropy_1High <- corr_df_Entropy_1High[-1, ] # this gets rid of gameId r
 rm(corr_matrix_Entropy_1High)
 
 # Now take all variables with at least a correlation of 0.25 in either direction
-top_variables_Entropy_1High <- corr_df %>% filter(abs(Snap_Entropy) >= 0.25)
+top_variables_Entropy_1High <- corr_df_Entropy_1High %>% filter(abs(Snap_Entropy) >= 0.25)
 rownames(top_variables_Entropy_1High) # keep in mind Snap_Entropy obviously isn't a predictor variable
 # And make it so the only columns in this new DF align with the rows in that DF
 top_variables_Entropy_1High <- top_variables[, colnames(top_variables_Entropy_1High) %in% rownames(top_variables_Entropy_1High)]
