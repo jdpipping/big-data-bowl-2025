@@ -92,6 +92,16 @@ table(
   (df_safety_quality_check %>% filter(pos_official %in% c("SS","FS")))$is_pre_safety
 )
 
+### percent of plays that are predictable
+# x = 0.2
+x = 0.1
+df_eval %>% 
+  reframe(play_is_predictable = p < x | p > 1-x) %>%
+  group_by(play_is_predictable) %>%
+  reframe(n = n()) %>%
+  ungroup() %>%
+  mutate(prop = n/sum(n), tot = sum(n))
+
 ##############################
 ### MODIFIED TRACKING DATA ###
 ##############################
@@ -977,10 +987,10 @@ j = 1
     ggplot(aes(x = M, y = emp_prop, size = n)) +
     geom_abline(intercept=0,slope=1) +
     geom_point() +
-    theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 12)) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 15)) +
     scale_x_continuous(limits = c(0,1), breaks=p_breaks) +
     xlab("predicted probability p(MOFO)") +
-    ylab("empirical proportion") +
+    ylab("actual MOFO rate") +
     ylim(c(0,1)) +
     labs(title="Calibration Plot")
   ggsave(paste0("results_plot_calibration_",j,".png"),plot_calibration,width=7,height=5)
