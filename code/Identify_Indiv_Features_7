@@ -77,8 +77,8 @@ corr_df_MOFO_1High <- corr_df_MOFO_1High[-1, ] # this gets rid of gameId row
 # View(corr_df_MOFO_1High %>% arrange(desc(PostSnap_MOF_Num)))
 rm(corr_matrix_MOFO_1High)
 
-# Now take all variables with at least a correlation of 0.25 in either direction
-top_variables_MOFO_1High <- corr_df_MOFO_1High %>% filter(abs(PostSnap_MOF_Num) >= 0.25)
+# Now take all variables with at least a correlation of 0.1 in either direction (lower standard b/c we're picking from fewer variables)
+top_variables_MOFO_1High <- corr_df_MOFO_1High %>% filter(abs(PostSnap_MOF_Num) >= 0.1)
 rownames(top_variables_MOFO_1High) # keep in mind PostSnap_MOF_Num obviously isn't a predictor variable
 # And make it so the only columns in this new DF align with the rows in that DF
 top_variables_MOFO_1High <- top_variables_MOFO_1High[, colnames(top_variables_MOFO_1High) %in% rownames(top_variables_MOFO_1High)]
@@ -154,8 +154,8 @@ corr_df_Entropy_1High <- corr_df_Entropy_1High[-1, ] # this gets rid of gameId r
 # View(corr_df_Entropy_1High %>% arrange(desc(Snap_Entropy)))
 rm(corr_matrix_Entropy_1High)
 
-# Now take all variables with at least a correlation of 0.25 in either direction
-top_variables_Entropy_1High <- corr_df_Entropy_1High %>% filter(abs(Snap_Entropy) >= 0.25)
+# Now take all variables with at least a correlation of 0.1 in either direction (lower standard b/c we're picking from fewer variables)
+top_variables_Entropy_1High <- corr_df_Entropy_1High %>% filter(abs(Snap_Entropy) >= 0.1)
 rownames(top_variables_Entropy_1High) # keep in mind Snap_Entropy obviously isn't a predictor variable
 # And make it so the only columns in this new DF align with the rows in that DF
 top_variables_Entropy_1High <- top_variables_Entropy_1High[, colnames(top_variables_Entropy_1High) %in% rownames(top_variables_Entropy_1High)]
