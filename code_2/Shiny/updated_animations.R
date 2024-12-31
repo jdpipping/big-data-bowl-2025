@@ -8,7 +8,7 @@ memory.limit(size=10000)
 # these are the files related directly to the visualizations
 safety_movement1 <- read_csv('df_safety_movement_1.csv')
 safety_movement2 <- read_csv('df_safety_movement_2.csv')
-NN_model_results_DF <- read_csv('results_df_preds_outOfSample.csv')
+NN_model_results_DF <- read_csv('results_df_preds.csv')
 
 # tracking the entire plays:
 # df_C_players <- read_csv('df_C_players.csv')
