@@ -193,6 +193,7 @@ BallCarrier_ProjDist <- BallCarrier_ProjDist %>%
            "ball_carrier_Y_proj_3", "ball_carrier_Y_proj_4", "ball_carrier_Y_proj_5"))
 MergedData <- MergedData %>% 
   left_join(BallCarrier_ProjDist, by = c("playId", "gameId", "frameId"))
+
 # MergedData <- MergedData %>% arrange(gameId, playId, nflId, frameId)
 setDT(MergedData)
 setkey(MergedData, gameId, playId, nflId, frameId)
