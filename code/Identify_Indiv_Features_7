@@ -1,0 +1,125 @@
+library(tidyverse)
+
+# Stats_ByFullPlay_Final was defined in the "Aggregating Frames to Plays" GitHib file
+
+# Read in data if necessary: 
+Stats_ByFullPlay_Final <- fread("Stats_ByFullPlay_Final.csv")
+
+colnames(Stats_ByFullPlay_Final) # recall that Snap_Entropy is the continuous play-level one (HighEntropy is binary)
+MOFO_Features_AllPlays <- Stats_ByFullPlay_Final %>%
+  select(c("PostSnap_MOF_Num", "X_Diff_BetweenSafeties_AtSnap", "TotDist_BetweenSafeties_AtSnap",
+           "min_SafetyAbsHorizDistToMOF_PreSnap", "X_Vel_Diff_BetweenSafeties_AtSnap",
+           "Y_Vel_Diff_BetweenSafeties_AtSnap", "TotSpeed_Diff_BetweenSafeties_AtSnap",
+           "X_Acc_Diff_BetweenSafeties_AtSnap", "Y_Acc_Diff_BetweenSafeties_AtSnap",           
+           "TotAcc_Diff_BetweenSafeties_AtSnap", "Max_VertCreptDistance_AnySafety",
+           "Max_TotalCreptDistance_ToBall_AnySafety", "Min_PreSnap_X_vel_component_AnySafety",
+           "Min_PreSnap_X_acc_component_AnySafety", "Y_AbsDistFromBall_Diff_BetweenSafeties_AtSnap", 
+           "Max_Y_AbsSpeed_AtSnap_AnySafety", "Max_Y_AbsAcc_AtSnap_AnySafety", "Max_Y_AbsDistFromBall_AtSnap_AnySafety"))
+
+corr_matrix_MOFO_AllPlays <- MOFO_Features_AllPlays %>%
+  select(where(is.numeric)) %>%  
+  cor(use = "complete.obs") %>%  
+  round(2)  
+# Now see which variables had strongest positive or negative correlation with PostSnap_MOF_Num
+corr_df_MOFO_AllPlays <- as.data.frame(corr_matrix_MOFO_AllPlays)
+corr_df_MOFO_AllPlays <- corr_df_MOFO_AllPlays %>% select(-"gameId")
+corr_df_MOFO_AllPlays <- corr_df_MOFO_AllPlays[-1, ] # this gets rid of gameId row
+# View(corr_df_MOFO_AllPlays %>% arrange(desc(PostSnap_MOF_Num)))
+rm(corr_matrix_MOFO_AllPlays)
+
+MOFO_Features_2High <- Stats_ByFullPlay_Final %>% filter(num_safeties_pre_snap == 2) %>%
+  select(c("PostSnap_MOF_Num", "X_Diff_BetweenSafeties_AtSnap", "TotDist_BetweenSafeties_AtSnap",
+           "min_SafetyAbsHorizDistToMOF_PreSnap", "X_Vel_Diff_BetweenSafeties_AtSnap",
+           "Y_Vel_Diff_BetweenSafeties_AtSnap", "TotSpeed_Diff_BetweenSafeties_AtSnap",
+           "X_Acc_Diff_BetweenSafeties_AtSnap", "Y_Acc_Diff_BetweenSafeties_AtSnap",           
+           "TotAcc_Diff_BetweenSafeties_AtSnap", "Max_VertCreptDistance_AnySafety",
+           "Max_TotalCreptDistance_ToBall_AnySafety", "Min_PreSnap_X_vel_component_AnySafety",
+           "Min_PreSnap_X_acc_component_AnySafety", "Y_AbsDistFromBall_Diff_BetweenSafeties_AtSnap", 
+           "Max_Y_AbsSpeed_AtSnap_AnySafety", "Max_Y_AbsAcc_AtSnap_AnySafety", "Max_Y_AbsDistFromBall_AtSnap_AnySafety"))
+
+corr_matrix_MOFO_2High <- MOFO_Features_2High %>%
+  select(where(is.numeric)) %>%  
+  cor(use = "complete.obs") %>%  
+  round(2)  
+# Now see which variables had strongest positive or negative correlation with PostSnap_MOF_Num
+corr_df_MOFO_2High <- as.data.frame(corr_matrix_MOFO_2High)
+corr_df_MOFO_2High <- corr_df_MOFO_2High %>% select(-"gameId")
+corr_df_MOFO_2High <- corr_df_MOFO_2High[-1, ] # this gets rid of gameId row
+# View(corr_df_MOFO_2High %>% arrange(desc(PostSnap_MOF_Num)))
+rm(corr_matrix_MOFO_2High)
+
+MOFO_Features_1High <- Stats_ByFullPlay_Final %>% filter(num_safeties_pre_snap == 1) %>%
+  select(c("PostSnap_MOF_Num", "min_SafetyAbsHorizDistToMOF_PreSnap", "Max_VertCreptDistance_AnySafety",
+           "Max_TotalCreptDistance_ToBall_AnySafety", "Min_PreSnap_X_vel_component_AnySafety",
+           "Min_PreSnap_X_acc_component_AnySafety", "Max_Y_AbsSpeed_AtSnap_AnySafety", 
+           "Max_Y_AbsAcc_AtSnap_AnySafety", "Max_Y_AbsDistFromBall_AtSnap_AnySafety"))
+
+corr_matrix_MOFO_1High <- MOFO_Features_1High %>%
+  select(where(is.numeric)) %>%  
+  cor(use = "complete.obs") %>%  
+  round(2)  
+# Now see which variables had strongest positive or negative correlation with PostSnap_MOF_Num
+corr_df_MOFO_1High <- as.data.frame(corr_matrix_MOFO_1High)
+corr_df_MOFO_1High <- corr_df_MOFO_1High %>% select(-"gameId")
+corr_df_MOFO_1High <- corr_df_MOFO_1High[-1, ] # this gets rid of gameId row
+# View(corr_df_MOFO_1High %>% arrange(desc(PostSnap_MOF_Num)))
+rm(corr_matrix_MOFO_1High)
+
+Entropy_Features_AllPlays <- Stats_ByFullPlay_Final %>%
+  select(c("Snap_Entropy", "X_Diff_BetweenSafeties_AtSnap", "TotDist_BetweenSafeties_AtSnap",
+           "min_SafetyAbsHorizDistToMOF_PreSnap", "X_Vel_Diff_BetweenSafeties_AtSnap",
+           "Y_Vel_Diff_BetweenSafeties_AtSnap", "TotSpeed_Diff_BetweenSafeties_AtSnap",
+           "X_Acc_Diff_BetweenSafeties_AtSnap", "Y_Acc_Diff_BetweenSafeties_AtSnap",           
+           "TotAcc_Diff_BetweenSafeties_AtSnap", "Max_VertCreptDistance_AnySafety",
+           "Max_TotalCreptDistance_ToBall_AnySafety", "Min_PreSnap_X_vel_component_AnySafety",
+           "Min_PreSnap_X_acc_component_AnySafety", "Y_AbsDistFromBall_Diff_BetweenSafeties_AtSnap", 
+           "Max_Y_AbsSpeed_AtSnap_AnySafety", "Max_Y_AbsAcc_AtSnap_AnySafety", "Max_Y_AbsDistFromBall_AtSnap_AnySafety"))
+
+corr_matrix_Entropy_AllPlays <- Entropy_Features_AllPlays %>%
+  select(where(is.numeric)) %>%  
+  cor(use = "complete.obs") %>%  
+  round(2)  
+# Now see which variables had strongest positive or negative correlation with PostSnap_MOF_Num
+corr_df_Entropy_AllPlays <- as.data.frame(corr_matrix_Entropy_AllPlays)
+corr_df_Entropy_AllPlays <- corr_df_Entropy_AllPlays %>% select(-"gameId")
+corr_df_Entropy_AllPlays <- corr_df_Entropy_AllPlays[-1, ] # this gets rid of gameId row
+# View(corr_df_Entropy_AllPlays %>% arrange(desc(PostSnap_MOF_Num)))
+rm(corr_matrix_Entropy_AllPlays)
+
+Entropy_Features_2High <- Stats_ByFullPlay_Final %>% filter(num_safeties_pre_snap == 2) %>%
+  select(c("Snap_Entropy", "X_Diff_BetweenSafeties_AtSnap", "TotDist_BetweenSafeties_AtSnap",
+           "min_SafetyAbsHorizDistToMOF_PreSnap", "X_Vel_Diff_BetweenSafeties_AtSnap",
+           "Y_Vel_Diff_BetweenSafeties_AtSnap", "TotSpeed_Diff_BetweenSafeties_AtSnap",
+           "X_Acc_Diff_BetweenSafeties_AtSnap", "Y_Acc_Diff_BetweenSafeties_AtSnap",           
+           "TotAcc_Diff_BetweenSafeties_AtSnap", "Max_VertCreptDistance_AnySafety",
+           "Max_TotalCreptDistance_ToBall_AnySafety", "Min_PreSnap_X_vel_component_AnySafety",
+           "Min_PreSnap_X_acc_component_AnySafety", "Y_AbsDistFromBall_Diff_BetweenSafeties_AtSnap", 
+           "Max_Y_AbsSpeed_AtSnap_AnySafety", "Max_Y_AbsAcc_AtSnap_AnySafety", "Max_Y_AbsDistFromBall_AtSnap_AnySafety"))
+
+corr_matrix_Entropy_2High <- Entropy_Features_2High %>%
+  select(where(is.numeric)) %>%  
+  cor(use = "complete.obs") %>%  
+  round(2)  
+# Now see which variables had strongest positive or negative correlation with PostSnap_MOF_Num
+corr_df_Entropy_2High <- as.data.frame(corr_matrix_Entropy_2High)
+corr_df_Entropy_2High <- corr_df_Entropy_2High %>% select(-"gameId")
+corr_df_Entropy_2High <- corr_df_Entropy_2High[-1, ] # this gets rid of gameId row
+# View(corr_df_Entropy_2High %>% arrange(desc(PostSnap_MOF_Num)))
+rm(corr_matrix_Entropy_2High)
+
+Entropy_Features_1High <- Stats_ByFullPlay_Final %>% filter(num_safeties_pre_snap == 1) %>%
+  select(c("Snap_Entropy", "min_SafetyAbsHorizDistToMOF_PreSnap", "Max_VertCreptDistance_AnySafety",
+           "Max_TotalCreptDistance_ToBall_AnySafety", "Min_PreSnap_X_vel_component_AnySafety",
+           "Min_PreSnap_X_acc_component_AnySafety", "Max_Y_AbsSpeed_AtSnap_AnySafety", 
+           "Max_Y_AbsAcc_AtSnap_AnySafety", "Max_Y_AbsDistFromBall_AtSnap_AnySafety"))
+
+corr_matrix_Entropy_1High <- Entropy_Features_1High %>%
+  select(where(is.numeric)) %>%  
+  cor(use = "complete.obs") %>%  
+  round(2)  
+# Now see which variables had strongest positive or negative correlation with PostSnap_MOF_Num
+corr_df_Entropy_1High <- as.data.frame(corr_matrix_Entropy_1High)
+corr_df_Entropy_1High <- corr_df_Entropy_1High %>% select(-"gameId")
+corr_df_Entropy_1High <- corr_df_Entropy_1High[-1, ] # this gets rid of gameId row
+# View(corr_df_Entropy_1High %>% arrange(desc(PostSnap_MOF_Num)))
+rm(corr_matrix_Entropy_1High)
