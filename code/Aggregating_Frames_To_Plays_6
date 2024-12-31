@@ -2121,3 +2121,6 @@ HighVsLowEntropy_NFLWide_FancyTable_FULL <- HighVsLowEntropy_NFLWide_FancyTable_
 
 gtsave(HighVsLowEntropy_NFLWide_FancyTable_FULL, "HighVsLowEntropy_NFLWide_FancyTable_FULL.png")
 
+# If needed, here's how to export to a CSV
+write.csv(Stats_ByPlayerAndPlay_Final, "Stats_ByPlayerAndPlay_Final.csv")
+write.csv(Stats_ByFullPlay_Final, "Stats_ByFullPlay_Final.csv")
