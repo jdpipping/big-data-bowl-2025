@@ -1630,12 +1630,12 @@ NFLVerse_Reduced <- PlaysAndGames_NFLVerse %>%
             405, 407:416, 418:424))
 
 rm(PlaysAndGames_NFLVerse)
-results_df_preds_outOfSample <- fread("results_df_preds_outOfSample.csv")
-colnames(results_df_preds_outOfSample)
-results_df_preds_outOfSample <- results_df_preds_outOfSample %>% select(-"expectedPoints") # this already exists in NFLVerse
-RyanModel_Merged <- merge(x = NFLVerse_Reduced, y = results_df_preds_outOfSample,
+results_df_preds <- fread("results_df_preds.csv")
+colnames(results_df_preds)
+results_df_preds <- results_df_preds %>% select(-"expectedPoints") # this already exists in NFLVerse
+RyanModel_Merged <- merge(x = NFLVerse_Reduced, y = results_df_preds,
                           by = c("gameId", "playId"))
-rm(results_df_preds_outOfSample, NFLVerse_Reduced)
+rm(results_df_preds, NFLVerse_Reduced)
 
 # Arrange it by game ID, play ID
 # But turn it into a data table so that it takes up less memory space
