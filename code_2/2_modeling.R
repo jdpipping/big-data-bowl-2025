@@ -1,4 +1,13 @@
 
+# FDA parameters
+# NUM_FOLDS = 2 
+NUM_FOLDS = 10
+# spline_DF <- 10  # number of spline basis functions (degrees of freedom)
+spline_DF = 5
+cutoff_time = -3.0 # for training our model, consider frames from this time to -0.1s
+use_time_cutoff = TRUE
+extrapolateEarlierTrajectories = TRUE
+
 #################
 ### LIBRARIES ###
 #################
@@ -45,7 +54,7 @@ theme_update(
 # tfprobability::tfd_multivariate_normal_diag
 
 # need to set random seet BEFORE importing NN librariers to make it reproducible
-set.seed(529735)
+set.seed(59835)
 library(keras)
 library(tensorflow)
 
@@ -119,27 +128,27 @@ df_tracking_presnap =
 df_tracking_presnap
 table(df_tracking_presnap$t_after_snap)
 
-# df_tracking_presnap = 
-#   df_tracking_presnap |>
-#   # polar coordinates for the angles o and dir
-#   mutate(
-#     o_polar = (90 - o) %% 360,
-#     dir_polar = (90 - dir) %% 360,
-#   ) |>
-#   relocate(o_polar, .after = dir) |>
-#   relocate(dir_polar, .after = o_polar) |>
-#   # decompose velo/accel into (x,y) components
-#   mutate(
-#     v_x = s * cos(dir_polar * pi / 180),
-#     v_y = s * sin(dir_polar * pi / 180),
-#     a_x = a * cos(dir_polar * pi / 180),
-#     a_y = a * sin(dir_polar * pi / 180)
-#   ) |>
-#   relocate(v_x, .after = dir_polar) |>
-#   relocate(v_y, .after = v_x) |>
-#   relocate(a_x, .after = v_y) |>
-#   relocate(a_y, .after = a_x)
-# df_tracking_presnap
+df_tracking_presnap =
+  df_tracking_presnap |>
+  # polar coordinates for the angles o and dir
+  mutate(
+    o_polar = (90 - o) %% 360,
+    dir_polar = (90 - dir) %% 360,
+  ) |>
+  relocate(o_polar, .after = dir) |>
+  relocate(dir_polar, .after = o_polar) |>
+  # decompose velo/accel into (x,y) components
+  mutate(
+    v_x = s * cos(dir_polar * pi / 180),
+    v_y = s * sin(dir_polar * pi / 180),
+    a_x = a * cos(dir_polar * pi / 180),
+    a_y = a * sin(dir_polar * pi / 180)
+  ) |>
+  relocate(v_x, .after = dir_polar) |>
+  relocate(v_y, .after = v_x) |>
+  relocate(a_x, .after = v_y) |>
+  relocate(a_y, .after = a_x)
+df_tracking_presnap
 # table(df_tracking_presnap$t_after_snap)
 # # check
 # temp = df_tracking_presnap %>% filter(pos_official == "RB") %>% filter(s > 1)
@@ -335,10 +344,7 @@ compute_spline_coeffs <- function(t, values, spline_DF) {
 # SHOW_EXAMPLE = TRUE
 SHOW_EXAMPLE = FALSE
 if (SHOW_EXAMPLE) {
-  # parameters
-  extrapolateEarlierTrajectories = TRUE
-  use_time_cutoff = TRUE
-  cutoff_time = -3.0
+  # set parameters extrapolateEarlierTrajectories, use_time_cutoff, cutoff_time, spline_DF at top of file
   
   # Example trajectory data
   # ex_traj = df_tracking_safeties %>% filter(gameId == 2022090800, playId == 692, nflId == 47844)
@@ -368,9 +374,8 @@ if (SHOW_EXAMPLE) {
   y_t
   
   # Compute spline coefficients for x_t and y_t
-  spline_DF <- 10  # Number of spline basis functions (degrees of freedom)
-  x_spline <- compute_spline_coeffs(t, x_t, spline_DF)
-  y_spline <- compute_spline_coeffs(t, y_t, spline_DF)
+  x_spline <- compute_spline_coeffs(t, x_t, spline_DF=spline_DF)
+  y_spline <- compute_spline_coeffs(t, y_t, spline_DF=spline_DF)
   
   # Combine coefficients into a feature vector
   feature_vector <- c(x_spline$coeffs, y_spline$coeffs)
@@ -402,12 +407,6 @@ if (SHOW_EXAMPLE) {
 ### FUNCTIONAL DATA ANALYSIS MOVEMENT FEATURES ###
 ##################################################
 
-# parameters
-spline_DF <- 10  # number of spline basis functions (degrees of freedom)
-cutoff_time = -3.0
-use_time_cutoff = TRUE
-extrapolateEarlierTrajectories = TRUE
-
 # create safety-level dataframe with movement features
 groups = df_tracking_safeties %>% distinct(gameId, playId, nflId)
 groups
@@ -420,28 +419,42 @@ for (i in 1:nrow(groups)) {
   df_i
   
   # get x and y trajectories
+  t = df_i$t_after_snap
   x_t = df_i$x1 
   y_t = df_i$y1 
-  t = df_i$t_after_snap
+  v_x = df_i$v_x
+  v_y = df_i$v_y
   if (extrapolateEarlierTrajectories) {
     etx = extrapolateEarlierTrajectory(t, x_t)
     ety = extrapolateEarlierTrajectory(t, y_t)
+    etvx = extrapolateEarlierTrajectory(t, v_x)
+    etvy = extrapolateEarlierTrajectory(t, v_y)
     t = etx$t
     x_t = etx$values
     y_t = ety$values
+    v_x = etvx$values
+    v_y = etvy$values
   }
   if (use_time_cutoff) {
     x_t = x_t[t >= cutoff_time]
     y_t = y_t[t >= cutoff_time]
-    t = t[t >= cutoff_time]
+    v_x = v_x[t >= cutoff_time]
+    v_y = v_y[t >= cutoff_time]
+    t = t[t >= cutoff_time] # keep at bottom of this if statement
   }
   # first and last (x,y) positions
   x_first = first(x_t)
   y_first = first(y_t)
   x_last = last(x_t)
   y_last = last(y_t)
+  v_x_last = last(v_x)
+  v_y_last = last(v_y)
+  # locs
   loc_vector = c(x_first, y_first, x_last, y_last)
   names(loc_vector) = c("x_first", "y_first", "x_last", "y_last")
+  # velos
+  velo_vector = c(v_x_last, v_y_last)
+  names(velo_vector) = c("v_x_last", "v_y_last")
   # compute spline coefficients for x_t and y_t
   x_spline <- compute_spline_coeffs(t, x_t, spline_DF)
   y_spline <- compute_spline_coeffs(t, y_t, spline_DF)
@@ -452,7 +465,7 @@ for (i in 1:nrow(groups)) {
   names(y_spline_coeffs) = paste0("y_", names(y_spline_coeffs))
   feature_vector <- c(x_spline_coeffs, y_spline_coeffs)
   # save features
-  movement_features_lst[[length(movement_features_lst)+1]] = c(loc_vector, feature_vector)
+  movement_features_lst[[length(movement_features_lst)+1]] = c(loc_vector, velo_vector, feature_vector)
 }
 df_movement_features = do.call(rbind, movement_features_lst)
 df_movement_features = as_tibble(df_movement_features)
@@ -483,7 +496,7 @@ df_safety_movement_2_v1 <-
   mutate(player_num = paste0("p",row_number())) %>%  # Assign unique identifier for each player
   pivot_wider(
     names_from = player_num,   # Use player number to create new column names
-    values_from = c(nflId, displayName, starts_with("x_"), starts_with("y_"))
+    values_from = c(nflId, displayName, starts_with("x_"), starts_with("y_"), starts_with("v_x_"), starts_with("v_y_"))
   ) %>%
   ungroup()
 names(df_safety_movement_2_v1)
@@ -535,16 +548,25 @@ write_csv(df_safety_movement_2, "df_safety_movement_2.csv")
 # # Enable verbose logging to track if nondeterministic ops are sneaking in:
 # tf$debugging$set_log_device_placement(TRUE)
 
-
 get_movement_X <- function(df) {
   X = df %>%
     select(
-      minSafetyDistToMOF,
-      all_of(contains("_first")), all_of(contains("_last")),
-      all_of(contains("spline"))
+      all_of(contains("_first")), 
+      all_of(contains("_last"))
     )
   X
 }
+
+# get_movement_X <- function(df) {
+#   X = df %>%
+#     select(
+#       minSafetyDistToMOF,
+#       all_of(contains("_first")), 
+#       all_of(contains("_last")),
+#       all_of(contains("spline"))
+#     )
+#   X
+# }
 
 fit_movement_NN <- function(df_train, num_safeties, val_split=0) {
   # training data
@@ -554,8 +576,8 @@ fit_movement_NN <- function(df_train, num_safeties, val_split=0) {
   y_train
   
   # make the NN training reproducible - DIDN'T WORK...
-  set.seed(711883)
-  tf$random$set_seed(711883)
+  set.seed(7441883)
+  tf$random$set_seed(7441883)
   reticulate::py_run_string("import numpy as np; np.random.seed(42)")
   
   # model
@@ -631,6 +653,8 @@ predict_movement_NN <- function(df_test, model) {
 }
 
 # examples
+# get_movement_X(df_safety_movement_1)
+# get_movement_X(df_safety_movement_2)
 # fit_movement_NN(df_safety_movement_1, num_safeties = 1, val_split = 0.2)
 # fit_movement_NN(df_safety_movement_2, num_safeties = 2, val_split = 0.2)
 
@@ -658,8 +682,8 @@ plays_all
 
 # K-fold cross validation
 TEST_NN = TRUE
-NUM_FOLDS = 10 #FIXME
 set.seed(12345) # for reproducibility of the folds
+# set variable NUM_FOLDS at top of file
 folds <- cvFolds(n = nrow(plays_all), K = NUM_FOLDS, type = "random")
 plays_all_f = 
   tibble(i = tibble(folds$subsets)[[1]][,1], FOLD = folds$which) %>% 
@@ -717,8 +741,8 @@ for (fold in 1:NUM_FOLDS) {
   
   # fit NN models
   if (TEST_NN) {
-    fit_nn_1 = fit_movement_NN(df_safety_movement_1, num_safeties = 1, val_split = 0)
-    fit_nn_2 = fit_movement_NN(df_safety_movement_2, num_safeties = 2, val_split = 0)
+    fit_nn_1 = fit_movement_NN(df_train_1, num_safeties = 1, val_split = 0)
+    fit_nn_2 = fit_movement_NN(df_train_2, num_safeties = 2, val_split = 0)
   }
   
   # predictions
@@ -766,7 +790,7 @@ for (fold in 1:NUM_FOLDS) {
     df_preds_1NN = 
       df_test_1 %>%
       mutate(
-        pred_FDA = predict_movement_NN(., fit_nn_1)
+        pred_ourModel = predict_movement_NN(., fit_nn_1)
       ) %>%
       select(gameId, playId, mofo_postsnap, all_of(starts_with("pred"))) %>%
       distinct()
@@ -775,7 +799,7 @@ for (fold in 1:NUM_FOLDS) {
     df_preds_2NN = 
       df_test_2 %>%
       mutate(
-        pred_FDA = predict_movement_NN(., fit_nn_2)
+        pred_ourModel = predict_movement_NN(., fit_nn_2)
       ) %>%
       select(gameId, playId, mofo_postsnap, all_of(starts_with("pred"))) %>%
       distinct()
@@ -857,12 +881,17 @@ plot_results_logloss_pScale =
   ylab("model")
 ggsave("results_loss_plot_logloss_pScale.png", width=12, height=4)
 
-# save out-of-sample predictions for each play
-df_preds_outOfSample_A = df_preds_outOfSample %>% 
-  select(gameId,playId,mofo_postsnap,pred_FDA) %>%
-  rename(p = pred_FDA)
+beepr::beep(3)
+
+##########################
+
+# get out-of-sample predictions for each play
+df_preds_outOfSample_A =
+  df_preds_outOfSample %>%
+  select(gameId,playId,mofo_postsnap,pred_ourModel) %>%
+  rename(p = pred_ourModel)
 df_preds_outOfSample_A
-df_eval = 
+df_eval_0 =
   df_tracking_safeties %>%
   distinct(
     gameId,playId,nflId,displayName,num_safeties,defensiveTeam,
@@ -876,10 +905,88 @@ df_eval =
     names_from = player_num,   # Use player number to create new column names
     values_from = c(nflId, displayName)
   ) %>%
-  ungroup()
-df_eval
+  ungroup() %>%
+  rename(p_cv = p)
+df_eval_0
 
-write_csv(df_preds_outOfSample, "results_df_preds_outOfSample_0.csv")
-write_csv(df_eval, "results_df_preds_outOfSample.csv")
+######################################
+### FULL MODEL TRAINED ON ALL DATA ###
+######################################
+
+# train full NNs
+fit_nn_1_full = fit_movement_NN(df_safety_movement_1, num_safeties = 1, val_split = 0)
+fit_nn_2_full = fit_movement_NN(df_safety_movement_2, num_safeties = 2, val_split = 0)
+# get predictions of full NNs
+preds_nn_1_full = predict_movement_NN(df_safety_movement_1, fit_nn_1_full)
+preds_nn_2_full = predict_movement_NN(df_safety_movement_2, fit_nn_2_full)
+preds_nn_full =
+  bind_rows(
+    df_safety_movement_1 %>% select(gameId,playId,num_safeties) %>% mutate(p = preds_nn_1_full),
+    df_safety_movement_2 %>% select(gameId,playId,num_safeties) %>% mutate(p = preds_nn_2_full),
+  )
+df_eval = df_eval_0 %>% left_join(preds_nn_full) %>% relocate(p, .before = p_cv)
+
+# save
+write_csv(df_eval, "results_df_preds.csv")
+# df_eval = read_csv("results_df_preds.csv")
+
+########################
+### CALIBRATION PLOT ###
+########################
+
+NUM_SAFETIES_OPTION = list(c(1,2), 1, 2)
+NUM_SAFETIES_OPTION
+num_bins = 10
+# num_bins = 8
+# num_bins = 5
+j = 1
+
+{
+  # for (j in 1:length(NUM_SAFETIES_OPTION)) {
+  NUM_SAFETIES = NUM_SAFETIES_OPTION[[j]]
+  NUM_SAFETIES
+
+  p_breaks = seq(0,1,length.out=num_bins+1)
+  df_cal =
+    df_eval %>%
+    select(num_safeties, p, mofo_postsnap) %>%
+    filter(num_safeties %in% NUM_SAFETIES) %>%
+    mutate(
+      p_bin = cut(p, breaks=p_breaks, include.lowest = TRUE),
+      L = as.numeric(sub("\\((.+),.*", "\\1", p_bin)),
+      L = ifelse(is.na(L),0,L),
+      R = as.numeric(sub(".*,\\s*([0-9.]+)]", "\\1", p_bin)),
+      R = ifelse(is.na(R),1,R),
+      M = (L+R)/2
+    )
+  df_cal
+
+  df_cal_1 =
+    df_cal %>%
+    group_by(p_bin) %>%
+    reframe(
+      M = unique(M),
+      n = n(),
+      emp_prop = mean(mofo_postsnap),
+    )
+  df_cal_1
+
+  plot_calibration = 
+    df_cal_1 %>%
+    # ggplot(aes(x = p_bin, y = emp_prop, size = n)) +
+    ggplot(aes(x = M, y = emp_prop, size = n)) +
+    geom_abline(intercept=0,slope=1) +
+    geom_point() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 12)) +
+    scale_x_continuous(limits = c(0,1), breaks=p_breaks) +
+    xlab("predicted probability p(MOFO)") +
+    ylab("empirical proportion") +
+    ylim(c(0,1)) +
+    labs(title="Calibration Plot")
+  ggsave(paste0("results_plot_calibration_",j,".png"),plot_calibration,width=7,height=5)
+}
+
+beepr::beep(3)
 
 ##########################
+

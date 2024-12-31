@@ -56,8 +56,7 @@ rsconnect/
 *.DS_Store
 
 # do not ignore these files
-!code_2/results_df_preds_outOfSample_0.csv
-!code_2/results_df_preds_outOfSample.csv
+!code_2/results_df_preds.csv
 !code_2/df_safety_movement_1.csv
 !code_2/df_safety_movement_2.csv
 
