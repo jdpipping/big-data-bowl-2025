@@ -6,14 +6,21 @@ library(tidyverse)
 Stats_ByFullPlay_Final <- fread("Stats_ByFullPlay_Final.csv")
 
 colnames(Stats_ByFullPlay_Final) # recall that Snap_Entropy is the continuous play-level one (HighEntropy is binary)
+# Before we make these matrices, adjust Min_PreSnap_X_vel_component_AnySafety and Min_PreSnap_X_acc_component_AnySafety
+# This is to get rid of the "double negative" idea ... in other words, make a high velocity toward the ball show up as a positive number
+Stats_ByFullPlay_Final <- Stats_ByFullPlay_Final %>% 
+  mutate(Max_PreSnap_X_velocity_TowardBall_AnySafety = -1 * Min_PreSnap_X_vel_component_AnySafety)
+Stats_ByFullPlay_Final <- Stats_ByFullPlay_Final %>% 
+  mutate(Max_PreSnap_X_acc_TowardBall_AnySafety = -1 * Min_PreSnap_X_acc_component_AnySafety)
+
 MOFO_Features_AllPlays <- Stats_ByFullPlay_Final %>%
   select(c("PostSnap_MOF_Num", "X_Diff_BetweenSafeties_AtSnap", "TotDist_BetweenSafeties_AtSnap",
            "min_SafetyAbsHorizDistToMOF_PreSnap", "X_Vel_Diff_BetweenSafeties_AtSnap",
            "Y_Vel_Diff_BetweenSafeties_AtSnap", "TotSpeed_Diff_BetweenSafeties_AtSnap",
            "X_Acc_Diff_BetweenSafeties_AtSnap", "Y_Acc_Diff_BetweenSafeties_AtSnap",           
            "TotAcc_Diff_BetweenSafeties_AtSnap", "Max_VertCreptDistance_AnySafety",
-           "Max_TotalCreptDistance_ToBall_AnySafety", "Min_PreSnap_X_vel_component_AnySafety",
-           "Min_PreSnap_X_acc_component_AnySafety", "Y_AbsDistFromMOF_Diff_BetweenSafeties_AtSnap", 
+           "Max_TotalCreptDistance_ToBall_AnySafety", "Max_PreSnap_X_velocity_TowardBall_AnySafety",
+           "Max_PreSnap_X_acc_TowardBall_AnySafety", "Y_AbsDistFromMOF_Diff_BetweenSafeties_AtSnap", 
            "Max_Y_AbsSpeed_AtSnap_AnySafety", "Max_Y_AbsAcc_AtSnap_AnySafety", "Max_Y_AbsDistFromMOF_AtSnap_AnySafety"))
 
 corr_matrix_MOFO_AllPlays <- MOFO_Features_AllPlays %>%
@@ -39,8 +46,8 @@ MOFO_Features_2High <- Stats_ByFullPlay_Final %>% filter(num_safeties_pre_snap =
            "Y_Vel_Diff_BetweenSafeties_AtSnap", "TotSpeed_Diff_BetweenSafeties_AtSnap",
            "X_Acc_Diff_BetweenSafeties_AtSnap", "Y_Acc_Diff_BetweenSafeties_AtSnap",           
            "TotAcc_Diff_BetweenSafeties_AtSnap", "Max_VertCreptDistance_AnySafety",
-           "Max_TotalCreptDistance_ToBall_AnySafety", "Min_PreSnap_X_vel_component_AnySafety",
-           "Min_PreSnap_X_acc_component_AnySafety", "Y_AbsDistFromMOF_Diff_BetweenSafeties_AtSnap", 
+           "Max_TotalCreptDistance_ToBall_AnySafety", "Max_PreSnap_X_velocity_TowardBall_AnySafety",
+           "Max_PreSnap_X_acc_TowardBall_AnySafety", "Y_AbsDistFromMOF_Diff_BetweenSafeties_AtSnap", 
            "Max_Y_AbsSpeed_AtSnap_AnySafety", "Max_Y_AbsAcc_AtSnap_AnySafety", "Max_Y_AbsDistFromMOF_AtSnap_AnySafety"))
 
 corr_matrix_MOFO_2High <- MOFO_Features_2High %>%
@@ -62,8 +69,8 @@ top_variables_MOFO_2High <- top_variables_MOFO_2High[, colnames(top_variables_MO
 
 MOFO_Features_1High <- Stats_ByFullPlay_Final %>% filter(num_safeties_pre_snap == 1) %>%
   select(c("PostSnap_MOF_Num", "min_SafetyAbsHorizDistToMOF_PreSnap", "Max_VertCreptDistance_AnySafety",
-           "Max_TotalCreptDistance_ToBall_AnySafety", "Min_PreSnap_X_vel_component_AnySafety",
-           "Min_PreSnap_X_acc_component_AnySafety", "Max_Y_AbsSpeed_AtSnap_AnySafety", 
+           "Max_TotalCreptDistance_ToBall_AnySafety", "Max_PreSnap_X_velocity_TowardBall_AnySafety",
+           "Max_PreSnap_X_acc_TowardBall_AnySafety", "Max_Y_AbsSpeed_AtSnap_AnySafety", 
            "Max_Y_AbsAcc_AtSnap_AnySafety", "Max_Y_AbsDistFromMOF_AtSnap_AnySafety"))
 
 corr_matrix_MOFO_1High <- MOFO_Features_1High %>%
@@ -89,8 +96,8 @@ Entropy_Features_AllPlays <- Stats_ByFullPlay_Final %>%
            "Y_Vel_Diff_BetweenSafeties_AtSnap", "TotSpeed_Diff_BetweenSafeties_AtSnap",
            "X_Acc_Diff_BetweenSafeties_AtSnap", "Y_Acc_Diff_BetweenSafeties_AtSnap",           
            "TotAcc_Diff_BetweenSafeties_AtSnap", "Max_VertCreptDistance_AnySafety",
-           "Max_TotalCreptDistance_ToBall_AnySafety", "Min_PreSnap_X_vel_component_AnySafety",
-           "Min_PreSnap_X_acc_component_AnySafety", "Y_AbsDistFromMOF_Diff_BetweenSafeties_AtSnap", 
+           "Max_TotalCreptDistance_ToBall_AnySafety", "Max_PreSnap_X_velocity_TowardBall_AnySafety",
+           "Max_PreSnap_X_acc_TowardBall_AnySafety", "Y_AbsDistFromMOF_Diff_BetweenSafeties_AtSnap", 
            "Max_Y_AbsSpeed_AtSnap_AnySafety", "Max_Y_AbsAcc_AtSnap_AnySafety", "Max_Y_AbsDistFromMOF_AtSnap_AnySafety"))
 
 corr_matrix_Entropy_AllPlays <- Entropy_Features_AllPlays %>%
@@ -116,8 +123,8 @@ Entropy_Features_2High <- Stats_ByFullPlay_Final %>% filter(num_safeties_pre_sna
            "Y_Vel_Diff_BetweenSafeties_AtSnap", "TotSpeed_Diff_BetweenSafeties_AtSnap",
            "X_Acc_Diff_BetweenSafeties_AtSnap", "Y_Acc_Diff_BetweenSafeties_AtSnap",           
            "TotAcc_Diff_BetweenSafeties_AtSnap", "Max_VertCreptDistance_AnySafety",
-           "Max_TotalCreptDistance_ToBall_AnySafety", "Min_PreSnap_X_vel_component_AnySafety",
-           "Min_PreSnap_X_acc_component_AnySafety", "Y_AbsDistFromMOF_Diff_BetweenSafeties_AtSnap", 
+           "Max_TotalCreptDistance_ToBall_AnySafety", "Max_PreSnap_X_velocity_TowardBall_AnySafety",
+           "Max_PreSnap_X_acc_TowardBall_AnySafety", "Y_AbsDistFromMOF_Diff_BetweenSafeties_AtSnap", 
            "Max_Y_AbsSpeed_AtSnap_AnySafety", "Max_Y_AbsAcc_AtSnap_AnySafety", "Max_Y_AbsDistFromMOF_AtSnap_AnySafety"))
 
 corr_matrix_Entropy_2High <- Entropy_Features_2High %>%
@@ -139,8 +146,8 @@ top_variables_Entropy_2High <- top_variables_Entropy_2High[, colnames(top_variab
 
 Entropy_Features_1High <- Stats_ByFullPlay_Final %>% filter(num_safeties_pre_snap == 1) %>%
   select(c("Snap_Entropy", "min_SafetyAbsHorizDistToMOF_PreSnap", "Max_VertCreptDistance_AnySafety",
-           "Max_TotalCreptDistance_ToBall_AnySafety", "Min_PreSnap_X_vel_component_AnySafety",
-           "Min_PreSnap_X_acc_component_AnySafety", "Max_Y_AbsSpeed_AtSnap_AnySafety", 
+           "Max_TotalCreptDistance_ToBall_AnySafety", "Max_PreSnap_X_velocity_TowardBall_AnySafety",
+           "Max_PreSnap_X_acc_TowardBall_AnySafety", "Max_Y_AbsSpeed_AtSnap_AnySafety", 
            "Max_Y_AbsAcc_AtSnap_AnySafety", "Max_Y_AbsDistFromMOF_AtSnap_AnySafety"))
 
 corr_matrix_Entropy_1High <- Entropy_Features_1High %>%
@@ -159,3 +166,7 @@ top_variables_Entropy_1High <- corr_df_Entropy_1High %>% filter(abs(Snap_Entropy
 rownames(top_variables_Entropy_1High) # keep in mind Snap_Entropy obviously isn't a predictor variable
 # And make it so the only columns in this new DF align with the rows in that DF
 top_variables_Entropy_1High <- top_variables_Entropy_1High[, colnames(top_variables_Entropy_1High) %in% rownames(top_variables_Entropy_1High)]
+
+# Now test out some graphs
+Stats_ByFullPlay_2High <- Stats_ByFullPlay_Final %>% filter(num_safeties_pre_snap == 2)
+Stats_ByFullPlay_1High <- Stats_ByFullPlay_Final %>% filter(num_safeties_pre_snap == 1)
