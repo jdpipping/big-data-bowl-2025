@@ -8,7 +8,7 @@ memory.limit(size=10000)
 # these are the files related directly to the visualizations
 safety_movement1 <- read_csv('df_safety_movement_1.csv')
 safety_movement2 <- read_csv('df_safety_movement_2.csv')
-out_of_sample_preds <- read_csv('results_df_preds_outOfSample.csv')
+NN_model_results_DF <- read_csv('results_df_preds_outOfSample.csv')
 
 # tracking the entire plays:
 # df_C_players <- read_csv('df_C_players.csv')
@@ -25,7 +25,7 @@ df_C_tracking <- df_C_tracking %>%
   ungroup() 
 table(df_C_tracking$frameId)
 
-all_safety_movements_preds1 <- out_of_sample_preds %>%
+all_safety_movements_preds1 <- NN_model_results_DF %>%
   filter(num_safeties==1) %>%
   left_join(safety_movement1 %>%
               select(gameId,
@@ -52,7 +52,7 @@ all_safety_movements_preds1 <- out_of_sample_preds %>%
          x_last_p2 = NA,
          y_last_p2 = NA)
 
-all_safety_movements_preds2 <- out_of_sample_preds %>%
+all_safety_movements_preds2 <- NN_model_results_DF %>%
   filter(num_safeties==2) %>%
   left_join(safety_movement2 %>%
               select(gameId,
@@ -135,7 +135,8 @@ all_data_joined <- all_data_joined %>%
   left_join(plays %>%
               select(gameId,
                      playId,
-                     playDescription),
+                     playDescription,
+                     yardsToGo), # this is to help us with the yellow line in the visualization
             by = c('gameId', 'playId'))
 
 rm(plays, player_play)
@@ -204,9 +205,13 @@ sample_data_4 <- sample_data_4 %>%
   mutate(PostSnap_MOF = ifelse(!is.na(mofo_postsnap) & mofo_postsnap %in% 1, "MOF Open",
                                ifelse(!is.na(mofo_postsnap) & mofo_postsnap %in% 0, "MOF Closed", NA)))
 
+# And also add first_down_marker
+sample_data_3 <- sample_data_3 %>% mutate(first_down_marker = los + yardsToGo)
+sample_data_4 <- sample_data_4 %>% mutate(first_down_marker = los + yardsToGo)
+
 # adding in pauses, starting with sample_data_3:
 sample_data_3 <- sample_data_3 %>%
-  mutate(show_time = case_when(start_indicator == 'Model Start' | t_after_snap==-0.1 ~ 50,
+  mutate(show_time = case_when(start_indicator == 'Model Start' | t_after_snap == -0.1 ~ 50,
                                TRUE ~ 1),
          text_for_anim = case_when(
            t_after_snap < start_of_model_time ~ 'Before Line is Set',
@@ -260,6 +265,9 @@ anim <- ggplot() +
               color = 'black') +
   geom_text(data = sample_data_3, aes(x = x, y = y, group = nflId, label = jerseyNumber), colour = "white",
             vjust = 0.36, size = 4.5) +
+    # adding first down line and LOS
+    geom_segment(data = sample_data_3, aes(x = los, xend = los, y = 0, yend = 53.3), col = "blue") +
+    geom_segment(data = sample_data_3, aes(x = first_down_marker, xend = first_down_marker, y = 0, yend = 53.3), col = "yellow") +
   scale_color_manual(values = c('Offense' = "red", 'Defense'="black", 'football'="brown", 'Safety #1'='goldenrod', 'Safety #2'='goldenrod')) +
     scale_fill_manual(values = c('Offense' = "red", 'Defense'="black", 'football'="brown", 'Safety #1'='goldenrod', 'Safety #2'='goldenrod')) +
     scale_size_manual(values = c('Offense' = 8, 'Defense' = 8, 'football' = 6, 'Safety #1'= 8, 'Safety #2'= 8)) +
@@ -274,14 +282,16 @@ anim <- ggplot() +
         legend.position = "none") # obviously scrap this if we want to keep the "club" legend
 
 gif_animation_3_pauses <- animate(play_animation_3_pauses, duration = 0.1 * nFrames)
-  
+
 anim_save('play_animation_3_pauses.gif', gif_animation_3_pauses)
+
+unique(sample_data_3$nflId)
 
 rm(sample_data_3)
 
 # Now repeat it all for sample_data_4
 sample_data_4 <- sample_data_4 %>%
-  mutate(show_time = case_when(start_indicator == 'Model Start' | t_after_snap==-0.1 ~ 500,
+  mutate(show_time = case_when(start_indicator == 'Model Start' | t_after_snap == -0.1 ~ 50,
                                TRUE ~ 1),
          text_for_anim = case_when(
            t_after_snap < start_of_model_time ~ 'Before Line is Set',
@@ -328,13 +338,16 @@ play_animation_4_pauses <- anim +
                 y = y,
                 group = club),
             color = 'black')+
-  geom_text(data = sample_data_4,aes(x = 60, y = 55, label = text_for_anim), color = 'white') +
+  geom_text(data = sample_data_4, aes(x = 60, y = 55, label = text_for_anim), color = 'white') +
   geom_text(aes(x = 100, y = -2, label = paste0("Time Since Snap: ", t_after_snap)), 
             data = sample_data_4, 
             inherit.aes = FALSE, 
             color = 'black') +
   geom_text(data = sample_data_4, aes(x = x, y = y, group = nflId, label = jerseyNumber), colour = "white",
             vjust = 0.36, size = 4.5) +
+  # adding first down line and LOS
+  geom_segment(data = sample_data_4, aes(x = los, xend = los, y = 0, yend = 53.3), col = "blue") +
+  geom_segment(data = sample_data_4, aes(x = first_down_marker, xend = first_down_marker, y = 0, yend = 53.3), col = "yellow") +
   scale_color_manual(values = c('Offense' = "black", 'Defense'="orange", 'football'="brown", 'Safety #1'='red', 'Safety #2'='red'))+
   scale_fill_manual(values = c('Offense' = "black", 'Defense'="orange", 'football'="brown", 'Safety #1'='red', 'Safety #2'='red')) +
   scale_size_manual(values = c('Offense' = 8, 'Defense' = 8, 'football' = 6, 'Safety #1'= 8, 'Safety #2'= 8)) +
