@@ -57,7 +57,7 @@ all_dat_joined_1 <- all_dat_joined_1 %>% filter(gameId %in% c(2022092507) & play
   
 # Then add MOFO probability for the eventual data visualization
 all_dat_joined_1 <- all_dat_joined_1 %>%
-  left_join(out_of_sample_preds %>% select(playId, gameId, p, expectedPoints, winProbability), by = c('playId', 'gameId'))
+  left_join(NN_model_results_DF %>% select(playId, gameId, p, expectedPoints, winProbability), by = c('playId', 'gameId'))
 
 # Now join in the other data frames 
 # BUT first, establish which games/plays we want data visualizations for
@@ -122,6 +122,10 @@ size_vals <- c(8, 6, 8, 8)
 shape_vals <- c(21, 16, 21, 21)
 plot_title <- all_dat_joined_1[1, "playDescription"]
 nFrames <- max(all_dat_joined_1$frameId)
+los <- all_dat_joined_1[1, "los"]
+los <- as.numeric(los)
+first_down_marker <- los + all_dat_joined_1[1, "yardsToGo"]
+first_down_marker <- as.numeric(first_down_marker)
 
 #setting the field:
 anim <- ggplot() +
@@ -149,7 +153,7 @@ anim_func <- function(dataset, play, game) {
     ungroup()
   
   plot_title <- paste0(data_for_viz$playDescription[1], 
-                       '\n', 'MOFO Probability: ', round(100*data_for_viz$p[1], 2), '%',
+                       '\n', 'MOFO Probability: ', round(100*data_for_viz$p[1], 1), '%',
                        '\n', 'Pre-Snap Safeties (in Red): ',data_for_viz$num_safeties[1],
                        '\n', 'Actual MOFO vs. MOFC: ',data_for_viz$PostSnap_MOF[1],
                        '\n', 'Coverage Scheme: ', 'Tampa 2')
@@ -168,6 +172,10 @@ anim_func <- function(dataset, play, game) {
     # adding jersey numbers
     geom_text(data = all_dat_joined_1, aes(x = x, y = y, label = jerseyNumber), colour = "white",
               vjust = 0.36, size = 4.5) +
+    
+    # adding first down line and LOS
+    geom_segment(aes(x = los, xend = los, y = 0, yend = 53.3), col = "blue") +
+    geom_segment(aes(x = first_down_marker, xend = first_down_marker, y = 0, yend = 53.3), col = "yellow") +
     
     # titling plot with play description
     # setting animation parameters
@@ -223,7 +231,7 @@ all_dat_joined_2 <- all_dat_joined_2 %>% filter(gameId %in% c(2022090800) & play
 
 # Then add MOFO probability for the eventual data visualization
 all_dat_joined_2 <- all_dat_joined_2 %>%
-  left_join(out_of_sample_preds %>% select(playId, gameId, p, expectedPoints, winProbability), by = c('playId', 'gameId'))
+  left_join(NN_model_results_DF %>% select(playId, gameId, p, expectedPoints, winProbability), by = c('playId', 'gameId'))
 
 # Now join the other DFs in
 # 2-high: gameId == 2022090800, playId == 1504
@@ -287,6 +295,10 @@ size_vals <- c(8, 6, 8, 8)
 shape_vals <- c(21, 16, 21, 21)
 plot_title <- all_dat_joined_2[1, "playDescription"]
 nFrames <- max(all_dat_joined_2$frameId)
+los <- all_dat_joined_2[1, "los"]
+los <- as.numeric(los)
+first_down_marker <- los + all_dat_joined_2[1, "yardsToGo"]
+first_down_marker <- as.numeric(first_down_marker)
 
 #setting the field:
 anim <- ggplot() +
@@ -314,7 +326,7 @@ anim_func <- function(dataset, play, game) {
     ungroup()
   
   plot_title <- paste0(data_for_viz$playDescription[1], 
-                       '\n', 'MOFO Probability: ', round(100*data_for_viz$p[1], 2), '%',
+                       '\n', 'MOFO Probability: ', round(100*data_for_viz$p[1], 1), '%',
                        '\n', 'Pre-Snap Safeties (in Gold): ',data_for_viz$num_safeties[1],
                        '\n', 'Actual MOFO vs. MOFC: ',data_for_viz$PostSnap_MOF[1],
                        '\n', 'Coverage Scheme: ', 'Cover 3 Sky')
@@ -333,6 +345,10 @@ anim_func <- function(dataset, play, game) {
     # adding jersey numbers
     geom_text(data = all_dat_joined_2, aes(x = x, y = y, label = jerseyNumber), colour = "white",
               vjust = 0.36, size = 4.5) +
+    
+    # adding first down line and LOS
+    geom_segment(aes(x = los, xend = los, y = 0, yend = 53.3), col = "blue") +
+    geom_segment(aes(x = first_down_marker, xend = first_down_marker, y = 0, yend = 53.3), col = "yellow") +
     
     #titling plot with play description
     #setting animation parameters
@@ -372,6 +388,7 @@ anim_save("play_animation_2.gif", animation = gif_animation_2)
 
 # Now repeat for gameId 2022091804, playId 2572 (Week 2)
 tracking_week_2 <- fread("tracking_week_2.csv")
+# View(tracking_week_2 %>% filter(gameId == 2022091804, playId == 2572, frameType %in% "SNAP"))
 Week2_NamesAndNumbers <- tracking_week_2 %>% select(c(nflId, displayName, jerseyNumber))
 Week2_NamesAndNumbers <- unique(Week2_NamesAndNumbers)
 df_C_tracking_3 <- df_C_tracking %>% left_join(Week2_NamesAndNumbers, by = c("nflId", "displayName"))  
@@ -385,7 +402,7 @@ all_dat_joined_3 <- all_dat_joined_3 %>% filter(gameId %in% c(2022091804) & play
 
 # Then add MOFO probability for the eventual data visualization
 all_dat_joined_3 <- all_dat_joined_3 %>%
-  left_join(out_of_sample_preds %>% select(playId, gameId, p, expectedPoints, winProbability), by = c('playId', 'gameId'))
+  left_join(NN_model_results_DF %>% select(playId, gameId, p, expectedPoints, winProbability), by = c('playId', 'gameId'))
 
 # Now join the other DFs in
 # 2-high: gameId == 2022091804, playId == 2572
@@ -449,6 +466,10 @@ size_vals <- c(8, 6, 8, 8)
 shape_vals <- c(21, 16, 21, 21)
 plot_title <- all_dat_joined_3[1, "playDescription"]
 nFrames <- max(all_dat_joined_3$frameId)
+los <- all_dat_joined_3[1, "los"]
+los <- as.numeric(los)
+first_down_marker <- los + all_dat_joined_3[1, "yardsToGo"]
+first_down_marker <- as.numeric(first_down_marker)
 
 #setting the field:
 anim <- ggplot() +
@@ -476,7 +497,7 @@ anim_func <- function(dataset, play, game) {
     ungroup()
   
   plot_title <- paste0(data_for_viz$playDescription[1], 
-                       '\n', 'MOFO Probability: ', round(100*data_for_viz$p[1], 2), '%',
+                       '\n', 'MOFO Probability: ', round(100*data_for_viz$p[1], 1), '%',
                        '\n', 'Pre-Snap Safeties (in Gold): ',data_for_viz$num_safeties[1],
                        '\n', 'Actual MOFO vs. MOFC: ',data_for_viz$PostSnap_MOF[1],
                        '\n', 'Coverage Scheme: ', 'Tampa 2')
@@ -495,6 +516,10 @@ anim_func <- function(dataset, play, game) {
     # adding jersey numbers
     geom_text(data = all_dat_joined_3, aes(x = x, y = y, label = jerseyNumber), colour = "white",
               vjust = 0.36, size = 4.5) +
+    
+    # adding first down line and LOS
+    geom_segment(aes(x = los, xend = los, y = 0, yend = 53.3), col = "blue") +
+    geom_segment(aes(x = first_down_marker, xend = first_down_marker, y = 0, yend = 53.3), col = "yellow") +
     
     #titling plot with play description
     #setting animation parameters
@@ -534,6 +559,7 @@ anim_save("play_animation_3.gif", animation = gif_animation_3)
 
 # Now repeat for gameId 2022092200, playId 2112 (Week 3)
 tracking_week_3 <- fread("tracking_week_3.csv")
+# View(tracking_week_3 %>% filter(gameId == 2022092200, playId == 2112, frameType %in% "SNAP"))
 Week3_NamesAndNumbers <- tracking_week_3 %>% select(c(nflId, displayName, jerseyNumber))
 Week3_NamesAndNumbers <- unique(Week3_NamesAndNumbers)
 df_C_tracking_4 <- df_C_tracking %>% left_join(Week3_NamesAndNumbers, by = c("nflId", "displayName"))  
@@ -547,7 +573,7 @@ all_dat_joined_4 <- all_dat_joined_4 %>% filter(gameId %in% c(2022092200) & play
 
 # Then add MOFO probability for the eventual data visualization
 all_dat_joined_4 <- all_dat_joined_4 %>%
-  left_join(out_of_sample_preds %>% select(playId, gameId, p, expectedPoints, winProbability), by = c('playId', 'gameId'))
+  left_join(NN_model_results_DF %>% select(playId, gameId, p, expectedPoints, winProbability), by = c('playId', 'gameId'))
 
 # Now join the other DFs in
 # 2-high: gameId == 2022092200, playId == 2112
@@ -611,6 +637,10 @@ size_vals <- c(8, 6, 8, 8)
 shape_vals <- c(21, 16, 21, 21)
 plot_title <- all_dat_joined_4[1, "playDescription"]
 nFrames <- max(all_dat_joined_4$frameId)
+los <- all_dat_joined_4[1, "los"]
+los <- as.numeric(los)
+first_down_marker <- los + all_dat_joined_4[1, "yardsToGo"]
+first_down_marker <- as.numeric(first_down_marker)
 
 #setting the field:
 anim <- ggplot() +
@@ -638,7 +668,7 @@ anim_func <- function(dataset, play, game) {
     ungroup()
   
   plot_title <- paste0(data_for_viz$playDescription[1], 
-                       '\n', 'MOFO Probability: ', round(100*data_for_viz$p[1], 2), '%',
+                       '\n', 'MOFO Probability: ', round(100*data_for_viz$p[1], 1), '%',
                        '\n', 'Pre-Snap Safeties (in Red): ',data_for_viz$num_safeties[1],
                        '\n', 'Actual MOFO vs. MOFC: ',data_for_viz$PostSnap_MOF[1],
                        '\n', 'Coverage Scheme: ', 'Cover 1')
@@ -657,6 +687,10 @@ anim_func <- function(dataset, play, game) {
     # adding jersey numbers
     geom_text(data = all_dat_joined_4, aes(x = x, y = y, label = jerseyNumber), colour = "white",
               vjust = 0.36, size = 4.5) +
+    
+    # adding first down line and LOS
+    geom_segment(aes(x = los, xend = los, y = 0, yend = 53.3), col = "blue") +
+    geom_segment(aes(x = first_down_marker, xend = first_down_marker, y = 0, yend = 53.3), col = "yellow") +
     
     #titling plot with play description
     #setting animation parameters
@@ -696,7 +730,7 @@ anim_save("play_animation_4.gif", animation = gif_animation_4)
 
 rm(df_C_players, df_C_plays, df_C_tracking, 
    df_C_tracking_1, df_C_tracking_2, df_C_tracking_3, df_C_tracking_4,
-   df_safety_movement_1, df_safety_movement_2, out_of_sample_preds, 
+   df_safety_movement_1, df_safety_movement_2, NN_model_results_DF, 
    all_dat_joined_1, all_dat_joined_2, all_dat_joined_3, all_dat_joined_4, comp_df)
 
 
