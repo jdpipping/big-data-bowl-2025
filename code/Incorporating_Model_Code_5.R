@@ -7,7 +7,7 @@ Dropbacks_Merged <- read_csv("Dropbacks_Merged.csv")
 NN_model_results_DF <- fread("results_df_preds.csv")
 # Recall that "p" means probability of MOFO coverage
 
-# For the sake of formality, get the column names here to align with those of Dropbacks_Merged
+# Get the column names here to align with those of Dropbacks_Merged
 colnames(NN_model_results_DF)
 colnames(Dropbacks_Merged)
 NN_model_results_DF <- NN_model_results_DF %>% rename(num_safeties_pre_snap = `num_safeties`)
@@ -22,6 +22,7 @@ NN_model_results_DF <- NN_model_results_DF %>% rename(pre_snap_safety_2_name = `
 
 # Now merge() this to Dropbacks_Merged ... to keep it simple, can just limit the NN_model_results_DF to gameId, playId, and "p"
 NN_DF_abridged <- NN_model_results_DF %>% select(c("gameId", "playId", "p"))
+# Also keep in mind that the model limited to first downs and second downs with 5+ yards to go
 Dropbacks_Merged <- merge(x = Dropbacks_Merged, y = NN_DF_abridged, 
                           by = c("gameId", "playId"))
 Dropbacks_Merged <- Dropbacks_Merged %>% rename(MOFO_probability_FDA = `p`)
@@ -30,10 +31,11 @@ rm(NN_DF_abridged)
 setDT(Dropbacks_Merged)
 setkey(Dropbacks_Merged, gameId, playId, nflId, frameId)
 Dropbacks_Merged <- Dropbacks_Merged %>% relocate("gameId", "playId", "nflId", "displayName", "frameId")
-rm(Dropbacks_Merged)
 
 # The goal is to explore why the model says what it says, and to do so, clustering will be important
 # Practically, to do so, we will need to join the modeling CSV with df_safety_movement_1 and df_safety_movement_2 CSVs
+# We can cluster on the same features used in the model
+# See the function “get_movement_X” in the 2_modeling GH doc for the features
 df_safety_movement_1 <- read_csv("df_safety_movement_1.csv")
 df_safety_movement_2 <- read_csv("df_safety_movement_2.csv")
 
@@ -71,12 +73,18 @@ df_safety_movement_2 <- df_safety_movement_2 %>% rename(pre_snap_safety_2_X_AtSn
 df_safety_movement_1 <- df_safety_movement_1 %>% rename(pre_snap_safety_1_Y_AtSnap = `y_last`)
 df_safety_movement_2 <- df_safety_movement_2 %>% rename(pre_snap_safety_1_Y_AtSnap = `y_last_p1`)
 df_safety_movement_2 <- df_safety_movement_2 %>% rename(pre_snap_safety_2_Y_AtSnap = `y_last_p2`)
+df_safety_movement_1 <- df_safety_movement_1 %>% rename(Safety1_x_vel_component_AtSnap = `v_x_last`)
+df_safety_movement_2 <- df_safety_movement_2 %>% rename(Safety1_x_vel_component_AtSnap = `v_x_last_p1`)
+df_safety_movement_2 <- df_safety_movement_2 %>% rename(Safety2_x_vel_component_AtSnap = `v_x_last_p2`)
+df_safety_movement_1 <- df_safety_movement_1 %>% rename(Safety1_y_vel_component_AtSnap = `v_y_last`)
+df_safety_movement_2 <- df_safety_movement_2 %>% rename(Safety1_y_vel_component_AtSnap = `v_y_last_p1`)
+df_safety_movement_2 <- df_safety_movement_2 %>% rename(Safety2_y_vel_component_AtSnap = `v_y_last_p2`)
 
 # Now merge() these to Dropbacks_Merged, but probably have to separate to 1-high and 2-high plays
-# To keep it simple, take out some unnecessary columns from df_safety_movement DFs
+# To keep the merge simple, take out some unnecessary columns from df_safety_movement DFs
 df_safety_movement_1 <- df_safety_movement_1 %>% 
   select(-c("pre_snap_safety_1", "pre_snap_safety_1_name", "num_safeties_pre_snap", "PostSnap_MOF_Num",
-            "defteam", "posteam", "Ball_X_Snap", "pre_snap_safety_1_X_AtSnap", "pre_snap_safety_1_Y_AtSnap"))
+            "defteam", "posteam", "Ball_X_Snap", "pre_snap_safety_1_X_AtSnap", "pre_snap_safety_1_Y_AtSnap", "Safety1_x_vel_component_AtSnap", "Safety1_y_vel_component_AtSnap"))
 final_dropbacks_1High <- merge(x = Dropbacks_Merged, y = df_safety_movement_1,
                                by = c("gameId", "playId"))
 
@@ -84,7 +92,8 @@ df_safety_movement_2 <- df_safety_movement_2 %>%
   select(-c("pre_snap_safety_1", "pre_snap_safety_1_name", "pre_snap_safety_2", "pre_snap_safety_2_name", 
             "num_safeties_pre_snap", "PostSnap_MOF_Num",
             "defteam", "posteam", "Ball_X_Snap", "pre_snap_safety_1_X_AtSnap", "pre_snap_safety_1_Y_AtSnap",
-            "pre_snap_safety_2_X_AtSnap", "pre_snap_safety_2_Y_AtSnap"))
+            "pre_snap_safety_2_X_AtSnap", "pre_snap_safety_2_Y_AtSnap", , "Safety1_x_vel_component_AtSnap", "Safety1_y_vel_component_AtSnap",
+            "Safety2_x_vel_component_AtSnap", "Safety2_y_vel_component_AtSnap"))
 final_dropbacks_2High <- merge(x = Dropbacks_Merged, y = df_safety_movement_2,
                                by = c("gameId", "playId"))
 
@@ -96,21 +105,21 @@ final_dropbacks_1High <- final_dropbacks_1High %>% rename(x_spline_basis1_p1 = `
                                                           x_spline_basis3_p1 = `x_spline_basis3`,
                                                           x_spline_basis4_p1 = `x_spline_basis4`,
                                                           x_spline_basis5_p1 = `x_spline_basis5`,
-                                                          x_spline_basis6_p1 = `x_spline_basis6`,
-                                                          x_spline_basis7_p1 = `x_spline_basis7`,
-                                                          x_spline_basis8_p1 = `x_spline_basis8`,
-                                                          x_spline_basis9_p1 = `x_spline_basis9`,
-                                                          x_spline_basis10_p1 = `x_spline_basis10`,
+                                                        #  x_spline_basis6_p1 = `x_spline_basis6`,
+                                                        #  x_spline_basis7_p1 = `x_spline_basis7`,
+                                                        #  x_spline_basis8_p1 = `x_spline_basis8`,
+                                                        #  x_spline_basis9_p1 = `x_spline_basis9`,
+                                                        #  x_spline_basis10_p1 = `x_spline_basis10`,
                                                           y_spline_basis1_p1 = `y_spline_basis1`,
                                                           y_spline_basis2_p1 = `y_spline_basis2`,
                                                           y_spline_basis3_p1 = `y_spline_basis3`,
                                                           y_spline_basis4_p1 = `y_spline_basis4`,
-                                                          y_spline_basis5_p1 = `y_spline_basis5`,
-                                                          y_spline_basis6_p1 = `y_spline_basis6`,
-                                                          y_spline_basis7_p1 = `y_spline_basis7`,
-                                                          y_spline_basis8_p1 = `y_spline_basis8`,
-                                                          y_spline_basis9_p1 = `y_spline_basis9`,
-                                                          y_spline_basis10_p1 = `y_spline_basis10`)
+                                                          y_spline_basis5_p1 = `y_spline_basis5`)
+                                                        #  y_spline_basis6_p1 = `y_spline_basis6`,
+                                                        #  y_spline_basis7_p1 = `y_spline_basis7`,
+                                                        #  y_spline_basis8_p1 = `y_spline_basis8`,
+                                                        #  y_spline_basis9_p1 = `y_spline_basis9`,
+                                                        #  y_spline_basis10_p1 = `y_spline_basis10`)
 
 # We can't rbind() while they have a different number of columns, so let's add "NA" columns to final_dropbacks_1High
 # Identify the columns that are in final_dropbacks_2High but not in final_dropbacks_1High
