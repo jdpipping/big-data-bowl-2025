@@ -170,3 +170,220 @@ top_variables_Entropy_1High <- top_variables_Entropy_1High[, colnames(top_variab
 # Now test out some graphs
 Stats_ByFullPlay_2High <- Stats_ByFullPlay_Final %>% filter(num_safeties_pre_snap == 2)
 Stats_ByFullPlay_1High <- Stats_ByFullPlay_Final %>% filter(num_safeties_pre_snap == 1)
+
+# Diagnose features we should be graphing
+# View(top_variables_MOFO_AllPlays)
+# All plays: X_Diff_BetweenSafeties_AtSnap, Max_VertCreptDistance_AnySafety, X_Vel_Diff_BetweenSafeties_AtSnap AND/OR Max_PreSnap_X_vel_TowardBall_AnySafety
+Plot6 <- ggplot(data = Stats_ByFullPlay_Final) +
+  geom_point(aes(x = X_Diff_BetweenSafeties_AtSnap, y = PostSnap_MOF_Num), alpha = 0.1) +
+  stat_smooth(mapping = aes(x = X_Diff_BetweenSafeties_AtSnap, y = PostSnap_MOF_Num, color = "red"),
+              method = "gam", se = T, span = 0.75) +
+  # geom_abline(intercept = 0, slope = 0) +
+  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_x_continuous(breaks = seq(0, 10, 2)) +
+  coord_cartesian(xlim = c(0, 10), ylim = c(0, 1)) +
+  labs(x = "Vertical Stagger b/w Safeties at Snap (Yards)", y = "MOFO Coverage Rate",
+       title = "How MOFO Coverage Rate Depends on Vertical Stagger Between Safeties",
+       subtitle = "Early Down Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022 (n = 4381)",
+       caption = "Vertical Stagger: vertical distance b/w safeties at time of snap",
+       color = " ") +
+  theme_bw() + 
+  theme(plot.title = element_text(size = 10, hjust = 0.5),
+        plot.subtitle = element_text(size = 8, hjust = 0.5),
+        legend.position = "none")
+
+Plot7 <- ggplot(data = Stats_ByFullPlay_Final) +
+  geom_point(aes(x = Max_VertCreptDistance_AnySafety, y = PostSnap_MOF_Num), alpha = 0.1) +
+  stat_smooth(mapping = aes(x = Max_VertCreptDistance_AnySafety, y = PostSnap_MOF_Num, color = "red"),
+              method = "gam", se = T, span = 0.75) +
+  # geom_abline(intercept = 0, slope = 0) +
+  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_x_continuous(breaks = seq(0, 10, 2)) +
+  coord_cartesian(xlim = c(0, 7), ylim = c(0, 1)) +
+  labs(x = "Highest Vertical 'Creep' Distance by a Safety (Yards)", y = "MOFO Coverage Rate",
+       title = "How MOFO Coverage Rate Depends on Highest Vertical 'Creep' Distance by a Safety",
+       subtitle = "Early Down Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022 (n = 4381)",
+       caption = "Vertical 'Creep' Distance: How Far Safety Moved Toward LOS Before Snap",
+       color = " ") +
+  theme_bw() + 
+  theme(plot.title = element_text(size = 10, hjust = 0.5),
+        plot.subtitle = element_text(size = 8, hjust = 0.5),
+        legend.position = "none")
+
+Plot8 <- ggplot(data = Stats_ByFullPlay_Final) +
+  geom_point(aes(x = X_Vel_Diff_BetweenSafeties_AtSnap, y = PostSnap_MOF_Num), alpha = 0.1) +
+  stat_smooth(mapping = aes(x = X_Vel_Diff_BetweenSafeties_AtSnap, y = PostSnap_MOF_Num, color = "red"),
+              method = "gam", se = T, span = 0.75) +
+  # geom_abline(intercept = 0, slope = 0) +
+  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_x_continuous(breaks = seq(0, 10, 2)) +
+  coord_cartesian(xlim = c(0, 6), ylim = c(0, 1)) +
+  labs(x = "Difference in Vertical Velocities b/w Safeties at Snap (Yds/Sec)", y = "MOFO Coverage Rate",
+       title = "How MOFO Coverage Rate Depends on Difference in Vertical Velocities b/w Safeties at Snap",
+       subtitle = "Early Down Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022 (n = 4381)",
+       caption = "Vertical Velocities: each safety's yards/sec, but only toward or away from LOS (i.e. parallel to sideline)",
+       color = " ") +
+  theme_bw() + 
+  theme(plot.title = element_text(size = 10, hjust = 0.5),
+        plot.subtitle = element_text(size = 8, hjust = 0.5),
+        legend.position = "none")
+
+Plot9 <- ggplot(data = Stats_ByFullPlay_Final) +
+  geom_point(aes(x = Max_PreSnap_X_vel_TowardBall_AnySafety, y = PostSnap_MOF_Num), alpha = 0.1) +
+  stat_smooth(mapping = aes(x = Max_PreSnap_X_vel_TowardBall_AnySafety, y = PostSnap_MOF_Num, color = "red"),
+              method = "gam", se = T, span = 0.75) +
+  # geom_abline(intercept = 0, slope = 0) +
+  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_x_continuous(breaks = seq(0, 10, 2)) +
+  coord_cartesian(xlim = c(0, 5), ylim = c(0, 1)) +
+  labs(x = "Maximum Pre-Snap Speed Toward Ball by a Safety (Yds/Sec)", y = "MOFO Coverage Rate",
+       title = "How MOFO Coverage Rate Depends on Maximum Pre-Snap Speed Toward Ball by a Safety",
+       subtitle = "Early Down Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022 (n = 4381)",
+       caption = "Max Pre-Snap Speed Toward Ball: highest velocity, in direction of ball, at any point before snap",
+       color = " ") +
+  theme_bw() + 
+  theme(plot.title = element_text(size = 10, hjust = 0.5),
+        plot.subtitle = element_text(size = 8, hjust = 0.5),
+        legend.position = "none")
+
+grid.arrange(Plot6, Plot7, ncol = 2)
+# grid.arrange(Plot6, Plot7, Plot8, Plot9, ncol = 4) ... don't use, too crowded
+grid.arrange(Plot6, Plot7, Plot8, Plot9, nrow = 2, ncol = 2)
+
+# View(top_variables_MOFO_2High)
+# 2-high: X_Diff_BetweenSafeties_AtSnap, Max_VertCreptDistance_AnySafety, X_Vel_Diff_BetweenSafeties_AtSnap AND/OR Max_PreSnap_X_vel_TowardBall_AnySafety
+Plot10 <- ggplot(data = Stats_ByFullPlay_2High) +
+  geom_point(aes(x = X_Diff_BetweenSafeties_AtSnap, y = PostSnap_MOF_Num), alpha = 0.1) +
+  stat_smooth(mapping = aes(x = X_Diff_BetweenSafeties_AtSnap, y = PostSnap_MOF_Num, color = "red"),
+              method = "gam", se = T, span = 0.75) +
+  # geom_abline(intercept = 0, slope = 0) +
+  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_x_continuous(breaks = seq(0, 10, 2)) +
+  coord_cartesian(xlim = c(0, 10), ylim = c(0, 1)) +
+  labs(x = "Vertical Stagger b/w Safeties at Snap (Yards)", y = "MOFO Coverage Rate",
+       title = "How MOFO Coverage Rate Depends on Vertical Stagger Between Safeties",
+       subtitle = "Early Down 2-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022 (n = 3029)",
+       caption = "Vertical Stagger: vertical distance b/w safeties at time of snap",
+       color = " ") +
+  theme_bw() + 
+  theme(plot.title = element_text(size = 10, hjust = 0.5),
+        plot.subtitle = element_text(size = 8, hjust = 0.5),
+        legend.position = "none")
+
+Plot11 <- ggplot(data = Stats_ByFullPlay_2High) +
+  geom_point(aes(x = Max_VertCreptDistance_AnySafety, y = PostSnap_MOF_Num), alpha = 0.1) +
+  stat_smooth(mapping = aes(x = Max_VertCreptDistance_AnySafety, y = PostSnap_MOF_Num, color = "red"),
+              method = "gam", se = T, span = 0.75) +
+  # geom_abline(intercept = 0, slope = 0) +
+  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_x_continuous(breaks = seq(0, 10, 2)) +
+  coord_cartesian(xlim = c(0, 7), ylim = c(0, 1)) +
+  labs(x = "Highest Vertical 'Creep' Distance by a Safety (Yards)", y = "MOFO Coverage Rate",
+       title = "How MOFO Coverage Rate Depends on Highest Vertical 'Creep' Distance by a Safety",
+       subtitle = "Early Down 2-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022 (n = 3029)",
+       caption = "Vertical 'Creep' Distance: How Far Safety Moved Toward LOS Before Snap",
+       color = " ") +
+  theme_bw() + 
+  theme(plot.title = element_text(size = 10, hjust = 0.5),
+        plot.subtitle = element_text(size = 8, hjust = 0.5),
+        legend.position = "none")
+
+Plot12 <- ggplot(data = Stats_ByFullPlay_2High) +
+  geom_point(aes(x = X_Vel_Diff_BetweenSafeties_AtSnap, y = PostSnap_MOF_Num), alpha = 0.1) +
+  stat_smooth(mapping = aes(x = X_Vel_Diff_BetweenSafeties_AtSnap, y = PostSnap_MOF_Num, color = "red"),
+              method = "gam", se = T, span = 0.75) +
+  # geom_abline(intercept = 0, slope = 0) +
+  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_x_continuous(breaks = seq(0, 10, 2)) +
+  coord_cartesian(xlim = c(0, 6), ylim = c(0, 1)) +
+  labs(x = "Difference in Vertical Velocities b/w Safeties at Snap (Yds/Sec)", y = "MOFO Coverage Rate",
+       title = "How MOFO Coverage Rate Depends on Difference in Vertical Velocities b/w Safeties at Snap",
+       subtitle = "Early Down 2-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022 (n = 3029)",
+       caption = "Vertical Velocities: each safety's yards/sec, but only toward or away from LOS (i.e. parallel to sideline)",
+       color = " ") +
+  theme_bw() + 
+  theme(plot.title = element_text(size = 10, hjust = 0.5),
+        plot.subtitle = element_text(size = 8, hjust = 0.5),
+        legend.position = "none")
+
+Plot13 <- ggplot(data = Stats_ByFullPlay_2High) +
+  geom_point(aes(x = Max_PreSnap_X_vel_TowardBall_AnySafety, y = PostSnap_MOF_Num), alpha = 0.1) +
+  stat_smooth(mapping = aes(x = Max_PreSnap_X_vel_TowardBall_AnySafety, y = PostSnap_MOF_Num, color = "red"),
+              method = "gam", se = T, span = 0.75) +
+  # geom_abline(intercept = 0, slope = 0) +
+  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_x_continuous(breaks = seq(0, 10, 2)) +
+  coord_cartesian(xlim = c(0, 5), ylim = c(0, 1)) +
+  labs(x = "Maximum Pre-Snap Speed Toward Ball by a Safety (Yds/Sec)", y = "MOFO Coverage Rate",
+       title = "How MOFO Coverage Rate Depends on Maximum Pre-Snap Speed Toward Ball by a Safety",
+       subtitle = "Early Down 2-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022 (n = 3029)",
+       caption = "Max Pre-Snap Speed Toward Ball: highest velocity, in direction of ball, at any point before snap",
+       color = " ") +
+  theme_bw() + 
+  theme(plot.title = element_text(size = 10, hjust = 0.5),
+        plot.subtitle = element_text(size = 8, hjust = 0.5),
+        legend.position = "none")
+
+grid.arrange(Plot10, Plot11, ncol = 2)
+# grid.arrange(Plot10, Plot11, Plot12, Plot13, ncol = 4) ... don't use, too crowded
+grid.arrange(Plot10, Plot11, Plot12, Plot13, nrow = 2, ncol = 2)
+
+# View(top_variables_MOFO_1High)
+# 1-high: Max_Y_AbsSpeed_AtSnap_AnySafety, Max_Y_AbsAcc_AtSnap_AnySafety, Max_Y_AbsDistFromMOF_AtSnap_AnySafety
+Plot14 <- ggplot(data = Stats_ByFullPlay_1High) +
+  geom_point(aes(x = Max_Y_AbsSpeed_AtSnap_AnySafety, y = PostSnap_MOF_Num), alpha = 0.1) +
+  stat_smooth(mapping = aes(x = Max_Y_AbsSpeed_AtSnap_AnySafety, y = PostSnap_MOF_Num, color = "red"),
+              method = "gam", se = T, span = 0.75) +
+  # geom_abline(intercept = 0, slope = 0) +
+  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_x_continuous(breaks = seq(0, 10, 1)) +
+  coord_cartesian(xlim = c(0, 5), ylim = c(0, 1)) +
+  labs(x = "Horizontal Speed by Safety at Snap (Yds/Sec)", y = "MOFO Coverage Rate",
+       title = "How MOFO Coverage Rate Depends on Safety's Horizontal Speed at the Snap",
+       subtitle = "Early Down 1-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022 (n = 1352)",
+       caption = "Horizontal Speed: speed strictly toward the sideline (either right or left counts as positive)",
+       color = " ") +
+  theme_bw() + 
+  theme(plot.title = element_text(size = 10, hjust = 0.5),
+        plot.subtitle = element_text(size = 8, hjust = 0.5),
+        legend.position = "none")
+
+Plot15 <- ggplot(data = Stats_ByFullPlay_1High) +
+  geom_point(aes(x = Max_Y_AbsDistFromMOF_AtSnap_AnySafety, y = PostSnap_MOF_Num), alpha = 0.1) +
+  stat_smooth(mapping = aes(x = Max_Y_AbsDistFromMOF_AtSnap_AnySafety, y = PostSnap_MOF_Num, color = "red"),
+              method = "gam", se = T, span = 0.75) +
+  # geom_abline(intercept = 0, slope = 0) +
+  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_x_continuous(breaks = seq(0, 10, 2)) +
+  coord_cartesian(xlim = c(0, 9), ylim = c(0, 1)) +
+  labs(x = "Safety's Horizontal Distance from MOF at the Snap (Yards)", y = "MOFO Coverage Rate",
+       title = "How MOFO Coverage Rate Depends on Safety's Horizontal Distance from MOF at the Snap",
+       subtitle = "Early Down 1-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022 (n = 1352)",
+       caption = "Horizontal Distance from MOF: net distance from middle of field (either right or left counts as positive)",
+       color = " ") +
+  theme_bw() + 
+  theme(plot.title = element_text(size = 10, hjust = 0.5),
+        plot.subtitle = element_text(size = 8, hjust = 0.5),
+        legend.position = "none")
+
+Plot16 <- ggplot(data = Stats_ByFullPlay_1High) +
+  geom_point(aes(x = Max_Y_AbsAcc_AtSnap_AnySafety, y = PostSnap_MOF_Num), alpha = 0.1) +
+  stat_smooth(mapping = aes(x = Max_Y_AbsAcc_AtSnap_AnySafety, y = PostSnap_MOF_Num, color = "red"),
+              method = "gam", se = T, span = 0.75) +
+  # geom_abline(intercept = 0, slope = 0) +
+  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_x_continuous(breaks = seq(0, 10, 2)) +
+  coord_cartesian(xlim = c(0, 5), ylim = c(0, 1)) +
+  labs(x = "Horizontal Acceleration by Safety at Snap (Yds/Sec^2)", y = "MOFO Coverage Rate",
+       title = "How MOFO Coverage Rate Depends on Safety's Horizontal Acceleration at the Snap",
+       subtitle = "Early Down 1-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022 (n = 1352)",
+       caption = "Horizontal Acc: acceleration strictly toward the sideline (either right or left counts as positive)",
+       color = " ") +
+  theme_bw() + 
+  theme(plot.title = element_text(size = 10, hjust = 0.5),
+        plot.subtitle = element_text(size = 8, hjust = 0.5),
+        legend.position = "none")
+
+grid.arrange(Plot14, Plot15, ncol = 2)
+grid.arrange(Plot14, Plot15, Plot16, ncol = 3) # worth considering with only 3, but not great
+grid.arrange(Plot14, Plot15, Plot16, nrow = 2, ncol = 2)
