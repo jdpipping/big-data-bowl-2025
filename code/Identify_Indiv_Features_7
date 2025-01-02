@@ -15,7 +15,6 @@ Stats_ByFullPlay_Final <- Stats_ByFullPlay_Final %>%
   mutate(Max_PreSnap_X_acc_TowardBall_AnySafety = -1 * Min_PreSnap_X_acc_component_AnySafety)
 Stats_ByFullPlay_Final <- Stats_ByFullPlay_Final %>% select(-c("Min_PreSnap_X_vel_component_AnySafety", "Min_PreSnap_X_acc_component_AnySafety"))
 
-# Now test out some graphs
 Stats_ByFullPlay_2High <- Stats_ByFullPlay_Final %>% filter(num_safeties_pre_snap == 2)
 Stats_ByFullPlay_1High <- Stats_ByFullPlay_Final %>% filter(num_safeties_pre_snap == 1)
 
