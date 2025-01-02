@@ -344,7 +344,7 @@ Plot14 <- ggplot(data = Stats_ByFullPlay_1High) +
   labs(x = "Absolute Horizontal Speed by Safety at Snap (Yds/Sec)", y = "MOFO Coverage Rate",
        title = "How MOFO Coverage Rate Depends on Safety's Absolute Horizontal Speed at the Snap",
        subtitle = "Early Down 1-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022 (n = 1352)",
-       caption = "Absolute Horizontal Speed: horizontal speed where either right or left counts as positive",
+       caption = "Abs Horizontal Speed: horizontal speed where either right or left counts as positive",
        color = " ") +
   theme_bw() + 
   theme(plot.title = element_text(size = 10, hjust = 0.5),
@@ -398,7 +398,7 @@ Plot17 <- ggplot(data = Stats_ByFullPlay_1High) +
   labs(x = "Absolute Horizontal Acceleration by Safety at Snap (Yds/Sec^2)", y = "MOFO Coverage Rate",
        title = "How MOFO Coverage Rate Depends on Safety's Horizontal Acceleration at the Snap",
        subtitle = "Early Down 1-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022 (n = 1352)",
-       caption = "Absolute Horizontal Acc: horizontal acceleration where either right or left counts as positive",
+       caption = "Abs Horizontal Acc: horizontal acceleration where either right or left counts as positive",
        color = " ") +
   theme_bw() + 
   theme(plot.title = element_text(size = 10, hjust = 0.5),
