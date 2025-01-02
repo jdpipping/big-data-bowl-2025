@@ -561,6 +561,10 @@ MergedData <- MergedData %>% mutate(Min_Y_SpeedTowardMOF_AtSnap_AnySafety = pmin
 MergedData <- MergedData %>% mutate(Max_Y_AccTowardMOF_AtSnap_AnySafety = pmax(Safety1_Y_AccTowardMOF_AtSnap, Safety2_Y_AccTowardMOF_AtSnap, na.rm = TRUE))
 MergedData <- MergedData %>% mutate(Min_Y_AccTowardMOF_AtSnap_AnySafety = pmin(Safety1_Y_AccTowardMOF_AtSnap, Safety2_Y_AccTowardMOF_AtSnap, na.rm = TRUE))
 
+# And also add Y_SpeedTowardMOF_Diff_BetweenSafeties_AtSnap and Y_AccTowardMOF_Diff_BetweenSafeties_AtSnap 
+MergedData <- MergedData %>% mutate(Y_SpeedTowardMOF_Diff_BetweenSafeties_AtSnap = abs(Safety1_Y_SpeedTowardMOF_AtSnap - Safety2_Y_SpeedTowardMOF_AtSnap))
+MergedData <- MergedData %>% mutate(Y_AccTowardMOF_Diff_BetweenSafeties_AtSnap = abs(Safety1_Y_AccTowardMOF_AtSnap - Safety2_Y_AccTowardMOF_AtSnap))
+
 # AND don't forget difference in the absolute distances from MOF between the safeties at the snap
 # In other words, if one safety is 2 yards to his left of MOF, and other is 12 yards to his right, that's 10, not 14
 # So a very big number indicates that one safety is very near MOF, the other is not
