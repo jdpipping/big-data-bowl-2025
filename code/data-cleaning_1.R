@@ -69,6 +69,19 @@ write_csv(tracking_std, 'processed-data/tracking_std.csv')
 # read cleaned data
 tracking_std = read_csv('processed-data/tracking_std.csv')
 
+# Before anything else, fix Robbie Chosen/Robby Anderson name error
+# View(players %>% filter(nflId == 43808))
+# View(tracking_std %>% filter(nflId == 43808))
+players <- players %>% mutate(displayName = 
+                                ifelse(nflId == 43808, "Robby Anderson", displayName))
+tracking_std <- tracking_std %>% mutate(displayName = 
+                                ifelse(nflId == 43808, "Robby Anderson", displayName))
+
+# Also manual fix of a random "huddle_start_offense" during a play in a Week 8 game
+# View(tracking_std %>% filter(gameId %in% 2022103003 & playId %in% 2394))
+tracking_std <- tracking_std %>% 
+  mutate(event = ifelse((gameId %in% 2022103003 & playId %in% 2394 & frameId %in% 120), NA, event))
+
 # These plays (among others) have multiple "first_contact" events, but we want only first instance
 # View(tracking_std %>% filter(gameId == 2022100209, playId == 1581, event == "first_contact"))
 # View(tracking_std %>% filter(gameId == 2022103100, playId == 1689, event == "first_contact"))
@@ -406,7 +419,7 @@ table(tracking_std$frameId)
 
 # Now create line of scrimmage for each play using ball data
 # Obviously, where the ball is during the ball_snap event is the LOS
-Snap_Ball_Location <- tracking_combined %>%
+Snap_Ball_Location <- tracking_std %>%
   filter(club == "football", event %in% c("ball_snap", "snap_direct", "autoevent_ballsnap")) %>%
   select(gameId, playId, x, y, frameId) %>%
   rename(Ball_X_Snap = x, Ball_Y_Snap = y, frameId_Snap = frameId)
