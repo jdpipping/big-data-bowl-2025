@@ -104,7 +104,7 @@ player_play <- fread("raw-data/player_play.csv")
 # # DOING WEEK 9
 tracking <- fread("raw-data/tracking_week_9.csv")
 
-# Get rid of extra columns right away for Ben's laptop
+# Get rid of extra columns right away
 games <- games %>% select(-c("gameDate", "gameTimeEastern"))
 players <- players %>% select(-c("birthDate", "collegeName", "height", "weight"))
 plays <- plays %>% select(-c("yardlineSide", "yardlineNumber", "gameClock", "absoluteYardlineNumber", 
@@ -706,9 +706,9 @@ MergedData <- MergedData %>%
 MergedData <- MergedData %>% mutate(DefWPA = (-1) * wpa)
 
 # Find other ways to filter the data, e.g. get rid of garbage time
-# MergedData <- MergedData %>% filter(wp >= 0.05 & wp <= 0.95)
+# MergedData <- MergedData %>% filter(winProbability >= 0.05 & winProbability <= 0.95)
 # Here's how to filter in a data table
-MergedData <- MergedData[wp >= 0.05 & wp <= 0.95]
+MergedData <- MergedData[winProbability >= 0.05 & winProbability <= 0.95]
 
 # Other possible modifications for this specific project:
 MergedData <- MergedData[xpass <= 0.95]
@@ -1300,7 +1300,7 @@ colnames(Dropbacks_Merged)
 NN_model_results_DF <- NN_model_results_DF %>% rename(num_safeties_pre_snap = `num_safeties`)
 NN_model_results_DF <- NN_model_results_DF %>% rename(defteam = `defensiveTeam`)
 NN_model_results_DF <- NN_model_results_DF %>% rename(posteam = `possessionTeam`)
-NN_model_results_DF <- NN_model_results_DF %>% rename(wp = `winProbability`)
+# NN_model_results_DF <- NN_model_results_DF %>% rename(wp = `winProbability`)
 NN_model_results_DF <- NN_model_results_DF %>% rename(PostSnap_MOF_Num = `mofo_postsnap`)
 NN_model_results_DF <- NN_model_results_DF %>% rename(pre_snap_safety_1 = `nflId_p1`)
 NN_model_results_DF <- NN_model_results_DF %>% rename(pre_snap_safety_2 = `nflId_p2`)
@@ -1458,7 +1458,7 @@ Stats_ByFullPlay_All9Weeks <- final_dropbacks_merged %>%
             # pass_horiz_location = max(pass_location), air_yards = max(air_yards), team_yards_after_catch = max(yards_after_catch), 
             Team_PassTD = max(pass_touchdown), Touchdown = max(touchdown),
             Team_RushTD = max(rush_touchdown), Team_ReturnTD = max(return_touchdown), 
-            td_team = max(td_team), WP = max(wp), WPA = max(wpa), DefWPA = max(DefWPA), WPSuccess = max(WPSuccess),
+            td_team = max(td_team), WP = max(winProbability), WPA = max(wpa), DefWPA = max(DefWPA), WPSuccess = max(WPSuccess),
             # OffTeam_Fumble = max(fumble), OffTeam_LostFumble = max(fumble_lost), 
             penalty_team = max(penalty_team), penalty_type = max(penalty_type), 
             return_team = max(return_team), # return_yards = max(return_yards),
