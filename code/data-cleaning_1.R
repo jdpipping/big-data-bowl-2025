@@ -97,8 +97,8 @@ tracking_std <- tracking_std %>% select(-"FirstContact_rank")
 # Do the same thing with ball_snap, except this time we only want the last instance
 # But first, do a quick confirmation that there are no plays with zero events for ball being snapped
 tracking_std <- tracking_std %>% mutate(BallSnap_OnFrame = 
-                                                    ifelse(!is.na(event) & event %in% c("ball_snap", "snap_direct"), 1, 
-                                                           ifelse(!is.na(event) & !event %in% c("ball_snap", "snap_direct"), 0, NA)))
+                                                    ifelse(!is.na(event) & event %in% c("ball_snap", "snap_direct", "autoevent_ballsnap"), 1, 
+                                                           ifelse(!is.na(event) & !event %in% c("ball_snap", "snap_direct", "autoevent_ballsnap"), 0, NA)))
 tracking_std <- tracking_std %>%
   group_by(gameId, playId, nflId, displayName) %>%
   mutate(BallSnap_OnFullPlay = sum(BallSnap_OnFrame, na.rm = TRUE)) %>%
@@ -108,7 +108,7 @@ table(tracking_std$BallSnap_OnFullPlay)
 # View(tracking_std %>% filter(BallSnap_OnFullPlay != 1)) - it's empty
 tracking_std <- tracking_std %>% select(-"BallSnap_OnFullPlay")
 
-BallSnap_Events <- tracking_std %>% filter(event %in% c("ball_snap", "snap_direct")) %>%
+BallSnap_Events <- tracking_std %>% filter(event %in% c("ball_snap", "snap_direct", "autoevent_ballsnap")) %>%
   group_by(gameId, playId, nflId, displayName) %>%
   mutate(BallSnap_rank = rank(-frameId, ties.method = "first")) %>%
   ungroup()
@@ -407,7 +407,7 @@ table(tracking_std$frameId)
 # Now create line of scrimmage for each play using ball data
 # Obviously, where the ball is during the ball_snap event is the LOS
 Snap_Ball_Location <- tracking_combined %>%
-  filter(club == "football", event %in% c("ball_snap", "snap_direct")) %>%
+  filter(club == "football", event %in% c("ball_snap", "snap_direct", "autoevent_ballsnap")) %>%
   select(gameId, playId, x, y, frameId) %>%
   rename(Ball_X_Snap = x, Ball_Y_Snap = y, frameId_Snap = frameId)
 
