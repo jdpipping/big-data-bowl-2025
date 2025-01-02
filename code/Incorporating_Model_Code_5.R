@@ -25,7 +25,7 @@ NN_DF_abridged <- NN_model_results_DF %>% select(c("gameId", "playId", "p"))
 # Also keep in mind that the model limited to first downs and second downs with 5+ yards to go
 Dropbacks_Merged <- merge(x = Dropbacks_Merged, y = NN_DF_abridged, 
                           by = c("gameId", "playId"))
-Dropbacks_Merged <- Dropbacks_Merged %>% rename(MOFO_probability_FDA = `p`)
+Dropbacks_Merged <- Dropbacks_Merged %>% rename(MOFO_probability = `p`)
 rm(NN_DF_abridged)
 
 setDT(Dropbacks_Merged)
