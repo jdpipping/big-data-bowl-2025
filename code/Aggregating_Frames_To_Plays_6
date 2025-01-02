@@ -14,7 +14,7 @@ colnames(final_dropbacks_merged)
 # Realistically, this one won't be as useful as the "full play" version, but good to have as a formality
 Stats_ByPlayerAndPlay_Final <- final_dropbacks_merged %>% filter(club != "football") %>%
   group_by(gameId, playId, nflId, displayName) %>%
-  summarize(Frames = n(), down = max(down), distance = max(yardsToGo), Team = max(club),
+  summarize(Frames = max(frameId), down = max(down), distance = max(yardsToGo), Team = max(club),
             PlayerSideOfBall = PlayerSideOfBall[1], Player_Role = max(Player_Role), PosTeam = max(posteam), 
             DefTeam = max(defteam), posteam_type = max(posteam_type), # HomeTeam = max(homeTeamAbbr), AwayTeam = max(visitorTeamAbbr),
             yardline_100 = max(yardline_100), yardsToGo = max(yardsToGo), # Dropback = max(isDropback),
