@@ -21,7 +21,9 @@ MOFO_Features_AllPlays <- Stats_ByFullPlay_Final %>%
            "TotAcc_Diff_BetweenSafeties_AtSnap", "Max_VertCreptDistance_AnySafety",
            "Max_TotalCreptDistance_ToBall_AnySafety", "Max_PreSnap_X_vel_TowardBall_AnySafety",
            "Max_PreSnap_X_acc_TowardBall_AnySafety", "Y_AbsDistFromMOF_Diff_BetweenSafeties_AtSnap", 
-           "Max_Y_AbsSpeed_AtSnap_AnySafety", "Max_Y_AbsAcc_AtSnap_AnySafety", "Max_Y_AbsDistFromMOF_AtSnap_AnySafety"))
+           "Max_Y_AbsSpeed_AtSnap_AnySafety", "Max_Y_AbsAcc_AtSnap_AnySafety", "Max_Y_AbsDistFromMOF_AtSnap_AnySafety",
+           "Max_Y_SpeedTowardMOF_AtSnap_AnySafety", "Min_Y_SpeedTowardMOF_AtSnap_AnySafety", "Max_Y_AccTowardMOF_AtSnap_AnySafety",
+           "Min_Y_AccTowardMOF_AtSnap_AnySafety", "Y_SpeedTowardMOF_Diff_BetweenSafeties_AtSnap", "Y_AccTowardMOF_Diff_BetweenSafeties_AtSnap"))
 
 corr_matrix_MOFO_AllPlays <- MOFO_Features_AllPlays %>%
   select(where(is.numeric)) %>%  
