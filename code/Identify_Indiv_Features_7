@@ -12,6 +12,7 @@ Stats_ByFullPlay_Final <- Stats_ByFullPlay_Final %>%
   mutate(Max_PreSnap_X_vel_TowardBall_AnySafety = -1 * Min_PreSnap_X_vel_component_AnySafety)
 Stats_ByFullPlay_Final <- Stats_ByFullPlay_Final %>% 
   mutate(Max_PreSnap_X_acc_TowardBall_AnySafety = -1 * Min_PreSnap_X_acc_component_AnySafety)
+Stats_ByFullPlay_Final <- Stats_ByFullPlay_Final %>% select(-c("Min_PreSnap_X_vel_component_AnySafety", "Min_PreSnap_X_acc_component_AnySafety"))
 
 MOFO_Features_AllPlays <- Stats_ByFullPlay_Final %>%
   select(c("PostSnap_MOF_Num", "X_Diff_BetweenSafeties_AtSnap", "TotDist_BetweenSafeties_AtSnap",
