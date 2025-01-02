@@ -728,9 +728,9 @@ rm(BallCarriers_Snap, Frame1_DF)
 # it's empty, recall that this refers to EPA
 
 # Find other ways to filter the data, e.g. excluding garbage time
-# MergedData <- MergedData %>% filter(wp >= 0.05 & wp <= 0.95)
+# MergedData <- MergedData %>% filter(winProbability >= 0.05 & winProbability <= 0.95)
 # Here's how to filter in a data table
-MergedData <- MergedData[wp >= 0.05 & wp <= 0.95]
+MergedData <- MergedData[winProbability >= 0.05 & winProbability <= 0.95]
 
 # Other possible modifications for this specific project:
 MergedData <- MergedData[xpass <= 0.95]
