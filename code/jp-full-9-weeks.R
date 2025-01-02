@@ -127,6 +127,11 @@ players <- players %>% mutate(displayName =
 tracking_combined <- tracking_combined %>% mutate(displayName = 
                                                     ifelse(nflId == 43808, "Robby Anderson", displayName))
 
+# Also manual fix of a random "huddle_start_offense" during a play in a Week 8 game
+# View(tracking_combined %>% filter(gameId %in% 2022103003 & playId %in% 2394))
+tracking_combined <- tracking_combined %>% 
+  mutate(event = ifelse((gameId %in% 2022103003 & playId %in% 2394 & frameId %in% 120), NA, event))
+
 # General data cleansing/checking for errors
 sort(table(players$nflId)) # no duplicates
 sort(table(players$displayName)) # no duplicates
