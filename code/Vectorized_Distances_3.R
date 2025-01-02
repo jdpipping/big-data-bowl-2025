@@ -397,6 +397,21 @@ MergedData <- MergedData %>%
          x_acc_component = (a*cos((90-dir)*pi/180)),
          y_acc_component = (a*sin((90-dir)*pi/180)))
 
+# Also create Y_SpeedTowardMOF and Y_AccTowardMOF
+# Recall, going to offense's left/defense's right is positive Y, and offense's right/defense's left is negative Y
+# In other words, Y = 0 at sideline to offense's right, Y = 53.3 at sideline to offense's left, Y = 26.65 at MOF
+# Thus, if current Y location is >= 26.65 (so person is to offense's left), a positive Y velocity means you're moving further away from MOF
+# Likewise, if current Y location is < 26.65 (person is to offense's right), a positive Y velocity means you're moving toward MOF
+MergedData <- MergedData %>% 
+  mutate(Y_SpeedTowardMOF = case_when(
+    y >= 26.65 ~ -1 * y_vel_component,
+    y < 26.65 ~ y_vel_component)) 
+
+MergedData <- MergedData %>% 
+  mutate(Y_AccTowardMOF = case_when(
+    y >= 26.65 ~ -1 * y_acc_component,
+    y < 26.65 ~ y_acc_component)) 
+
 # Create "safety creep distance" using code similar to "aggregating frames" from 2023-24
 # NOTE: b/c this DF will only include defensive players and only pre-snap frames, X_AbsDistFromBall is equivalent to X_DistFromBall
 # In other words, it's not possible for a defensive player to have a negative X_DistFromBall value before the snap
