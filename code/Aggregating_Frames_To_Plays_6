@@ -94,7 +94,7 @@ Stats_ByPlayerAndPlay_Final <- final_dropbacks_merged %>% filter(club != "footba
             Max_PreSnap_x_acc_component = max(x_acc_component), Max_PreSnap_y_acc_component = max(y_acc_component),
             Mean_x_vel_component = mean(x_vel_component), Mean_y_vel_component = mean(y_vel_component), 
             Mean_x_acc_component = mean(x_acc_component), Mean_y_acc_component = mean(y_acc_component),
-            MOFO_probability_FDA = max(MOFO_probability_FDA), min_SafetyAbsHorizDistToMOF_PreSnap = max(min_SafetyAbsHorizDistToMOF_PreSnap),
+            MOFO_probability = max(MOFO_probability), min_SafetyAbsHorizDistToMOF_PreSnap = max(min_SafetyAbsHorizDistToMOF_PreSnap),
             X_Vel_Diff_BetweenSafeties_AtSnap = max(X_Vel_Diff_BetweenSafeties_AtSnap),           
             Y_Vel_Diff_BetweenSafeties_AtSnap = max(Y_Vel_Diff_BetweenSafeties_AtSnap),
             TotSpeed_Diff_BetweenSafeties_AtSnap = max(TotSpeed_Diff_BetweenSafeties_AtSnap),        
@@ -266,7 +266,7 @@ Stats_ByFullPlay_Final <- final_dropbacks_merged %>%
             X_Diff_BetweenSafeties_AtSnap = max(X_Diff_BetweenSafeties_AtSnap),
             Y_Diff_BetweenSafeties_AtSnap = max(Y_Diff_BetweenSafeties_AtSnap),
             TotDist_BetweenSafeties_AtSnap = max(TotDist_BetweenSafeties_AtSnap),
-            MOFO_probability_FDA = max(MOFO_probability_FDA), min_SafetyAbsHorizDistToMOF_PreSnap = max(min_SafetyAbsHorizDistToMOF_PreSnap),
+            MOFO_probability = max(MOFO_probability), min_SafetyAbsHorizDistToMOF_PreSnap = max(min_SafetyAbsHorizDistToMOF_PreSnap),
             X_Vel_Diff_BetweenSafeties_AtSnap = max(X_Vel_Diff_BetweenSafeties_AtSnap),           
             Y_Vel_Diff_BetweenSafeties_AtSnap = max(Y_Vel_Diff_BetweenSafeties_AtSnap),
             TotSpeed_Diff_BetweenSafeties_AtSnap = max(TotSpeed_Diff_BetweenSafeties_AtSnap),        
@@ -394,9 +394,9 @@ Stats_ByFullPlay_Final <- Stats_ByFullPlay_Final %>%
 
 # And add the single-snap entropy value to both data sets
 Stats_ByPlayerAndPlay_Final <- Stats_ByPlayerAndPlay_Final %>% 
-  mutate(Snap_Entropy = -MOFO_probability_FDA*log(MOFO_probability_FDA, 2) - (1 - MOFO_probability_FDA)*log((1-MOFO_probability_FDA), 2))
+  mutate(Snap_Entropy = -MOFO_probability*log(MOFO_probability, 2) - (1 - MOFO_probability)*log((1-MOFO_probability), 2))
 Stats_ByFullPlay_Final <- Stats_ByFullPlay_Final %>% 
-  mutate(Snap_Entropy = -MOFO_probability_FDA*log(MOFO_probability_FDA, 2) - (1 - MOFO_probability_FDA)*log((1-MOFO_probability_FDA), 2))
+  mutate(Snap_Entropy = -MOFO_probability*log(MOFO_probability, 2) - (1 - MOFO_probability)*log((1-MOFO_probability), 2))
 
 Median_Entropy <- median(Stats_ByFullPlay_Final$Snap_Entropy)
 
