@@ -78,6 +78,7 @@ library(tidyverse)
 library(dplyr)
 library(rsvg)
 # library(conflicted)
+library(progress)
 
 options(digits = 4)
 options(scipen = 999) 
@@ -86,23 +87,17 @@ options(scipen = 999)
 ### IMPORT / CLEAN ###
 ######################
 
-games <- fread("raw-data/games.csv")
-players <- fread("raw-data/players.csv")
-plays <- fread("raw-data/plays.csv")
-player_play <- fread("raw-data/player_play.csv")
-
-# DO 1 AT A TIME
-
-# tracking <- fread("raw-data/tracking_week_1.csv")
-# tracking <- fread("raw-data/tracking_week_2.csv")
-# tracking <- fread("raw-data/tracking_week_3.csv")
-# tracking <- fread("raw-data/tracking_week_4.csv")
-# tracking <- fread("raw-data/tracking_week_5.csv")
-# tracking <- fread("raw-data/tracking_week_6.csv")
-# tracking <- fread("raw-data/tracking_week_7.csv")
-# tracking <- fread("raw-data/tracking_week_8.csv")
-# # DOING WEEK 9
-tracking <- fread("raw-data/tracking_week_9.csv")
+# progress bar for loop
+pb = progress_bar$new(total = 9)
+# for loop to run each tracking week one at a time
+for (iter in 1:9) {
+  # read in data
+  games <- fread("raw-data/games.csv")
+  players <- fread("raw-data/players.csv")
+  plays <- fread("raw-data/plays.csv")
+  player_play <- fread("raw-data/player_play.csv")
+  # read in tracking
+  tracking <- fread(paste0('raw-data/tracking_week_', iter, '.csv'))
 
 # Get rid of extra columns right away
 games <- games %>% select(-c("gameDate", "gameTimeEastern"))
@@ -708,7 +703,7 @@ MergedData <- MergedData %>% mutate(DefWPA = (-1) * wpa)
 # Find other ways to filter the data, e.g. get rid of garbage time
 # MergedData <- MergedData %>% filter(winProbability >= 0.05 & winProbability <= 0.95)
 # Here's how to filter in a data table
-MergedData <- MergedData[winProbability >= 0.05 & winProbability <= 0.95]
+MergedData <- MergedData[wp >= 0.05 & wp <= 0.95]
 
 # Other possible modifications for this specific project:
 MergedData <- MergedData[xpass <= 0.95]
@@ -1458,7 +1453,7 @@ Stats_ByFullPlay_All9Weeks <- final_dropbacks_merged %>%
             # pass_horiz_location = max(pass_location), air_yards = max(air_yards), team_yards_after_catch = max(yards_after_catch), 
             Team_PassTD = max(pass_touchdown), Touchdown = max(touchdown),
             Team_RushTD = max(rush_touchdown), Team_ReturnTD = max(return_touchdown), 
-            td_team = max(td_team), WP = max(winProbability), WPA = max(wpa), DefWPA = max(DefWPA), WPSuccess = max(WPSuccess),
+            td_team = max(td_team), WP = max(wp), WPA = max(wpa), DefWPA = max(DefWPA), WPSuccess = max(WPSuccess),
             # OffTeam_Fumble = max(fumble), OffTeam_LostFumble = max(fumble_lost), 
             penalty_team = max(penalty_team), penalty_type = max(penalty_type), 
             return_team = max(return_team), # return_yards = max(return_yards),
@@ -1622,8 +1617,11 @@ Stats_ByFullPlay_All9Weeks <- Stats_ByFullPlay_All9Weeks %>%
 Stats_ByFullPlay_All9Weeks <- Stats_ByFullPlay_All9Weeks %>% mutate(Disguise = ifelse(num_safeties_pre_snap != num_safeties_post_snap, "Disguise", "No Disguise"))
 Stats_ByFullPlay_All9Weeks <- Stats_ByFullPlay_All9Weeks %>% mutate(Disguise_Num = ifelse(num_safeties_pre_snap != num_safeties_post_snap, 1, 0))
 
-# DOING WEEK 9
-write.csv(Stats_ByFullPlay_All9Weeks, "drive-data/Stats_ByFullPlay_Week9.csv")
+# write csv
+write.csv(Stats_ByFullPlay_All9Weeks, paste0('drive-data/Stats_ByFullPlay_Week', iter, '.csv'))
+# update progress bar
+pb$tick()
+}
 
 ###############
 ### MERGING ###
