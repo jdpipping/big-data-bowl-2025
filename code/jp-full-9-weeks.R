@@ -175,8 +175,8 @@ tracking_combined <- tracking_combined %>% select(-"FirstContact_rank")
 # Do the same thing with ball_snap, except this time we only want the last instance
 # But first, do a quick confirmation that there are no plays with zero events for ball being snapped
 tracking_combined <- tracking_combined %>% mutate(BallSnap_OnFrame = 
-                                                    ifelse(!is.na(event) & event %in% c("ball_snap", "snap_direct"), 1, 
-                                                           ifelse(!is.na(event) & !event %in% c("ball_snap", "snap_direct"), 0, NA)))
+                                                    ifelse(!is.na(event) & event %in% c("ball_snap", "snap_direct", "autoevent_ballsnap"), 1, 
+                                                           ifelse(!is.na(event) & !event %in% c("ball_snap", "snap_direct", "autoevent_ballsnap"), 0, NA)))
 tracking_combined <- tracking_combined %>%
   group_by(gameId, playId, nflId, displayName) %>%
   mutate(BallSnap_OnFullPlay = sum(BallSnap_OnFrame, na.rm = TRUE)) %>%
@@ -186,7 +186,7 @@ table(tracking_combined$BallSnap_OnFullPlay)
 # View(tracking_combined %>% filter(BallSnap_OnFullPlay != 1)) - it's empty
 tracking_combined <- tracking_combined %>% select(-"BallSnap_OnFullPlay")
 
-BallSnap_Events <- tracking_combined %>% filter(event %in% c("ball_snap", "snap_direct")) %>%
+BallSnap_Events <- tracking_combined %>% filter(event %in% c("ball_snap", "snap_direct", "autoevent_ballsnap")) %>%
   group_by(gameId, playId, nflId, displayName) %>%
   mutate(BallSnap_rank = rank(-frameId, ties.method = "first")) %>%
   ungroup()
@@ -512,7 +512,7 @@ table(tracking_combined$frameId)
 # Now create line of scrimmage for each play using ball data
 # Obviously, where the ball is during the ball_snap event is the LOS
 Snap_Ball_Location <- tracking_combined %>%
-  filter(club == "football", event %in% c("ball_snap", "snap_direct")) %>%
+  filter(club == "football", event %in% c("ball_snap", "snap_direct", "autoevent_ballsnap")) %>%
   select(gameId, playId, x, y, frameId) %>%
   rename(Ball_X_Snap = x, Ball_Y_Snap = y, frameId_Snap = frameId)
 
@@ -822,7 +822,7 @@ calc_distance <- function(x, y, x_baseline = 0, y_baseline = 0) {
 # Same concept as previously established Y_NetDistFromBall_Rank_BySide, but this refers to only at the time of the snap
 MergedData_AtSnap <- MergedData %>%
   group_by(gameId, playId, PlayerSideOfBall) %>%
-  filter(event %in% c("ball_snap", "snap_direct")) %>% 
+  filter(event %in% c("ball_snap", "snap_direct", "autoevent_ballsnap")) %>% 
   mutate(X_PreSnap_Rank_BySide = rank(-x, ties.method = "first"),
          Y_PreSnap_Rank_BySide = rank(-y, ties.method = "first")) %>%
   ungroup() %>%
@@ -853,7 +853,7 @@ MergedData <- MergedData %>% mutate(is_post_snap_safety =
 # Likewise, on defense, the person with rank 1 would be the defense's left CB (i.e. offense's right)
 # The reason we don't use X_PreSnap_Rank_BySide here is that we want to use the "event" so we get each person's actual X and Y values at the snap
 LeftMost_Receivers <- MergedData %>% 
-  filter(PlayerSideOfBall == "offense", Y_NetDistFromBall_Rank_BySide == 11, event %in% c("ball_snap", "snap_direct")) 
+  filter(PlayerSideOfBall == "offense", Y_NetDistFromBall_Rank_BySide == 11, event %in% c("ball_snap", "snap_direct", "autoevent_ballsnap")) 
 LeftMost_Receivers <- LeftMost_Receivers %>% select("gameId", "playId", "nflId", "displayName", "x", "y")
 LeftMost_Receivers <- LeftMost_Receivers %>% rename(LeftMost_Receiver_ID = `nflId`,
                                                     LeftMost_Receiver_Name = `displayName`,
@@ -861,7 +861,7 @@ LeftMost_Receivers <- LeftMost_Receivers %>% rename(LeftMost_Receiver_ID = `nflI
 MergedData <- MergedData %>% left_join(LeftMost_Receivers, by = c("gameId", "playId"))
 
 RightMost_Receivers <- MergedData %>% 
-  filter(PlayerSideOfBall == "offense", Y_NetDistFromBall_Rank_BySide == 1, event %in% c("ball_snap", "snap_direct")) 
+  filter(PlayerSideOfBall == "offense", Y_NetDistFromBall_Rank_BySide == 1, event %in% c("ball_snap", "snap_direct", "autoevent_ballsnap")) 
 RightMost_Receivers <- RightMost_Receivers %>% select("gameId", "playId", "nflId", "displayName", "x", "y")
 RightMost_Receivers <- RightMost_Receivers %>% rename(RightMost_Receiver_ID = `nflId`,
                                                       RightMost_Receiver_Name = `displayName`,
@@ -869,7 +869,7 @@ RightMost_Receivers <- RightMost_Receivers %>% rename(RightMost_Receiver_ID = `n
 MergedData <- MergedData %>% left_join(RightMost_Receivers, by = c("gameId", "playId"))
 
 LeftMost_Defenders <- MergedData %>% 
-  filter(PlayerSideOfBall == "defense", Y_NetDistFromBall_Rank_BySide == 1, event %in% c("ball_snap", "snap_direct")) 
+  filter(PlayerSideOfBall == "defense", Y_NetDistFromBall_Rank_BySide == 1, event %in% c("ball_snap", "snap_direct", "autoevent_ballsnap")) 
 LeftMost_Defenders <- LeftMost_Defenders %>% select("gameId", "playId", "nflId", "displayName", "x", "y")
 LeftMost_Defenders <- LeftMost_Defenders %>% rename(LeftMost_Defender_ID = `nflId`,
                                                     LeftMost_Defender_Name = `displayName`,
@@ -877,7 +877,7 @@ LeftMost_Defenders <- LeftMost_Defenders %>% rename(LeftMost_Defender_ID = `nflI
 MergedData <- MergedData %>% left_join(LeftMost_Defenders, by = c("gameId", "playId"))
 
 RightMost_Defenders <- MergedData %>% 
-  filter(PlayerSideOfBall == "defense", Y_NetDistFromBall_Rank_BySide == 11, event %in% c("ball_snap", "snap_direct")) 
+  filter(PlayerSideOfBall == "defense", Y_NetDistFromBall_Rank_BySide == 11, event %in% c("ball_snap", "snap_direct", "autoevent_ballsnap")) 
 RightMost_Defenders <- RightMost_Defenders %>% select("gameId", "playId", "nflId", "displayName", "x", "y")
 RightMost_Defenders <- RightMost_Defenders %>% rename(RightMost_Defender_ID = `nflId`,
                                                       RightMost_Defender_Name = `displayName`,
@@ -1019,14 +1019,14 @@ MergedData <- MergedData %>% filter(num_safeties_pre_snap <= 2)
 # Now, after avoiding any plays with more than 2 safeties, get each safety's X/Y position at the time of the snap
 # This will help us detect whether there was an "X stagger," i.e. one safety way deeper than the other
 Safety_1_AtSnap <- MergedData %>% 
-  filter(PlayerSideOfBall == "defense", nflId == pre_snap_safety_1, event %in% c("ball_snap", "snap_direct")) 
+  filter(PlayerSideOfBall == "defense", nflId == pre_snap_safety_1, event %in% c("ball_snap", "snap_direct", "autoevent_ballsnap")) 
 Safety_1_AtSnap <- Safety_1_AtSnap %>% select("gameId", "playId", "displayName", "x", "y")
 Safety_1_AtSnap <- Safety_1_AtSnap %>% rename(pre_snap_safety_1_name = `displayName`,
                                               pre_snap_safety_1_X_AtSnap = `x`, pre_snap_safety_1_Y_AtSnap = `y`)
 MergedData <- MergedData %>% left_join(Safety_1_AtSnap, by = c("gameId", "playId"))
 
 Safety_2_AtSnap <- MergedData %>% 
-  filter(PlayerSideOfBall == "defense", nflId == pre_snap_safety_2, event %in% c("ball_snap", "snap_direct")) 
+  filter(PlayerSideOfBall == "defense", nflId == pre_snap_safety_2, event %in% c("ball_snap", "snap_direct", "autoevent_ballsnap")) 
 Safety_2_AtSnap <- Safety_2_AtSnap %>% select("gameId", "playId", "displayName", "x", "y")
 Safety_2_AtSnap <- Safety_2_AtSnap %>% rename(pre_snap_safety_2_name = `displayName`,
                                               pre_snap_safety_2_X_AtSnap = `x`, pre_snap_safety_2_Y_AtSnap = `y`)
