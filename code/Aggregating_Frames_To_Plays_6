@@ -410,6 +410,10 @@ Stats_ByPlayerAndPlay_Final <- Stats_ByPlayerAndPlay_Final %>%
 Stats_ByFullPlay_Final <- Stats_ByFullPlay_Final %>% 
   mutate(HighEntropy_Num = ifelse(Snap_Entropy > Median_Entropy, 1, 0))
 
+# For the sake of simplicity, define "disguised" as different number of safeties before and after the snap
+Stats_ByFullPlay_Final <- Stats_ByFullPlay_Final %>% mutate(Disguise = ifelse(num_safeties_pre_snap != num_safeties_post_snap, "Disguise", "No Disguise"))
+Stats_ByFullPlay_Final <- Stats_ByFullPlay_Final %>% mutate(Disguise_Num = ifelse(num_safeties_pre_snap != num_safeties_post_snap, 1, 0))
+
 # These are for if/when we want to make confidence intervals
 # Recall, Bernoulli is binary variable (i.e. use for proportions)
 SD_Bernoulli <- function(x){
@@ -452,11 +456,7 @@ lower_Continuous <- function(x) {
   mean(x, na.rm = TRUE) - ConfBand_Continuous(x)
 }
 
-# Interesting play-level stats: does offense perform notably worse against disguised coverages?
-# For the sake of simplicity, define "disguised" as different number of safeties before and after the snap
-Stats_ByFullPlay_Final <- Stats_ByFullPlay_Final %>% mutate(Disguise = ifelse(num_safeties_pre_snap != num_safeties_post_snap, "Disguise", "No Disguise"))
-Stats_ByFullPlay_Final <- Stats_ByFullPlay_Final %>% mutate(Disguise_Num = ifelse(num_safeties_pre_snap != num_safeties_post_snap, 1, 0))
-
+# Interesting play-level stats: does offense perform notably worse against disguised or high-entropy coverages?
 # Start out with basic performance on disguised vs. non-disguised dropbacks ... don't group by team to start
 PlaySuccess_DisguiseVsNone_NFLWide <- Stats_ByFullPlay_Final %>% filter(!is.na(Disguise)) %>%
   group_by(Disguise) %>%
