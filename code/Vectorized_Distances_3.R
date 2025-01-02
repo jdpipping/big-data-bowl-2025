@@ -450,6 +450,8 @@ Safety1_PreSnapMovement_ByPlay <- MergedData_PreSnapFrames %>% filter(nflId == p
             Safety1_y_vel_component_AtSnap = y_vel_component[length(y_vel_component)],
             Safety1_x_acc_component_AtSnap = x_acc_component[length(x_acc_component)],
             Safety1_y_acc_component_AtSnap = y_acc_component[length(y_acc_component)],
+            Safety1_Y_SpeedTowardMOF_AtSnap = Y_SpeedTowardMOF[length(Y_SpeedTowardMOF)],
+            Safety1_Y_AccTowardMOF_AtSnap = Y_AccTowardMOF[length(Y_SpeedTowardMOF)],
             Safety1_Orientation_AtSnap = o[length(o)], Safety1_Direction_AtSnap = dir[length(dir)],
             Safety1_PosGroup = max(PosGroup), Safety1_position = max(position))
 
@@ -485,6 +487,8 @@ Safety2_PreSnapMovement_ByPlay <- MergedData_PreSnapFrames %>% filter(nflId == p
             Safety2_y_vel_component_AtSnap = y_vel_component[length(y_vel_component)],
             Safety2_x_acc_component_AtSnap = x_acc_component[length(x_acc_component)],
             Safety2_y_acc_component_AtSnap = y_acc_component[length(y_acc_component)],
+            Safety2_Y_SpeedTowardMOF_AtSnap = Y_SpeedTowardMOF[length(Y_SpeedTowardMOF)],
+            Safety2_Y_AccTowardMOF_AtSnap = Y_AccTowardMOF[length(Y_SpeedTowardMOF)],
             Safety2_Orientation_AtSnap = o[length(o)], Safety2_Direction_AtSnap = dir[length(dir)],
             Safety2_PosGroup = max(PosGroup), Safety2_position = max(position))
 rm(MergedData_PreSnapFrames)
@@ -550,6 +554,16 @@ MergedData <- MergedData %>% mutate(Min_PreSnap_X_acc_component_AnySafety = pmin
 MergedData <- MergedData %>% mutate(Max_Y_AbsSpeed_AtSnap_AnySafety = pmax(abs(Safety1_y_vel_component_AtSnap), abs(Safety2_y_vel_component_AtSnap), na.rm = TRUE))
 MergedData <- MergedData %>% mutate(Max_Y_AbsAcc_AtSnap_AnySafety = pmax(abs(Safety1_y_acc_component_AtSnap), abs(Safety2_y_acc_component_AtSnap), na.rm = TRUE))
 MergedData <- MergedData %>% mutate(Max_Y_AbsDistFromMOF_AtSnap_AnySafety = pmax(Safety1_Y_AbsDistFromMOF_AtSnap, Safety2_Y_AbsDistFromMOF_AtSnap, na.rm = TRUE))
+
+# Also create Max_Y_SpeedTowardMOF_AtSnap_AnySafety and Max_Y_AccTowardMOF_AtSnap_AnySafety, and minimums of same metrics
+MergedData <- MergedData %>% mutate(Max_Y_SpeedTowardMOF_AtSnap_AnySafety = pmax(Safety1_Y_SpeedTowardMOF_AtSnap, Safety2_Y_SpeedTowardMOF_AtSnap, na.rm = TRUE))
+MergedData <- MergedData %>% mutate(Min_Y_SpeedTowardMOF_AtSnap_AnySafety = pmin(Safety1_Y_SpeedTowardMOF_AtSnap, Safety2_Y_SpeedTowardMOF_AtSnap, na.rm = TRUE))
+MergedData <- MergedData %>% mutate(Max_Y_AccTowardMOF_AtSnap_AnySafety = pmax(Safety1_Y_AccTowardMOF_AtSnap, Safety2_Y_AccTowardMOF_AtSnap, na.rm = TRUE))
+MergedData <- MergedData %>% mutate(Min_Y_AccTowardMOF_AtSnap_AnySafety = pmin(Safety1_Y_AccTowardMOF_AtSnap, Safety2_Y_AccTowardMOF_AtSnap, na.rm = TRUE))
+
+# And also add Y_SpeedTowardMOF_Diff_BetweenSafeties_AtSnap and Y_AccTowardMOF_Diff_BetweenSafeties_AtSnap 
+MergedData <- MergedData %>% mutate(Y_SpeedTowardMOF_Diff_BetweenSafeties_AtSnap = abs(Safety1_Y_SpeedTowardMOF_AtSnap - Safety2_Y_SpeedTowardMOF_AtSnap))
+MergedData <- MergedData %>% mutate(Y_AccTowardMOF_Diff_BetweenSafeties_AtSnap = abs(Safety1_Y_AccTowardMOF_AtSnap - Safety2_Y_AccTowardMOF_AtSnap))
 
 # AND don't forget difference in the absolute distances from MOF between the safeties at the snap
 # In other words, if one safety is 2 yards to his left of MOF, and other is 12 yards to his right, that's 10, not 14
