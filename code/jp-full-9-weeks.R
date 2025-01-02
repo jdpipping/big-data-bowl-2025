@@ -1435,7 +1435,7 @@ colnames(final_dropbacks_merged)
 # Now create a version where each row represents an entire play (not a player or a frame)
 Stats_ByFullPlay_All9Weeks <- final_dropbacks_merged %>%
   group_by(gameId, playId) %>%
-  summarize(Frames = n(), down = max(down), distance = max(yardsToGo), PosTeam = max(posteam), 
+  summarize(Frames = max(frameId), down = max(down), distance = max(yardsToGo), PosTeam = max(posteam), 
             DefTeam = max(defteam), posteam_type = max(posteam_type), # HomeTeam = max(homeTeamAbbr), AwayTeam = max(visitorTeamAbbr),
             yardline_100 = max(yardline_100), yardsToGo = max(yardsToGo), # Dropback = max(isDropback),
             # BallCarrierID = max(ballCarrierId), BallCarrierName = max(ballCarrierDisplayName),
