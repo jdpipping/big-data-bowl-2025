@@ -32,7 +32,7 @@ MOFO_Features_AllPlays <- Stats_ByFullPlay_Final %>%
 
 corr_matrix_MOFO_AllPlays <- MOFO_Features_AllPlays %>%
   select(where(is.numeric)) %>%  
-  cor(use = "complete.obs") %>%  
+  cor(use = "pairwise.complete.obs") %>%  
   round(2)  
 # Now see which variables had strongest positive or negative correlation with PostSnap_MOF_Num
 corr_df_MOFO_AllPlays <- as.data.frame(corr_matrix_MOFO_AllPlays)
@@ -61,7 +61,7 @@ MOFO_Features_2High <- Stats_ByFullPlay_2High %>%
 
 corr_matrix_MOFO_2High <- MOFO_Features_2High %>%
   select(where(is.numeric)) %>%  
-  cor(use = "complete.obs") %>%  
+  cor(use = "pairwise.complete.obs") %>%  
   round(2)  
 # Now see which variables had strongest positive or negative correlation with PostSnap_MOF_Num
 corr_df_MOFO_2High <- as.data.frame(corr_matrix_MOFO_2High)
@@ -85,7 +85,7 @@ MOFO_Features_1High <- Stats_ByFullPlay_1High %>%
 
 corr_matrix_MOFO_1High <- MOFO_Features_1High %>%
   select(where(is.numeric)) %>%  
-  cor(use = "complete.obs") %>%  
+  cor(use = "pairwise.complete.obs") %>%  
   round(2)  
 # Now see which variables had strongest positive or negative correlation with PostSnap_MOF_Num
 corr_df_MOFO_1High <- as.data.frame(corr_matrix_MOFO_1High)
@@ -114,7 +114,7 @@ Entropy_Features_AllPlays <- Stats_ByFullPlay_Final %>%
 
 corr_matrix_Entropy_AllPlays <- Entropy_Features_AllPlays %>%
   select(where(is.numeric)) %>%  
-  cor(use = "complete.obs") %>%  
+  cor(use = "pairwise.complete.obs") %>%  
   round(2)  
 # Now see which variables had strongest positive or negative correlation with Snap_Entropy
 corr_df_Entropy_AllPlays <- as.data.frame(corr_matrix_Entropy_AllPlays)
@@ -143,7 +143,7 @@ Entropy_Features_2High <- Stats_ByFullPlay_2High %>%
 
 corr_matrix_Entropy_2High <- Entropy_Features_2High %>%
   select(where(is.numeric)) %>%  
-  cor(use = "complete.obs") %>%  
+  cor(use = "pairwise.complete.obs") %>%  
   round(2)  
 # Now see which variables had strongest positive or negative correlation with Snap_Entropy
 corr_df_Entropy_2High <- as.data.frame(corr_matrix_Entropy_2High)
@@ -167,7 +167,7 @@ Entropy_Features_1High <- Stats_ByFullPlay_1High %>%
 
 corr_matrix_Entropy_1High <- Entropy_Features_1High %>%
   select(where(is.numeric)) %>%  
-  cor(use = "complete.obs") %>%  
+  cor(use = "pairwise.complete.obs") %>%  
   round(2)  
 # Now see which variables had strongest positive or negative correlation with Snap_Entropy
 corr_df_Entropy_1High <- as.data.frame(corr_matrix_Entropy_1High)
