@@ -717,6 +717,10 @@ MergedData <- MergedData %>%
 # And do the same for defensive WPA (just negative offensive WPA)
 MergedData <- MergedData %>% mutate(DefWPA = (-1) * wpa)
 
+# Create WP for the offense in a way that aligns with Ryan's model, using home/away possession teams
+MergedData <- MergedData %>% mutate(winProbability =
+          ifelse(posteam == homeTeamAbbr, preSnapHomeTeamWinProbability, preSnapVisitorTeamWinProbability))
+
 # Add a column for "Is Ball Carrier"
 MergedData <- MergedData %>% mutate(IsBallCarrier = 
    ifelse(!is.na(hadRushAttempt) & !is.na(hadPassReception) & (hadRushAttempt %in% 1 | hadPassReception %in% 1), TRUE, 
