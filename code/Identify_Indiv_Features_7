@@ -20,7 +20,7 @@ Stats_ByFullPlay_9Weeks <- Stats_ByFullPlay_9Weeks %>% select(-c("Min_PreSnap_X_
 Stats_ByFullPlay_2High <- Stats_ByFullPlay_9Weeks %>% filter(num_safeties_pre_snap == 2)
 Stats_ByFullPlay_1High <- Stats_ByFullPlay_9Weeks %>% filter(num_safeties_pre_snap == 1)
 
-MOFO_Features_AllPlays <- Stats_ByFullPlay_9Weeks %>%
+MOFO_Features_AllPlays <- Stats_ByFullPlay_All9Weeks %>%
   select(c("PostSnap_MOF_Num", "X_Diff_BetweenSafeties_AtSnap", "TotDist_BetweenSafeties_AtSnap",
            "min_SafetyAbsHorizDistToMOF_PreSnap", "X_Vel_Diff_BetweenSafeties_AtSnap",
            "Y_Vel_Diff_BetweenSafeties_AtSnap", "TotSpeed_Diff_BetweenSafeties_AtSnap",
@@ -38,8 +38,6 @@ corr_matrix_MOFO_AllPlays <- MOFO_Features_AllPlays %>%
   round(2)  
 # Now see which variables had strongest positive or negative correlation with PostSnap_MOF_Num
 corr_df_MOFO_AllPlays <- as.data.frame(corr_matrix_MOFO_AllPlays)
-corr_df_MOFO_AllPlays <- corr_df_MOFO_AllPlays %>% select(-"gameId")
-corr_df_MOFO_AllPlays <- corr_df_MOFO_AllPlays[-1, ] # this gets rid of gameId row
 # View(corr_df_MOFO_AllPlays %>% arrange(desc(PostSnap_MOF_Num)))
 rm(corr_matrix_MOFO_AllPlays)
 
@@ -67,8 +65,6 @@ corr_matrix_MOFO_2High <- MOFO_Features_2High %>%
   round(2)  
 # Now see which variables had strongest positive or negative correlation with PostSnap_MOF_Num
 corr_df_MOFO_2High <- as.data.frame(corr_matrix_MOFO_2High)
-corr_df_MOFO_2High <- corr_df_MOFO_2High %>% select(-"gameId")
-corr_df_MOFO_2High <- corr_df_MOFO_2High[-1, ] # this gets rid of gameId row
 # View(corr_df_MOFO_2High %>% arrange(desc(PostSnap_MOF_Num)))
 rm(corr_matrix_MOFO_2High)
 
@@ -91,8 +87,6 @@ corr_matrix_MOFO_1High <- MOFO_Features_1High %>%
   round(2)  
 # Now see which variables had strongest positive or negative correlation with PostSnap_MOF_Num
 corr_df_MOFO_1High <- as.data.frame(corr_matrix_MOFO_1High)
-corr_df_MOFO_1High <- corr_df_MOFO_1High %>% select(-"gameId")
-corr_df_MOFO_1High <- corr_df_MOFO_1High[-1, ] # this gets rid of gameId row
 # View(corr_df_MOFO_1High %>% arrange(desc(PostSnap_MOF_Num)))
 rm(corr_matrix_MOFO_1High)
 
@@ -102,7 +96,7 @@ rownames(top_variables_MOFO_1High) # keep in mind PostSnap_MOF_Num obviously isn
 # And make it so the only columns in this new DF align with the rows in that DF
 top_variables_MOFO_1High <- top_variables_MOFO_1High[, colnames(top_variables_MOFO_1High) %in% rownames(top_variables_MOFO_1High)]
 
-Entropy_Features_AllPlays <- Stats_ByFullPlay_9Weeks %>%
+Entropy_Features_AllPlays <- Stats_ByFullPlay_All9Weeks %>%
   select(c("Snap_Entropy", "X_Diff_BetweenSafeties_AtSnap", "TotDist_BetweenSafeties_AtSnap",
            "min_SafetyAbsHorizDistToMOF_PreSnap", "X_Vel_Diff_BetweenSafeties_AtSnap",
            "Y_Vel_Diff_BetweenSafeties_AtSnap", "TotSpeed_Diff_BetweenSafeties_AtSnap",
@@ -120,8 +114,6 @@ corr_matrix_Entropy_AllPlays <- Entropy_Features_AllPlays %>%
   round(2)  
 # Now see which variables had strongest positive or negative correlation with Snap_Entropy
 corr_df_Entropy_AllPlays <- as.data.frame(corr_matrix_Entropy_AllPlays)
-corr_df_Entropy_AllPlays <- corr_df_Entropy_AllPlays %>% select(-"gameId")
-corr_df_Entropy_AllPlays <- corr_df_Entropy_AllPlays[-1, ] # this gets rid of gameId row
 # View(corr_df_Entropy_AllPlays %>% arrange(desc(Snap_Entropy)))
 rm(corr_matrix_Entropy_AllPlays)
 
@@ -149,8 +141,6 @@ corr_matrix_Entropy_2High <- Entropy_Features_2High %>%
   round(2)  
 # Now see which variables had strongest positive or negative correlation with Snap_Entropy
 corr_df_Entropy_2High <- as.data.frame(corr_matrix_Entropy_2High)
-corr_df_Entropy_2High <- corr_df_Entropy_2High %>% select(-"gameId")
-corr_df_Entropy_2High <- corr_df_Entropy_2High[-1, ] # this gets rid of gameId row
 # View(corr_df_Entropy_2High %>% arrange(desc(Snap_Entropy)))
 rm(corr_matrix_Entropy_2High)
 
@@ -173,13 +163,11 @@ corr_matrix_Entropy_1High <- Entropy_Features_1High %>%
   round(2)  
 # Now see which variables had strongest positive or negative correlation with Snap_Entropy
 corr_df_Entropy_1High <- as.data.frame(corr_matrix_Entropy_1High)
-corr_df_Entropy_1High <- corr_df_Entropy_1High %>% select(-"gameId")
-corr_df_Entropy_1High <- corr_df_Entropy_1High[-1, ] # this gets rid of gameId row
 # View(corr_df_Entropy_1High %>% arrange(desc(Snap_Entropy)))
 rm(corr_matrix_Entropy_1High)
 
-# Now take all variables with at least a correlation of 0.1 in either direction (lower standard b/c we're picking from fewer variables)
-top_variables_Entropy_1High <- corr_df_Entropy_1High %>% filter(abs(Snap_Entropy) >= 0.1)
+# Now take all variables with at least a correlation of 0.25 in either direction 
+top_variables_Entropy_1High <- corr_df_Entropy_1High %>% filter(abs(Snap_Entropy) >= 0.25)
 rownames(top_variables_Entropy_1High) # keep in mind Snap_Entropy obviously isn't a predictor variable
 # And make it so the only columns in this new DF align with the rows in that DF
 top_variables_Entropy_1High <- top_variables_Entropy_1High[, colnames(top_variables_Entropy_1High) %in% rownames(top_variables_Entropy_1High)]
