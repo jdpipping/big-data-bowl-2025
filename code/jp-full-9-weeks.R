@@ -1017,6 +1017,14 @@ MergedData <- MergedData %>% mutate(is_post_snap_safety = ifelse(PlayerSideOfBal
 # The 0.1 is so that the outcome variable is in seconds, rather than in frames
 MergedData <- MergedData %>% mutate(time_since_snap = 0.1*(frameId - frameId_Snap))
 
+# Play removal check:
+# View(MergedData %>% filter(gameId %in% 2022101602 & playId %in% 233 & displayName %in% "Rasul Douglas")) ... ISSUE IS 3 PRE-SNAP SAFETIES
+# His X at snap is 44.13, Ball_X_Snap is 35.61, difference is 8.52 ... BUT that was first frame he was 8.5+ yards off
+
+# To align with Ryan's model, make sure that play stays in the equation
+MergedData <- MergedData %>% mutate(num_safeties_pre_snap =
+              ifelse((gameId %in% 2022101602 & playId %in% 233), 2, num_safeties_pre_snap))
+
 # Here, limit to plays with <= 2 pre-snap safeties ... get rid of "3rd-and-forever" situations
 MergedData <- MergedData %>% filter(num_safeties_pre_snap <= 2)
 
