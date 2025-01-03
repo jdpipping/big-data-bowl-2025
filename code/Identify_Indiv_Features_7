@@ -619,7 +619,7 @@ mean((Stats_ByFullPlay_1High %>% filter(Max_Y_SpeedTowardMOF_AtSnap_AnySafety >=
 
 # 1-high plays with very low absolute horiz distance from MOF by safety at snap (Plot16)
 mean((Stats_ByFullPlay_1High %>% filter(Max_Y_AbsDistFromMOF_AtSnap_AnySafety < 2))$PostSnap_MOF_Num)
-# It's 0.1044
+# It's 0.1044 for < 2 yards, 0.125 for < 3 yards
 
 # Also flip Plot16 for very high absolute horiz distance, if sample is good (like at least 8 yards)
 mean((Stats_ByFullPlay_1High %>% filter(Max_Y_AbsDistFromMOF_AtSnap_AnySafety > 8))$PostSnap_MOF_Num)
