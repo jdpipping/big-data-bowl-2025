@@ -588,6 +588,10 @@ top_variables_MOFO_2High <- top_variables_MOFO_2High %>%
   mutate(Feature = ifelse(Feature %in% "Max_TotalCreptDistance_ToBall_AnySafety", "Max Total Creep Distance Toward Ball By a Safety", Feature))
 top_variables_MOFO_2High <- top_variables_MOFO_2High %>% 
   mutate(Feature = ifelse(Feature %in% "Max_PreSnap_X_acc_TowardBall_AnySafety", "Max Pre-Snap Vertical Acceleration Toward LOS By a Safety", Feature))
+top_variables_MOFO_2High <- top_variables_MOFO_2High %>% 
+  mutate(Feature = ifelse(Feature %in% "X_Acc_Diff_BetweenSafeties_AtSnap", "Difference in Vertical Accelerations Between Safeties at the Snap", Feature))
+top_variables_MOFO_2High <- top_variables_MOFO_2High %>% 
+  mutate(Feature = ifelse(Feature %in% "Max_Y_SpeedTowardMOF_AtSnap_AnySafety", "Max Horizontal Speed Toward MOF By a Safety at the Snap", Feature))
 
 # Re-arrange column order so the actual correlation is on the far-right
 top_variables_MOFO_2High <- top_variables_MOFO_2High %>% select(2, 1)
@@ -596,12 +600,13 @@ top_variables_MOFO_2High <- top_variables_MOFO_2High %>% select(2, 1)
 # top_variables_MOFO_2High <- top_variables_MOFO_2High %>% 
 #   mutate(Explanation = c("Larger Vertical Stagger --> MOFC more likely", "Safety Crept Far Forward Vertically --> MOFC more likely", 
 #                          "Safety Moving Fast Toward LOS --> MOFC more likely", "Safeties Moving in Different Directions --> MOFC more likely", 
-#                          "Safety Crept Far Toward Ball --> MOFC more likely", "Safety Accelerating Toward LOS --> MOFC more likely"))
+#                          "Safety Crept Far Toward Ball --> MOFC more likely", "Safety Accelerating Toward LOS --> MOFC more likely",
+#                          "Safeties Accelerating in Different Directions --> MOFC more likely", "Safety Moving Toward MOF --> MOFC more likely"))
 
 class(top_variables_MOFO_2High) <- "data.frame"
 MOFO_Features_2High_FancyTable <- top_variables_MOFO_2High %>%
   select(c("Feature", "PostSnap_MOF_Num")) %>%
-  head(6) %>% # this is how we limit to the top 20 if necessary
+  head(6) %>% # this is how we limit to the top 6
   mutate(Rank = row_number(desc(abs(PostSnap_MOF_Num)))) %>%
   relocate("Rank")
 
