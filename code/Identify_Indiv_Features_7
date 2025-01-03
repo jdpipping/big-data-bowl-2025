@@ -584,43 +584,33 @@ grid.arrange(Plot14, Plot15, Plot16, Plot17, nrow = 2, ncol = 2)
 # Now look into the concept of "strong telegraphs" for actual MOFO rate
 # I.e., is there any feature where "when this feature happens, it's MOFO 85+ percent of the time?"
 # NOTE: 1 yard/second is approximately 2.05 MPH (so 2 yards/second is a fast walk)
-
 # Ideas: very low "max horiz distance from MOF by safety at the snap" (see Plot8)
 mean((Stats_ByFullPlay_All9Weeks %>% filter(Max_Y_AbsDistFromMOF_AtSnap_AnySafety < 3))$PostSnap_MOF_Num)
-# It's 0.1269 
-
+# It's 0.1282 ... but probably better to look into a stat like that for 2-high or 1-high plays
 # 2-high plays with very high or low vertical stagger (Plot10)
 mean((Stats_ByFullPlay_2High %>% filter(X_Diff_BetweenSafeties_AtSnap < 1))$PostSnap_MOF_Num)
-# It's 0.7923 at < 1 yard, 0.7469 at < 2 yards
-
+# It's 0.7924 at < 1 yard, 0.7456 at < 2 yards (could use, but vert creep distance is better)
 mean((Stats_ByFullPlay_2High %>% filter(X_Diff_BetweenSafeties_AtSnap >= 7))$PostSnap_MOF_Num)
-# It's 0.1476 at 6+ yards, 0.1121 at 7+ yards, 0.0926 at 8+ yards 
-
+# It's 0.1462 at 6+ yards, 0.1113 at 7+ yards, 0.0919 at 8+ yards (could use)
 # Definitely 2-high plays with high difference in vertical velocities at snap (Plot11)
 mean((Stats_ByFullPlay_2High %>% filter(X_Vel_Diff_BetweenSafeties_AtSnap >= 4))$PostSnap_MOF_Num)
-# It's 0.0882 
-
+# It's 0.0870 # Use this
 # 2-high plays where a safety had notable vertical creep distance (Plot12)
 mean((Stats_ByFullPlay_2High %>% filter(Max_VertCreptDistance_AnySafety >= 4))$PostSnap_MOF_Num)
-# It's 0.07641
-
+# It's 0.0757 # Use this
 # 2-high plays with negative Max_PreSnap_X_vel_TowardBall_AnySafety (Plot13) ... if sample is decent
 mean((Stats_ByFullPlay_2High %>% filter(Max_PreSnap_X_vel_TowardBall_AnySafety < 0))$PostSnap_MOF_Num)
 # View(Stats_ByFullPlay_2High %>% filter(Max_PreSnap_X_vel_TowardBall_AnySafety < 0))
-# It's 0.8309, and sample size is 207 plays 
-
+# It's 0.8294, and sample size is 211 plays # Usable, but probably got better stuff for 2-high plays
 # 1-high plays with very low absolute horiz speed by safety at snap (Plot14) 
 mean((Stats_ByFullPlay_1High %>% filter(Max_Y_AbsSpeed_AtSnap_AnySafety < 1))$PostSnap_MOF_Num)
-# It's 0.1384 for < 0.5 yards/sec, 0.1395 for < 1 yards/sec
-
+# It's 0.1386 for < 0.5 yards/sec, 0.1393 for < 1 yards/sec
 # And can try similar idea with Plot15, almost the same, can test both
 mean((Stats_ByFullPlay_1High %>% filter(Max_Y_SpeedTowardMOF_AtSnap_AnySafety >= 0))$PostSnap_MOF_Num)
-# It's 0.1225 
-
+# It's 0.1222 ... this is better than Plot14 for the 1-high plays
 # 1-high plays with very low absolute horiz distance from MOF by safety at snap (Plot16)
-mean((Stats_ByFullPlay_1High %>% filter(Max_Y_AbsDistFromMOF_AtSnap_AnySafety < 2))$PostSnap_MOF_Num)
-# It's 0.1044 for < 2 yards, 0.125 for < 3 yards
-
+mean((Stats_ByFullPlay_1High %>% filter(Max_Y_AbsDistFromMOF_AtSnap_AnySafety < 3))$PostSnap_MOF_Num)
+# It's 0.1033 for < 2 yards, 0.1264 for < 3 yards # Use this
 # Also flip Plot16 for very high absolute horiz distance, if sample is good (like at least 8 yards)
 mean((Stats_ByFullPlay_1High %>% filter(Max_Y_AbsDistFromMOF_AtSnap_AnySafety > 8))$PostSnap_MOF_Num)
 # View(Stats_ByFullPlay_1High %>% filter(Max_Y_AbsDistFromMOF_AtSnap_AnySafety > 8))
@@ -628,7 +618,7 @@ mean((Stats_ByFullPlay_1High %>% filter(Max_Y_AbsDistFromMOF_AtSnap_AnySafety > 
 
 # Repeat similar process for plots, but with model's predicted MOFO rate on Y-axis ... start with 2-high plays
 # View(top_variables_PredictedMOFO_2High)
-# X_Diff_BetweenSafeties_AtSnap, Max_VertCreptDistance_AnySafety (or max total), X_Vel_Diff_BetweenSafeties_AtSnap AND/OR Max_PreSnap_X_vel_TowardBall_AnySafety
+# X_Diff_BetweenSafeties_AtSnap, Max_VertCreptDistance_AnySafety (or max total crept), X_Vel_Diff_BetweenSafeties_AtSnap AND/OR Max_PreSnap_X_vel_TowardBall_AnySafety
 Plot10B <- ggplot(data = Stats_ByFullPlay_2High) +
   # geom_point(aes(x = X_Diff_BetweenSafeties_AtSnap, y = MOFO_probability_FDA), alpha = 0.05) +
   stat_smooth(mapping = aes(x = X_Diff_BetweenSafeties_AtSnap, y = MOFO_probability_FDA, color = "red"),
@@ -858,47 +848,37 @@ grid.arrange(Plot14B, Plot15B, Plot16B, Plot17B, nrow = 2, ncol = 2)
 # Now look into the concept of "strong telegraphs" for predicted MOFO rate
 # I.e., is there any feature where "when this feature happens, model predicts MOFO 85+ percent of the time?"
 # NOTE: 1 yard/second is approximately 2.05 MPH (so 2 yards/second is a fast walk)
-
 # Ideas: 2-high plays with very high or low vertical stagger (Plot10B)
 mean((Stats_ByFullPlay_2High %>% filter(X_Diff_BetweenSafeties_AtSnap < 1))$MOFO_probability_FDA)
-# It's 0.7465 at < 1 yard, 0.7278 at < 2 yards
-
-mean((Stats_ByFullPlay_2High %>% filter(X_Diff_BetweenSafeties_AtSnap >= 6))$MOFO_probability_FDA)
-# It's 0.133 at 6+ yards, 0.1049 at 7+ yards, 0.0890 at 8+ yards 
-
+# It's 0.7475 at < 1 yard, 0.7281 at < 2 yards (use vert creep instead of this)
+mean((Stats_ByFullPlay_2High %>% filter(X_Diff_BetweenSafeties_AtSnap >= 7))$MOFO_probability_FDA)
+# It's 0.1332 at 6+ yards, 0.1043 at 7+ yards, 0.0886 at 8+ yards (use vert creep over this)
 # Definitely 2-high plays with high difference in vertical velocities at snap (Plot11B)
 mean((Stats_ByFullPlay_2High %>% filter(X_Vel_Diff_BetweenSafeties_AtSnap >= 4))$MOFO_probability_FDA)
-# It's 0.0815 
-
+# It's 0.0804 # Use this
 # 2-high plays where a safety had notable vertical creep distance (Plot12B)
 mean((Stats_ByFullPlay_2High %>% filter(Max_VertCreptDistance_AnySafety >= 4))$MOFO_probability_FDA)
-# It's 0.07488 
-
+# It's 0.0745 # Use this
 # 2-high plays with negative Max_PreSnap_X_vel_TowardBall_AnySafety (Plot13B) ... if sample is decent
 mean((Stats_ByFullPlay_2High %>% filter(Max_PreSnap_X_vel_TowardBall_AnySafety < 0))$MOFO_probability_FDA)
 # View(Stats_ByFullPlay_2High %>% filter(Max_PreSnap_X_vel_TowardBall_AnySafety < 0))
-# It's 0.8174, and sample size is 207 plays
-
+# It's 0.8187, and sample size is 211 plays # Usable, but probably got better stuff for 2-high plays
 # 1-high plays with very low absolute horiz distance from MOF by safety at snap (Plot14B)
 mean((Stats_ByFullPlay_1High %>% filter(Max_Y_AbsDistFromMOF_AtSnap_AnySafety < 3))$MOFO_probability_FDA)
-# It's 0.1159 for < 2 yards, 0.1209 for < 3 yards
-
+# It's 0.1158 for < 2 yards, 0.121 for < 3 yards # Use this
 # Also flip Plot 46B for very high absolute horiz distance, if sample is good (like at least 8 yards)
 mean((Stats_ByFullPlay_1High %>% filter(Max_Y_AbsDistFromMOF_AtSnap_AnySafety > 8))$MOFO_probability_FDA)
 # View(Stats_ByFullPlay_1High %>% filter(Max_Y_AbsDistFromMOF_AtSnap_AnySafety > 8))
-# It's 0.5625
-
+# It's 0.5625, but sample is only 31 plays ... scrap it
 # Can repeat similar idea with Plot15B, which refers to safety's min horiz distance from MOF at any point pre-snap
-mean((Stats_ByFullPlay_1High %>% filter(min_SafetyAbsHorizDistToMOF_PreSnap < 3))$MOFO_probability_FDA)
-# It's 0.1287 for < 2 yards, 0.1329 for < 3 yards
-
+mean((Stats_ByFullPlay_1High %>% filter(min_SafetyAbsHorizDistToMOF_PreSnap < 2))$MOFO_probability_FDA)
+# It's 0.1286 for < 2 yards, 0.1328 for < 3 yards, but 14B is probably better
 # Look into the safety having a positive horiz speed toward MOF at the snap, with Plot16B
 mean((Stats_ByFullPlay_1High %>% filter(Max_Y_SpeedTowardMOF_AtSnap_AnySafety >= 0))$MOFO_probability_FDA)
-# It's 0.1425 
-
+# It's 0.1427 ... definitely usable for the 1-high plays
 # And look into plays where safety never had a positive vertical velocity before the snap (Plot17B)
 mean((Stats_ByFullPlay_1High %>% filter(Max_PreSnap_X_vel_TowardBall_AnySafety < 0))$MOFO_probability_FDA)
-# It's 0.1332
+# It's 0.1328
 
 # Then incorporate a "multiple response variable" concept with actual AND predicted MOFO rates on Y-axis
 Plot10C <- ggplot(data = Stats_ByFullPlay_2High) +
@@ -1022,7 +1002,7 @@ layout <- c(
   area(t = 2, l = 1, b = 2, r = 2)  # Bottom-center: Plot12C
 )
 
-wrap_plots(Plot10B, Plot11B, Plot12B, design = layout)
+wrap_plots(Plot10C, Plot11C, Plot12C, design = layout)
 
 # And, make a gt table (either 2-high, or all plays) ranking features by how correlated they are with PostSnap_MOF_Num
 # First, gotta sort in descending order, starting with all plays ... but make it in descending order of ABSOLUTE correlation
