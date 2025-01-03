@@ -665,7 +665,7 @@ colnames(PlaysAndGames_NFLVerse)
 # Also passLocationType refers to QB's location, pass_location refers to where ball was thrown
 # Note that "time" includes game date for the tracking version, but just game clock for NFLVerse version
 NFLVerse_Reduced <- PlaysAndGames_NFLVerse %>% 
-  select(-c(3, 8:9, 15:19, 31:32, 39:41, 45, 47, 51:68, 70:83, 85:88, 97:105,
+  select(-c(3, 8:9, 15:17, 31:32, 39:41, 45, 47, 51:68, 70:83, 85:88, 97:105,
             107:125, 127:129, 131:160, 162, 164:185, 187, 192:197, 199:303, 307:309,
             313:318, 325:326, 330, 333:355, 360, 363, 374:379, 383, 385:402))
 TrackingWithStats_PlayerNames <- TrackingWithStats_PlayerNames %>% select(-"Frame1_Event")
@@ -704,6 +704,10 @@ MergedData <- MergedData %>%
 
 # And do the same for defensive WPA (just negative offensive WPA)
 MergedData <- MergedData %>% mutate(DefWPA = (-1) * wpa)
+
+# Create WP for the offense, using home/away possession teams
+MergedData <- MergedData %>% mutate(winProbability =
+              ifelse(posteam == homeTeamAbbr, preSnapHomeTeamWinProbability, preSnapVisitorTeamWinProbability))
 
 # Find other ways to filter the data, e.g. get rid of garbage time
 # MergedData <- MergedData %>% filter(winProbability >= 0.05 & winProbability <= 0.95)
