@@ -420,6 +420,50 @@ grid.arrange(Plot14, Plot15, ncol = 2)
 # grid.arrange(Plot14, Plot15, Plot16, Plot17, ncol = 4) # too messy, don't use
 grid.arrange(Plot14, Plot15, Plot16, Plot17, nrow = 2, ncol = 2)
 
+# Now look into the concept of "strong telegraphs"
+# I.e., is there any feature where "when this feature happens, it's MOFO 85+ percent of the time?"
+# NOTE: 1 yard/second is approximately 2.05 MPH (so 2 yards/second is a fast walk)
+# Ideas: very low "max horiz distance from MOF by safety at the snap" (see Plot8)
+mean((Stats_ByFullPlay_All9Weeks %>% filter(Max_Y_AbsDistFromMOF_AtSnap_AnySafety < 3))$PostSnap_MOF_Num)
+# It's 0.1269 
+
+# 2-high plays with very high or low vertical stagger (Plot10)
+mean((Stats_ByFullPlay_2High %>% filter(X_Diff_BetweenSafeties_AtSnap < 1))$PostSnap_MOF_Num)
+# It's 0.7923 at < 1 yard, 0.7469 at < 2 yards
+
+mean((Stats_ByFullPlay_2High %>% filter(X_Diff_BetweenSafeties_AtSnap >= 7))$PostSnap_MOF_Num)
+# It's 0.1476 at 6+ yards, 0.1121 at 7+ yards, 0.0926 at 8+ yards
+
+# Definitely 2-high plays with high difference in vertical velocities at snap (Plot11)
+mean((Stats_ByFullPlay_2High %>% filter(X_Vel_Diff_BetweenSafeties_AtSnap >= 4))$PostSnap_MOF_Num)
+# It's 0.0882 
+
+# 2-high plays where a safety had notable vertical creep distance (Plot12)
+mean((Stats_ByFullPlay_2High %>% filter(Max_VertCreptDistance_AnySafety >= 4))$PostSnap_MOF_Num)
+# It's 0.07641 
+
+# 2-high plays with negative Max_PreSnap_X_vel_TowardBall_AnySafety (Plot13) ... if sample is decent
+mean((Stats_ByFullPlay_2High %>% filter(Max_PreSnap_X_vel_TowardBall_AnySafety < 0))$PostSnap_MOF_Num)
+# View(Stats_ByFullPlay_2High %>% filter(Max_PreSnap_X_vel_TowardBall_AnySafety < 0))
+# It's 0.8309, and sample size is 207 plays
+
+# 1-high plays with very low absolute horiz speed by safety at snap (Plot14) 
+mean((Stats_ByFullPlay_1High %>% filter(Max_Y_AbsSpeed_AtSnap_AnySafety < 1))$PostSnap_MOF_Num)
+# It's 0.1384 for < 0.5 yards/sec, 0.1395 for < 1 yards/sec
+
+# And can try similar idea with Plot15, almost the same, can test both
+mean((Stats_ByFullPlay_1High %>% filter(Max_Y_SpeedTowardMOF_AtSnap_AnySafety >= 0))$PostSnap_MOF_Num)
+# It's 0.1225 
+
+# 1-high plays with very low absolute horiz distance from MOF by safety at snap (Plot16)
+mean((Stats_ByFullPlay_1High %>% filter(Max_Y_AbsDistFromMOF_AtSnap_AnySafety < 2))$PostSnap_MOF_Num)
+# It's 0.1044 
+
+# Also flip Plot16 for very high absolute horiz distance, if sample is good (like at least 8 yards)
+mean((Stats_ByFullPlay_1High %>% filter(Max_Y_AbsDistFromMOF_AtSnap_AnySafety > 8))$PostSnap_MOF_Num)
+# View(Stats_ByFullPlay_1High %>% filter(Max_Y_AbsDistFromMOF_AtSnap_AnySafety > 8))
+# It's 0.4839, but sample is only 31 plays ... scrap it
+
 # And, make a gt table (either 2-high, or all plays) ranking features by how correlated they are with PostSnap_MOF_Num
 # First, gotta sort in descending order, starting with all plays ... but make it in descending order of ABSOLUTE correlation
 # If we wanted all possible features instead of just the top few, use corr_df_MOFO_AllPlays instead of top_variables
