@@ -4,7 +4,7 @@ library(tidyverse)
 # Stats_ByFullPlay_All9Weeks is a CSV with same format, defined on JP's computer
 
 # Read in data if necessary: 
-Stats_ByFullPlay_Final <- fread("Stats_ByFullPlay_Final.csv")
+# Stats_ByFullPlay_Final <- fread("Stats_ByFullPlay_Final.csv")
 Stats_ByFullPlay_All9Weeks <- fread("Stats_ByFullPlay_All9Weeks.csv")
 
 colnames(Stats_ByFullPlay_9Weeks) # recall that Snap_Entropy is the continuous play-level one (HighEntropy is binary)
