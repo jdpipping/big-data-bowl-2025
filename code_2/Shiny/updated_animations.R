@@ -262,7 +262,7 @@ anim <- ggplot() +
     geom_text(aes(x = 100, y = -2, label = paste0("Time Since Snap: ", t_after_snap)), 
               data = sample_data_3, 
               inherit.aes = FALSE, 
-              color = 'black') +
+              color = 'white') +
   geom_text(data = sample_data_3, aes(x = x, y = y, group = nflId, label = jerseyNumber), colour = "white",
             vjust = 0.36, size = 4.5) +
     # adding first down line and LOS
@@ -342,7 +342,7 @@ play_animation_4_pauses <- anim +
   geom_text(aes(x = 100, y = -2, label = paste0("Time Since Snap: ", t_after_snap)), 
             data = sample_data_4, 
             inherit.aes = FALSE, 
-            color = 'black') +
+            color = 'white') +
   geom_text(data = sample_data_4, aes(x = x, y = y, group = nflId, label = jerseyNumber), colour = "white",
             vjust = 0.36, size = 4.5) +
   # adding first down line and LOS

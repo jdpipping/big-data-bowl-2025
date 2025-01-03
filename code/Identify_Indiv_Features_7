@@ -1,24 +1,26 @@
 library(tidyverse)
 
-# Stats_ByFullPlay_Final was defined in the "Aggregating Frames to Plays" GitHib file
+# Stats_ByFullPlay_Final was defined in the "Aggregating Frames to Plays" GitHub file
+# Stats_ByFullPlay_All9Weeks is a CSV with same format, defined on JP's computer
 
 # Read in data if necessary: 
-Stats_ByFullPlay_Final <- fread("Stats_ByFullPlay_Final.csv")
+# Stats_ByFullPlay_Final <- fread("Stats_ByFullPlay_Final.csv")
+Stats_ByFullPlay_All9Weeks <- fread("Stats_ByFullPlay_All9Weeks.csv")
 
-colnames(Stats_ByFullPlay_Final) # recall that Snap_Entropy is the continuous play-level one (HighEntropy is binary)
+colnames(Stats_ByFullPlay_9Weeks) # recall that Snap_Entropy is the continuous play-level one (HighEntropy is binary)
 
 # Before we make these matrices, adjust Min_PreSnap_X_vel_component_AnySafety and Min_PreSnap_X_acc_component_AnySafety
 # This is to get rid of the "double negative" idea ... in other words, make a high velocity toward the ball show up as a positive number
-Stats_ByFullPlay_Final <- Stats_ByFullPlay_Final %>% 
+Stats_ByFullPlay_9Weeks <- Stats_ByFullPlay_9Weeks %>% 
   mutate(Max_PreSnap_X_vel_TowardBall_AnySafety = -1 * Min_PreSnap_X_vel_component_AnySafety)
-Stats_ByFullPlay_Final <- Stats_ByFullPlay_Final %>% 
+Stats_ByFullPlay_9Weeks <- Stats_ByFullPlay_9Weeks %>% 
   mutate(Max_PreSnap_X_acc_TowardBall_AnySafety = -1 * Min_PreSnap_X_acc_component_AnySafety)
-Stats_ByFullPlay_Final <- Stats_ByFullPlay_Final %>% select(-c("Min_PreSnap_X_vel_component_AnySafety", "Min_PreSnap_X_acc_component_AnySafety"))
+Stats_ByFullPlay_9Weeks <- Stats_ByFullPlay_9Weeks %>% select(-c("Min_PreSnap_X_vel_component_AnySafety", "Min_PreSnap_X_acc_component_AnySafety"))
 
-Stats_ByFullPlay_2High <- Stats_ByFullPlay_Final %>% filter(num_safeties_pre_snap == 2)
-Stats_ByFullPlay_1High <- Stats_ByFullPlay_Final %>% filter(num_safeties_pre_snap == 1)
+Stats_ByFullPlay_2High <- Stats_ByFullPlay_9Weeks %>% filter(num_safeties_pre_snap == 2)
+Stats_ByFullPlay_1High <- Stats_ByFullPlay_9Weeks %>% filter(num_safeties_pre_snap == 1)
 
-MOFO_Features_AllPlays <- Stats_ByFullPlay_Final %>%
+MOFO_Features_AllPlays <- Stats_ByFullPlay_All9Weeks %>%
   select(c("PostSnap_MOF_Num", "X_Diff_BetweenSafeties_AtSnap", "TotDist_BetweenSafeties_AtSnap",
            "min_SafetyAbsHorizDistToMOF_PreSnap", "X_Vel_Diff_BetweenSafeties_AtSnap",
            "Y_Vel_Diff_BetweenSafeties_AtSnap", "TotSpeed_Diff_BetweenSafeties_AtSnap",
@@ -36,8 +38,6 @@ corr_matrix_MOFO_AllPlays <- MOFO_Features_AllPlays %>%
   round(2)  
 # Now see which variables had strongest positive or negative correlation with PostSnap_MOF_Num
 corr_df_MOFO_AllPlays <- as.data.frame(corr_matrix_MOFO_AllPlays)
-corr_df_MOFO_AllPlays <- corr_df_MOFO_AllPlays %>% select(-"gameId")
-corr_df_MOFO_AllPlays <- corr_df_MOFO_AllPlays[-1, ] # this gets rid of gameId row
 # View(corr_df_MOFO_AllPlays %>% arrange(desc(PostSnap_MOF_Num)))
 rm(corr_matrix_MOFO_AllPlays)
 
@@ -65,8 +65,6 @@ corr_matrix_MOFO_2High <- MOFO_Features_2High %>%
   round(2)  
 # Now see which variables had strongest positive or negative correlation with PostSnap_MOF_Num
 corr_df_MOFO_2High <- as.data.frame(corr_matrix_MOFO_2High)
-corr_df_MOFO_2High <- corr_df_MOFO_2High %>% select(-"gameId")
-corr_df_MOFO_2High <- corr_df_MOFO_2High[-1, ] # this gets rid of gameId row
 # View(corr_df_MOFO_2High %>% arrange(desc(PostSnap_MOF_Num)))
 rm(corr_matrix_MOFO_2High)
 
@@ -89,8 +87,6 @@ corr_matrix_MOFO_1High <- MOFO_Features_1High %>%
   round(2)  
 # Now see which variables had strongest positive or negative correlation with PostSnap_MOF_Num
 corr_df_MOFO_1High <- as.data.frame(corr_matrix_MOFO_1High)
-corr_df_MOFO_1High <- corr_df_MOFO_1High %>% select(-"gameId")
-corr_df_MOFO_1High <- corr_df_MOFO_1High[-1, ] # this gets rid of gameId row
 # View(corr_df_MOFO_1High %>% arrange(desc(PostSnap_MOF_Num)))
 rm(corr_matrix_MOFO_1High)
 
@@ -100,7 +96,7 @@ rownames(top_variables_MOFO_1High) # keep in mind PostSnap_MOF_Num obviously isn
 # And make it so the only columns in this new DF align with the rows in that DF
 top_variables_MOFO_1High <- top_variables_MOFO_1High[, colnames(top_variables_MOFO_1High) %in% rownames(top_variables_MOFO_1High)]
 
-Entropy_Features_AllPlays <- Stats_ByFullPlay_Final %>%
+Entropy_Features_AllPlays <- Stats_ByFullPlay_All9Weeks %>%
   select(c("Snap_Entropy", "X_Diff_BetweenSafeties_AtSnap", "TotDist_BetweenSafeties_AtSnap",
            "min_SafetyAbsHorizDistToMOF_PreSnap", "X_Vel_Diff_BetweenSafeties_AtSnap",
            "Y_Vel_Diff_BetweenSafeties_AtSnap", "TotSpeed_Diff_BetweenSafeties_AtSnap",
@@ -118,8 +114,6 @@ corr_matrix_Entropy_AllPlays <- Entropy_Features_AllPlays %>%
   round(2)  
 # Now see which variables had strongest positive or negative correlation with Snap_Entropy
 corr_df_Entropy_AllPlays <- as.data.frame(corr_matrix_Entropy_AllPlays)
-corr_df_Entropy_AllPlays <- corr_df_Entropy_AllPlays %>% select(-"gameId")
-corr_df_Entropy_AllPlays <- corr_df_Entropy_AllPlays[-1, ] # this gets rid of gameId row
 # View(corr_df_Entropy_AllPlays %>% arrange(desc(Snap_Entropy)))
 rm(corr_matrix_Entropy_AllPlays)
 
@@ -147,8 +141,6 @@ corr_matrix_Entropy_2High <- Entropy_Features_2High %>%
   round(2)  
 # Now see which variables had strongest positive or negative correlation with Snap_Entropy
 corr_df_Entropy_2High <- as.data.frame(corr_matrix_Entropy_2High)
-corr_df_Entropy_2High <- corr_df_Entropy_2High %>% select(-"gameId")
-corr_df_Entropy_2High <- corr_df_Entropy_2High[-1, ] # this gets rid of gameId row
 # View(corr_df_Entropy_2High %>% arrange(desc(Snap_Entropy)))
 rm(corr_matrix_Entropy_2High)
 
@@ -171,13 +163,11 @@ corr_matrix_Entropy_1High <- Entropy_Features_1High %>%
   round(2)  
 # Now see which variables had strongest positive or negative correlation with Snap_Entropy
 corr_df_Entropy_1High <- as.data.frame(corr_matrix_Entropy_1High)
-corr_df_Entropy_1High <- corr_df_Entropy_1High %>% select(-"gameId")
-corr_df_Entropy_1High <- corr_df_Entropy_1High[-1, ] # this gets rid of gameId row
 # View(corr_df_Entropy_1High %>% arrange(desc(Snap_Entropy)))
 rm(corr_matrix_Entropy_1High)
 
-# Now take all variables with at least a correlation of 0.1 in either direction (lower standard b/c we're picking from fewer variables)
-top_variables_Entropy_1High <- corr_df_Entropy_1High %>% filter(abs(Snap_Entropy) >= 0.1)
+# Now take all variables with at least a correlation of 0.25 in either direction 
+top_variables_Entropy_1High <- corr_df_Entropy_1High %>% filter(abs(Snap_Entropy) >= 0.25)
 rownames(top_variables_Entropy_1High) # keep in mind Snap_Entropy obviously isn't a predictor variable
 # And make it so the only columns in this new DF align with the rows in that DF
 top_variables_Entropy_1High <- top_variables_Entropy_1High[, colnames(top_variables_Entropy_1High) %in% rownames(top_variables_Entropy_1High)]
@@ -185,16 +175,16 @@ top_variables_Entropy_1High <- top_variables_Entropy_1High[, colnames(top_variab
 # Diagnose features we should be graphing
 # View(top_variables_MOFO_AllPlays)
 # All plays: X_Diff_BetweenSafeties_AtSnap, X_Vel_Diff_BetweenSafeties_AtSnap, Max_Y_AbsDistFromMOF_AtSnap_AnySafety AND/OR min_SafetyAbsHorizDistToMOF_PreSnap
-Plot6 <- ggplot(data = Stats_ByFullPlay_Final) +
-  geom_point(aes(x = X_Diff_BetweenSafeties_AtSnap, y = PostSnap_MOF_Num), alpha = 0.1) +
+Plot6 <- ggplot(data = Stats_ByFullPlay_All9Weeks) +
+  geom_point(aes(x = X_Diff_BetweenSafeties_AtSnap, y = PostSnap_MOF_Num), alpha = 0.05) +
   stat_smooth(mapping = aes(x = X_Diff_BetweenSafeties_AtSnap, y = PostSnap_MOF_Num, color = "red"),
-              method = "gam", se = T, span = 0.75) +
+              method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
   # scale_y_continuous(breaks = seq(70, 130, 20)) +
   scale_x_continuous(breaks = seq(0, 10, 2)) +
   coord_cartesian(xlim = c(0, 10), ylim = c(0, 1)) +
   labs(x = "Vertical Stagger b/w Safeties at Snap (Yards)", y = "MOFO Coverage Rate",
-       title = "How MOFO Coverage Rate Depends on Vertical Stagger Between Safeties",
+       title = "MOFO Rate vs. Vertical Stagger Between Safeties",
        subtitle = "Early Down Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022 (n = 4381)",
        caption = "Vertical Stagger: vertical distance b/w safeties at time of snap",
        color = " ") +
@@ -203,16 +193,16 @@ Plot6 <- ggplot(data = Stats_ByFullPlay_Final) +
         plot.subtitle = element_text(size = 8, hjust = 0.5),
         legend.position = "none")
 
-Plot7 <- ggplot(data = Stats_ByFullPlay_Final) +
-  geom_point(aes(x = X_Vel_Diff_BetweenSafeties_AtSnap, y = PostSnap_MOF_Num), alpha = 0.1) +
+Plot7 <- ggplot(data = Stats_ByFullPlay_All9Weeks) +
+  geom_point(aes(x = X_Vel_Diff_BetweenSafeties_AtSnap, y = PostSnap_MOF_Num), alpha = 0.05) +
   stat_smooth(mapping = aes(x = X_Vel_Diff_BetweenSafeties_AtSnap, y = PostSnap_MOF_Num, color = "red"),
-              method = "gam", se = T, span = 0.75) +
+              method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
   # scale_y_continuous(breaks = seq(70, 130, 20)) +
   scale_x_continuous(breaks = seq(0, 10, 2)) +
   coord_cartesian(xlim = c(0, 6), ylim = c(0, 1)) +
   labs(x = "Difference in Vertical Velocities b/w Safeties at Snap (Yds/Sec)", y = "MOFO Coverage Rate",
-       title = "How MOFO Coverage Rate Depends on Difference in Vertical Velocities b/w Safeties at Snap",
+       title = "MOFO Rate vs. Difference in Vertical Velocities b/w Safeties at Snap",
        subtitle = "Early Down Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022 (n = 4381)",
        caption = "Vertical Velocities: toward LOS is negative, away from LOS is positive",
        color = " ") +
@@ -221,16 +211,16 @@ Plot7 <- ggplot(data = Stats_ByFullPlay_Final) +
         plot.subtitle = element_text(size = 8, hjust = 0.5),
         legend.position = "none")
 
-Plot8 <- ggplot(data = Stats_ByFullPlay_Final) +
-  geom_point(aes(x = Max_Y_AbsDistFromMOF_AtSnap_AnySafety, y = PostSnap_MOF_Num), alpha = 0.1) +
+Plot8 <- ggplot(data = Stats_ByFullPlay_All9Weeks) +
+  geom_point(aes(x = Max_Y_AbsDistFromMOF_AtSnap_AnySafety, y = PostSnap_MOF_Num), alpha = 0.05) +
   stat_smooth(mapping = aes(x = Max_Y_AbsDistFromMOF_AtSnap_AnySafety, y = PostSnap_MOF_Num, color = "red"),
-              method = "gam", se = T, span = 0.75) +
+              method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
   # scale_y_continuous(breaks = seq(70, 130, 20)) +
   scale_x_continuous(breaks = seq(0, 14, 2)) +
   coord_cartesian(xlim = c(0, 14), ylim = c(0, 1)) +
   labs(x = "Highest Horiz Distance from MOF by a Safety at the Snap (Yards)", y = "MOFO Coverage Rate",
-       title = "How MOFO Coverage Rate Depends on Highest Horiz Distance from MOF by a Safety at Snap",
+       title = "MOFO Rate vs. Highest Horiz Distance from MOF by a Safety at Snap",
        subtitle = "Early Down Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022 (n = 4381)",
        caption = "Horizontal Distance from MOF: either right or left is positive",
        color = " ") +
@@ -239,16 +229,16 @@ Plot8 <- ggplot(data = Stats_ByFullPlay_Final) +
         plot.subtitle = element_text(size = 8, hjust = 0.5),
         legend.position = "none")
 
-Plot9 <- ggplot(data = Stats_ByFullPlay_Final) +
-  geom_point(aes(x =  min_SafetyAbsHorizDistToMOF_PreSnap, y = PostSnap_MOF_Num), alpha = 0.1) +
+Plot9 <- ggplot(data = Stats_ByFullPlay_All9Weeks) +
+  geom_point(aes(x =  min_SafetyAbsHorizDistToMOF_PreSnap, y = PostSnap_MOF_Num), alpha = 0.05) +
   stat_smooth(mapping = aes(x =  min_SafetyAbsHorizDistToMOF_PreSnap, y = PostSnap_MOF_Num, color = "red"),
-              method = "gam", se = T, span = 0.75) +
+              method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
   # scale_y_continuous(breaks = seq(70, 130, 20)) +
   scale_x_continuous(breaks = seq(0, 10, 2)) +
   coord_cartesian(xlim = c(0, 10), ylim = c(0, 1)) +
   labs(x = "Minimum Pre-Snap Horizontal Distance from MOF by a Safety (Yards)", y = "MOFO Coverage Rate",
-       title = "How MOFO Coverage Rate Depends on Minimum Pre-Snap Horizontal Distance from MOF by a Safety",
+       title = "MOFO Rate vs. Minimum Pre-Snap Horizontal Distance from MOF by a Safety",
        subtitle = "Early Down Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022 (n = 4381)",
        caption = "Horizontal Distance from MOF: either right or left is positive",
        color = " ") +
@@ -264,15 +254,15 @@ grid.arrange(Plot6, Plot7, Plot8, Plot9, nrow = 2, ncol = 2)
 # View(top_variables_MOFO_2High)
 # 2-high: X_Diff_BetweenSafeties_AtSnap, Max_VertCreptDistance_AnySafety, X_Vel_Diff_BetweenSafeties_AtSnap AND/OR Max_PreSnap_X_vel_TowardBall_AnySafety
 Plot10 <- ggplot(data = Stats_ByFullPlay_2High) +
-  geom_point(aes(x = X_Diff_BetweenSafeties_AtSnap, y = PostSnap_MOF_Num), alpha = 0.1) +
+  geom_point(aes(x = X_Diff_BetweenSafeties_AtSnap, y = PostSnap_MOF_Num), alpha = 0.05) +
   stat_smooth(mapping = aes(x = X_Diff_BetweenSafeties_AtSnap, y = PostSnap_MOF_Num, color = "red"),
-              method = "gam", se = T, span = 0.75) +
+              method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
   # scale_y_continuous(breaks = seq(70, 130, 20)) +
   scale_x_continuous(breaks = seq(0, 10, 2)) +
   coord_cartesian(xlim = c(0, 10), ylim = c(0, 1)) +
   labs(x = "Vertical Stagger b/w Safeties at Snap (Yards)", y = "MOFO Coverage Rate",
-       title = "How MOFO Coverage Rate Depends on Vertical Stagger Between Safeties",
+       title = "MOFO Rate vs. Vertical Stagger Between Safeties",
        subtitle = "Early Down 2-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022 (n = 3029)",
        caption = "Vertical Stagger: vertical distance b/w safeties at time of snap",
        color = " ") +
@@ -282,33 +272,15 @@ Plot10 <- ggplot(data = Stats_ByFullPlay_2High) +
         legend.position = "none")
 
 Plot11 <- ggplot(data = Stats_ByFullPlay_2High) +
-  geom_point(aes(x = Max_VertCreptDistance_AnySafety, y = PostSnap_MOF_Num), alpha = 0.1) +
-  stat_smooth(mapping = aes(x = Max_VertCreptDistance_AnySafety, y = PostSnap_MOF_Num, color = "red"),
-              method = "gam", se = T, span = 0.75) +
-  # geom_abline(intercept = 0, slope = 0) +
-  # scale_y_continuous(breaks = seq(70, 130, 20)) +
-  scale_x_continuous(breaks = seq(-4, 10, 2)) +
-  coord_cartesian(xlim = c(-4, 8), ylim = c(0, 1)) +
-  labs(x = "Highest Vertical 'Creep' Distance by a Safety (Yards)", y = "MOFO Coverage Rate",
-       title = "How MOFO Coverage Rate Depends on Highest Vertical 'Creep' Distance by a Safety",
-       subtitle = "Early Down 2-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022 (n = 3029)",
-       caption = "Vertical 'Creep' Distance: How Far Safety Moved Toward LOS Before Snap",
-       color = " ") +
-  theme_bw() + 
-  theme(plot.title = element_text(size = 10, hjust = 0.5),
-        plot.subtitle = element_text(size = 8, hjust = 0.5),
-        legend.position = "none")
-
-Plot12 <- ggplot(data = Stats_ByFullPlay_2High) +
-  geom_point(aes(x = X_Vel_Diff_BetweenSafeties_AtSnap, y = PostSnap_MOF_Num), alpha = 0.1) +
+  geom_point(aes(x = X_Vel_Diff_BetweenSafeties_AtSnap, y = PostSnap_MOF_Num), alpha = 0.05) +
   stat_smooth(mapping = aes(x = X_Vel_Diff_BetweenSafeties_AtSnap, y = PostSnap_MOF_Num, color = "red"),
-              method = "gam", se = T, span = 0.75) +
+              method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
   # scale_y_continuous(breaks = seq(70, 130, 20)) +
   scale_x_continuous(breaks = seq(0, 10, 2)) +
   coord_cartesian(xlim = c(0, 6), ylim = c(0, 1)) +
   labs(x = "Difference in Vertical Velocities b/w Safeties at Snap (Yds/Sec)", y = "MOFO Coverage Rate",
-       title = "How MOFO Coverage Rate Depends on Difference in Vertical Velocities b/w Safeties at Snap",
+       title = "MOFO Rate vs. Difference in Vertical Velocities b/w Safeties at Snap",
        subtitle = "Early Down 2-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022 (n = 3029)",
        caption = "Vertical Velocities: toward LOS is negative, away from LOS is positive",
        color = " ") +
@@ -317,16 +289,34 @@ Plot12 <- ggplot(data = Stats_ByFullPlay_2High) +
         plot.subtitle = element_text(size = 8, hjust = 0.5),
         legend.position = "none")
 
+Plot12 <- ggplot(data = Stats_ByFullPlay_2High) +
+  geom_point(aes(x = Max_VertCreptDistance_AnySafety, y = PostSnap_MOF_Num), alpha = 0.05) +
+  stat_smooth(mapping = aes(x = Max_VertCreptDistance_AnySafety, y = PostSnap_MOF_Num, color = "red"),
+              method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
+  # geom_abline(intercept = 0, slope = 0) +
+  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_x_continuous(breaks = seq(-4, 10, 2)) +
+  coord_cartesian(xlim = c(-4, 8), ylim = c(0, 1)) +
+  labs(x = "Highest Vertical 'Creep' Distance by a Safety (Yards)", y = "MOFO Coverage Rate",
+       title = "MOFO Rate vs. Highest Vertical 'Creep' Distance by a Safety",
+       subtitle = "Early Down 2-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022 (n = 3029)",
+       caption = "Vertical 'Creep' Distance: Safety's Distance Moved Forward b/w O-Line Set and Snap",
+       color = " ") +
+  theme_bw() + 
+  theme(plot.title = element_text(size = 10, hjust = 0.5),
+        plot.subtitle = element_text(size = 8, hjust = 0.5),
+        legend.position = "none") # + theme(aspect.ratio = 1)
+
 Plot13 <- ggplot(data = Stats_ByFullPlay_2High) +
-  geom_point(aes(x = Max_PreSnap_X_vel_TowardBall_AnySafety, y = PostSnap_MOF_Num), alpha = 0.1) +
+  geom_point(aes(x = Max_PreSnap_X_vel_TowardBall_AnySafety, y = PostSnap_MOF_Num), alpha = 0.05) +
   stat_smooth(mapping = aes(x = Max_PreSnap_X_vel_TowardBall_AnySafety, y = PostSnap_MOF_Num, color = "red"),
-              method = "gam", se = T, span = 0.75) +
+              method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
   # scale_y_continuous(breaks = seq(70, 130, 20)) +
   scale_x_continuous(breaks = seq(0, 10, 2)) +
   coord_cartesian(xlim = c(-1, 5), ylim = c(0, 1)) +
   labs(x = "Maximum Pre-Snap Speed Toward Ball by a Safety (Yds/Sec)", y = "MOFO Coverage Rate",
-       title = "How MOFO Coverage Rate Depends on Maximum Pre-Snap Speed Toward Ball by a Safety",
+       title = "MOFO Rate vs. Maximum Pre-Snap Speed Toward Ball by a Safety",
        subtitle = "Early Down 2-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022 (n = 3029)",
        caption = "Max Pre-Snap Speed Toward Ball: highest velocity, in direction of ball, at any point before snap",
        color = " ") +
@@ -338,19 +328,32 @@ Plot13 <- ggplot(data = Stats_ByFullPlay_2High) +
 grid.arrange(Plot10, Plot11, ncol = 2)
 # grid.arrange(Plot10, Plot11, Plot12, Plot13, ncol = 4) ... don't use, too crowded
 grid.arrange(Plot10, Plot11, Plot12, Plot13, nrow = 2, ncol = 2)
+grid.arrange(Plot10, Plot11, Plot12, nrow = 2, ncol = 2)
+grid.arrange(Plot10, Plot11, Plot12, ncol = 3)
+# Here's how to arrange three plots at once in an "upside-down triangle" format
+(Plot10 | Plot11) / Plot12
+
+# Here's a more complex way to do that ... requires adjustment to the aspect.ratio of the bottom plot
+layout <- c(
+  area(t = 1, l = 1, b = 1, r = 1), # Top-left: Plot10
+  area(t = 1, l = 2, b = 1, r = 2), # Top-right: Plot11
+  area(t = 2, l = 1, b = 2, r = 2)  # Bottom-center: Plot12
+)
+
+wrap_plots(Plot10, Plot11, Plot12, design = layout)
 
 # View(top_variables_MOFO_1High)
-# 1-high: Max_Y_AbsSpeed_AtSnap_AnySafety AND/OR Max_Y_SpeedTowardMOF_AtSnap_AnySafety, Max_Y_AbsAcc_AtSnap_AnySafety, Max_Y_AbsDistFromMOF_AtSnap_AnySafety
+# 1-high: Max_Y_AbsSpeed_AtSnap_AnySafety AND/OR Max_Y_SpeedTowardMOF_AtSnap_AnySafety, Max_Y_AccTowardMOF_AtSnap_AnySafety (or Max_Y_AbsAcc_AtSnap_AnySafety), Max_Y_AbsDistFromMOF_AtSnap_AnySafety (or min_SafetyAbsHorizDistToMOF_PreSnap)
 Plot14 <- ggplot(data = Stats_ByFullPlay_1High) +
-  geom_point(aes(x = Max_Y_AbsSpeed_AtSnap_AnySafety, y = PostSnap_MOF_Num), alpha = 0.1) +
+  geom_point(aes(x = Max_Y_AbsSpeed_AtSnap_AnySafety, y = PostSnap_MOF_Num), alpha = 0.05) +
   stat_smooth(mapping = aes(x = Max_Y_AbsSpeed_AtSnap_AnySafety, y = PostSnap_MOF_Num, color = "red"),
-              method = "gam", se = T, span = 0.75) +
+              method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
   # scale_y_continuous(breaks = seq(70, 130, 20)) +
   scale_x_continuous(breaks = seq(0, 10, 1)) +
-  coord_cartesian(xlim = c(0, 5), ylim = c(0, 0.5)) +
+  coord_cartesian(xlim = c(0, 3), ylim = c(0, 1)) +
   labs(x = "Absolute Horizontal Speed by Safety at Snap (Yds/Sec)", y = "MOFO Coverage Rate",
-       title = "How MOFO Coverage Rate Depends on Safety's Absolute Horizontal Speed at the Snap",
+       title = "MOFO Rate vs. Safety's Absolute Horizontal Speed at the Snap",
        subtitle = "Early Down 1-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022 (n = 1352)",
        caption = "Abs Horizontal Speed: horizontal speed where either right or left counts as positive",
        color = " ") +
@@ -360,15 +363,15 @@ Plot14 <- ggplot(data = Stats_ByFullPlay_1High) +
         legend.position = "none")
 
 Plot15 <- ggplot(data = Stats_ByFullPlay_1High) +
-  geom_point(aes(x = Max_Y_SpeedTowardMOF_AtSnap_AnySafety, y = PostSnap_MOF_Num), alpha = 0.1) +
+  geom_point(aes(x = Max_Y_SpeedTowardMOF_AtSnap_AnySafety, y = PostSnap_MOF_Num), alpha = 0.05) +
   stat_smooth(mapping = aes(x = Max_Y_SpeedTowardMOF_AtSnap_AnySafety, y = PostSnap_MOF_Num, color = "red"),
-              method = "gam", se = T, span = 0.75) +
+              method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
   # scale_y_continuous(breaks = seq(70, 130, 20)) +
   scale_x_continuous(breaks = seq(-5, 5, 1)) +
-  coord_cartesian(xlim = c(-5, 2), ylim = c(0, 0.5)) +
+  coord_cartesian(xlim = c(-2, 2), ylim = c(0, 1)) +
   labs(x = "Horizontal Speed Toward MOF by Safety at Snap (Yds/Sec)", y = "MOFO Coverage Rate",
-       title = "How MOFO Coverage Rate Depends on Safety's Horizontal Speed Toward MOF at the Snap",
+       title = "MOFO Rate vs. Safety's Horizontal Speed Toward MOF at the Snap",
        subtitle = "Early Down 1-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022 (n = 1352)",
        caption = "Horizontal Speed Toward MOF: moving horizontally toward MOF is positive, toward sideline is negative",
        color = " ") +
@@ -378,15 +381,15 @@ Plot15 <- ggplot(data = Stats_ByFullPlay_1High) +
         legend.position = "none")
 
 Plot16 <- ggplot(data = Stats_ByFullPlay_1High) +
-  geom_point(aes(x = Max_Y_AbsDistFromMOF_AtSnap_AnySafety, y = PostSnap_MOF_Num), alpha = 0.1) +
+  geom_point(aes(x = Max_Y_AbsDistFromMOF_AtSnap_AnySafety, y = PostSnap_MOF_Num), alpha = 0.05) +
   stat_smooth(mapping = aes(x = Max_Y_AbsDistFromMOF_AtSnap_AnySafety, y = PostSnap_MOF_Num, color = "red"),
-              method = "gam", se = T, span = 0.75) +
+              method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
   # scale_y_continuous(breaks = seq(70, 130, 20)) +
   scale_x_continuous(breaks = seq(0, 10, 2)) +
-  coord_cartesian(xlim = c(0, 9), ylim = c(0, 0.75)) +
+  coord_cartesian(xlim = c(0, 9), ylim = c(0, 1)) +
   labs(x = "Safety's Horizontal Distance from MOF at the Snap (Yards)", y = "MOFO Coverage Rate",
-       title = "How MOFO Coverage Rate Depends on Safety's Horizontal Distance from MOF at the Snap",
+       title = "MOFO Rate vs. Safety's Horizontal Distance from MOF at the Snap",
        subtitle = "Early Down 1-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022 (n = 1352)",
        caption = "Horizontal Distance from MOF: net distance from middle of field (either right or left counts as positive)",
        color = " ") +
@@ -396,17 +399,17 @@ Plot16 <- ggplot(data = Stats_ByFullPlay_1High) +
         legend.position = "none")
 
 Plot17 <- ggplot(data = Stats_ByFullPlay_1High) +
-  geom_point(aes(x = Max_Y_AbsAcc_AtSnap_AnySafety, y = PostSnap_MOF_Num), alpha = 0.1) +
-  stat_smooth(mapping = aes(x = Max_Y_AbsAcc_AtSnap_AnySafety, y = PostSnap_MOF_Num, color = "red"),
-              method = "gam", se = T, span = 0.75) +
+  geom_point(aes(x = Max_Y_AccTowardMOF_AtSnap_AnySafety, y = PostSnap_MOF_Num), alpha = 0.05) +
+  stat_smooth(mapping = aes(x = Max_Y_AccTowardMOF_AtSnap_AnySafety, y = PostSnap_MOF_Num, color = "red"),
+              method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
   # scale_y_continuous(breaks = seq(70, 130, 20)) +
-  scale_x_continuous(breaks = seq(0, 10, 2)) +
-  coord_cartesian(xlim = c(0, 5), ylim = c(0, 0.5)) +
-  labs(x = "Absolute Horizontal Acceleration by Safety at Snap (Yds/Sec^2)", y = "MOFO Coverage Rate",
-       title = "How MOFO Coverage Rate Depends on Safety's Absolute Horizontal Acceleration at the Snap",
+  scale_x_continuous(breaks = seq(-4, 10, 2)) +
+  coord_cartesian(xlim = c(-2, 2), ylim = c(0, 1)) +
+  labs(x = "Horizontal Acceleration by Safety Toward MOF at Snap (Yds/Sec^2)", y = "MOFO Coverage Rate",
+       title = "MOFO Rate vs. Safety's Horizontal Acceleration Toward MOF at Snap",
        subtitle = "Early Down 1-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022 (n = 1352)",
-       caption = "Abs Horizontal Acc: horizontal acceleration where either right or left counts as positive",
+       caption = "Horizontal Acc Toward MOF: accelerating toward MOF is positive, toward sideline is negative",
        color = " ") +
   theme_bw() + 
   theme(plot.title = element_text(size = 10, hjust = 0.5),
@@ -417,6 +420,49 @@ grid.arrange(Plot14, Plot15, ncol = 2)
 # grid.arrange(Plot14, Plot15, Plot16, Plot17, ncol = 4) # too messy, don't use
 grid.arrange(Plot14, Plot15, Plot16, Plot17, nrow = 2, ncol = 2)
 
+# Now look into the concept of "strong telegraphs"
+# I.e., is there any feature where "when this feature happens, it's MOFO 85+ percent of the time?"
+# NOTE: 1 yard/second is approximately 2.05 MPH (so 2 yards/second is a fast walk)
+# Ideas: very low "max horiz distance from MOF by safety at the snap" (see Plot8)
+mean((Stats_ByFullPlay_All9Weeks %>% filter(Max_Y_AbsDistFromMOF_AtSnap_AnySafety < 3))$PostSnap_MOF_Num)
+# It's 0.1269 
+
+# 2-high plays with very high or low vertical stagger (Plot10)
+mean((Stats_ByFullPlay_2High %>% filter(X_Diff_BetweenSafeties_AtSnap < 1))$PostSnap_MOF_Num)
+# It's 0.7923 at < 1 yard, 0.7469 at < 2 yards
+
+mean((Stats_ByFullPlay_2High %>% filter(X_Diff_BetweenSafeties_AtSnap >= 7))$PostSnap_MOF_Num)
+# It's 0.1476 at 6+ yards, 0.1121 at 7+ yards, 0.0926 at 8+ yards
+
+# Definitely 2-high plays with high difference in vertical velocities at snap (Plot11)
+mean((Stats_ByFullPlay_2High %>% filter(X_Vel_Diff_BetweenSafeties_AtSnap >= 4))$PostSnap_MOF_Num)
+# It's 0.0882 
+
+# 2-high plays where a safety had notable vertical creep distance (Plot12)
+mean((Stats_ByFullPlay_2High %>% filter(Max_VertCreptDistance_AnySafety >= 4))$PostSnap_MOF_Num)
+# It's 0.07641 
+
+# 2-high plays with negative Max_PreSnap_X_vel_TowardBall_AnySafety (Plot13) ... if sample is decent
+mean((Stats_ByFullPlay_2High %>% filter(Max_PreSnap_X_vel_TowardBall_AnySafety < 0))$PostSnap_MOF_Num)
+# View(Stats_ByFullPlay_2High %>% filter(Max_PreSnap_X_vel_TowardBall_AnySafety < 0))
+# It's 0.8309, and sample size is 207 plays
+
+# 1-high plays with very low absolute horiz speed by safety at snap (Plot14) 
+mean((Stats_ByFullPlay_1High %>% filter(Max_Y_AbsSpeed_AtSnap_AnySafety < 1))$PostSnap_MOF_Num)
+# It's 0.1384 for < 0.5 yards/sec, 0.1395 for < 1 yards/sec
+
+# And can try similar idea with Plot15, almost the same, can test both
+mean((Stats_ByFullPlay_1High %>% filter(Max_Y_SpeedTowardMOF_AtSnap_AnySafety >= 0))$PostSnap_MOF_Num)
+# It's 0.1225 
+
+# 1-high plays with very low absolute horiz distance from MOF by safety at snap (Plot16)
+mean((Stats_ByFullPlay_1High %>% filter(Max_Y_AbsDistFromMOF_AtSnap_AnySafety < 2))$PostSnap_MOF_Num)
+# It's 0.1044 
+
+# Also flip Plot16 for very high absolute horiz distance, if sample is good (like at least 8 yards)
+mean((Stats_ByFullPlay_1High %>% filter(Max_Y_AbsDistFromMOF_AtSnap_AnySafety > 8))$PostSnap_MOF_Num)
+# View(Stats_ByFullPlay_1High %>% filter(Max_Y_AbsDistFromMOF_AtSnap_AnySafety > 8))
+# It's 0.4839, but sample is only 31 plays ... scrap it
 
 # And, make a gt table (either 2-high, or all plays) ranking features by how correlated they are with PostSnap_MOF_Num
 # First, gotta sort in descending order, starting with all plays ... but make it in descending order of ABSOLUTE correlation
@@ -436,26 +482,24 @@ top_variables_MOFO_AllPlays <- top_variables_MOFO_AllPlays %>% mutate(Feature = 
 # Now manually rename the cells to make them make more sense
 top_variables_MOFO_AllPlays$Feature
 top_variables_MOFO_AllPlays <- top_variables_MOFO_AllPlays %>% 
-  mutate(Feature = ifelse(Feature %in% "Max_PreSnap_X_vel_TowardBall_AnySafety", "Max Pre-Snap Vertical Velocity Toward LOS By a Safety", Feature))
+  mutate(Feature = ifelse(Feature %in% "X_Diff_BetweenSafeties_AtSnap", "Vertical Stagger Between Safeties at the Snap", Feature))
 top_variables_MOFO_AllPlays <- top_variables_MOFO_AllPlays %>% 
   mutate(Feature = ifelse(Feature %in% "X_Vel_Diff_BetweenSafeties_AtSnap", "Difference in Vertical Velocities Between Safeties at the Snap", Feature))
 top_variables_MOFO_AllPlays <- top_variables_MOFO_AllPlays %>% 
-  mutate(Feature = ifelse(Feature %in% "Max_VertCreptDistance_AnySafety", "Max Vertical Creep Distance Foward By a Safety", Feature))
+  mutate(Feature = ifelse(Feature %in% "Max_Y_AbsDistFromMOF_AtSnap_AnySafety", "Max Horizontal Distance From MOF at the Snap By a Safety", Feature))
 top_variables_MOFO_AllPlays <- top_variables_MOFO_AllPlays %>% 
-  mutate(Feature = ifelse(Feature %in% "Max_TotalCreptDistance_ToBall_AnySafety", "Max Total Creep Distance Toward Ball By a Safety", Feature))
+  mutate(Feature = ifelse(Feature %in% "min_SafetyAbsHorizDistToMOF_PreSnap", "Minimum Pre-Snap Horizontal Distance from MOF By a Safety", Feature))
 top_variables_MOFO_AllPlays <- top_variables_MOFO_AllPlays %>% 
-  mutate(Feature = ifelse(Feature %in% "X_Diff_BetweenSafeties_AtSnap", "Vertical Stagger Between Safeties at the Snap", Feature))
-top_variables_MOFO_AllPlays <- top_variables_MOFO_AllPlays %>% 
-  mutate(Feature = ifelse(Feature %in% "Max_PreSnap_X_acc_TowardBall_AnySafety", "Max Pre-Snap Vertical Acceleration Toward LOS By a Safety", Feature))
+  mutate(Feature = ifelse(Feature %in% "X_Acc_Diff_BetweenSafeties_AtSnap", "Difference in Vertical Accelerations Between Safeties at the Snap", Feature))
 
 # Re-arrange column order so the actual correlation is on the far-right
 top_variables_MOFO_AllPlays <- top_variables_MOFO_AllPlays %>% select(2, 1)
 
 # Perhaps add an extra "explanation" column??
 top_variables_MOFO_AllPlays <- top_variables_MOFO_AllPlays %>% 
-  mutate(Explanation = c("Safety Moving Fast Toward LOS --> MOFC more likely", "Safeties Moving in Different Directions --> MOFC more likely",
-                         "Safety Crept Far Forward Vertically --> MOFC more likely", "Safety Crept Far Toward Ball --> MOFC more likely",
-                         "Larger Vertical Stagger --> MOFC more likely", "Safety Accelerating Toward LOS --> MOFC more likely"))
+  mutate(Explanation = c("Larger Vertical Stagger --> MOFC more likely", "Safeties Moving in Different Vertical Directions --> MOFC more likely",
+                         "Safety Far From Middle of Field at the Snap --> MOFO more likely", "Safety Very Close to MOF Before the Snap --> MOFC more likely", 
+                         "Safeties Accelerating in Different Vertical Directions --> MOFC more likely"))
 
 class(top_variables_MOFO_AllPlays) <- "data.frame"
 MOFO_Features_AllPlays_FancyTable <- top_variables_MOFO_AllPlays %>%
@@ -533,39 +577,44 @@ top_variables_MOFO_2High <- top_variables_MOFO_2High %>% mutate(Feature = Rows_t
 # Now manually rename the cells to make them make more sense
 top_variables_MOFO_2High$Feature
 top_variables_MOFO_2High <- top_variables_MOFO_2High %>% 
+  mutate(Feature = ifelse(Feature %in% "X_Diff_BetweenSafeties_AtSnap", "Vertical Stagger Between Safeties at the Snap", Feature))
+top_variables_MOFO_2High <- top_variables_MOFO_2High %>% 
+  mutate(Feature = ifelse(Feature %in% "Max_VertCreptDistance_AnySafety", "Max Vertical Creep Distance Foward By a Safety", Feature))
+top_variables_MOFO_2High <- top_variables_MOFO_2High %>% 
   mutate(Feature = ifelse(Feature %in% "Max_PreSnap_X_vel_TowardBall_AnySafety", "Max Pre-Snap Vertical Velocity Toward LOS By a Safety", Feature))
 top_variables_MOFO_2High <- top_variables_MOFO_2High %>% 
   mutate(Feature = ifelse(Feature %in% "X_Vel_Diff_BetweenSafeties_AtSnap", "Difference in Vertical Velocities Between Safeties at the Snap", Feature))
 top_variables_MOFO_2High <- top_variables_MOFO_2High %>% 
-  mutate(Feature = ifelse(Feature %in% "Max_VertCreptDistance_AnySafety", "Max Vertical Creep Distance Foward By a Safety", Feature))
-top_variables_MOFO_2High <- top_variables_MOFO_2High %>% 
   mutate(Feature = ifelse(Feature %in% "Max_TotalCreptDistance_ToBall_AnySafety", "Max Total Creep Distance Toward Ball By a Safety", Feature))
 top_variables_MOFO_2High <- top_variables_MOFO_2High %>% 
-  mutate(Feature = ifelse(Feature %in% "X_Diff_BetweenSafeties_AtSnap", "Vertical Stagger Between Safeties at the Snap", Feature))
-top_variables_MOFO_2High <- top_variables_MOFO_2High %>% 
   mutate(Feature = ifelse(Feature %in% "Max_PreSnap_X_acc_TowardBall_AnySafety", "Max Pre-Snap Vertical Acceleration Toward LOS By a Safety", Feature))
+top_variables_MOFO_2High <- top_variables_MOFO_2High %>% 
+  mutate(Feature = ifelse(Feature %in% "X_Acc_Diff_BetweenSafeties_AtSnap", "Difference in Vertical Accelerations Between Safeties at the Snap", Feature))
+top_variables_MOFO_2High <- top_variables_MOFO_2High %>% 
+  mutate(Feature = ifelse(Feature %in% "Max_Y_SpeedTowardMOF_AtSnap_AnySafety", "Max Horizontal Speed Toward MOF By a Safety at the Snap", Feature))
 
 # Re-arrange column order so the actual correlation is on the far-right
 top_variables_MOFO_2High <- top_variables_MOFO_2High %>% select(2, 1)
 
 # Perhaps add an extra "explanation" column??
-top_variables_MOFO_2High <- top_variables_MOFO_2High %>% 
-  mutate(Explanation = c("Safety Moving Fast Toward LOS --> MOFC more likely", "Safeties Moving in Different Directions --> MOFC more likely",
-                         "Safety Crept Far Forward Vertically --> MOFC more likely", "Safety Crept Far Toward Ball --> MOFC more likely",
-                         "Larger Vertical Stagger --> MOFC more likely", "Safety Accelerating Toward LOS --> MOFC more likely"))
+# top_variables_MOFO_2High <- top_variables_MOFO_2High %>% 
+#   mutate(Explanation = c("Larger Vertical Stagger --> MOFC more likely", "Safety Crept Far Forward Vertically --> MOFC more likely", 
+#                          "Safety Moving Fast Toward LOS --> MOFC more likely", "Safeties Moving in Different Directions --> MOFC more likely", 
+#                          "Safety Crept Far Toward Ball --> MOFC more likely", "Safety Accelerating Toward LOS --> MOFC more likely",
+#                          "Safeties Accelerating in Different Directions --> MOFC more likely", "Safety Moving Toward MOF --> MOFC more likely"))
 
 class(top_variables_MOFO_2High) <- "data.frame"
 MOFO_Features_2High_FancyTable <- top_variables_MOFO_2High %>%
-  select(c("Feature", "PostSnap_MOF_Num", "Explanation")) %>%
-  head(20) %>% # this is how we limit to the top 20 if necessary
+  select(c("Feature", "PostSnap_MOF_Num")) %>%
+  head(6) %>% # this is how we limit to the top 6
   mutate(Rank = row_number(desc(abs(PostSnap_MOF_Num)))) %>%
   relocate("Rank")
 
 MOFO_Features_2High_FancyTable <- MOFO_Features_2High_FancyTable |>
   # filter(officialPosition %in% c("OLB", "DE")) |> 
   # mutate(rank = row_number()) |> 
-  # select(1:2, "Feature", "PostSnap_MOF_Num", "Explanation) |> 
-  head(20) |> 
+  # select(1:2, "Feature", "PostSnap_MOF_Num", "Explanation") |> 
+  head(6) |> 
   gt() |>
   tab_options(
     table.border.top.color = "white",
@@ -592,11 +641,11 @@ MOFO_Features_2High_FancyTable <- MOFO_Features_2High_FancyTable |>
     Rank = md("**Rank**"), # the md is what makes the headers show up as bold
     Feature = md("**Feature**"),
     PostSnap_MOF_Num = html('<span style="text-decoration:overline; font-weight:bold">Correlation with MOFO Rate</span>'),
-    Explanation = md("**Explanation**")
+    # Explanation = md("**Explanation**")
   ) |> 
   cols_align(
     align = "center",
-    columns = Feature:Explanation
+    columns = Feature:PostSnap_MOF_Num
   ) |> 
   tab_header(md("**Top Safety Features that Correlate with MOFO Coverage Rate**"),
              md("(Early Down 2-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022)")) |> # don't forget to adjust your minimum
@@ -630,26 +679,29 @@ top_variables_MOFO_1High <- top_variables_MOFO_1High %>% mutate(Feature = Rows_t
 # Now manually rename the cells to make them make more sense
 top_variables_MOFO_1High$Feature
 top_variables_MOFO_1High <- top_variables_MOFO_1High %>% 
-  mutate(Feature = ifelse(Feature %in% "Max_Y_AbsAcc_AtSnap_AnySafety", "Safety's Absolute Horizontal Acceleration at the Snap", Feature))
-top_variables_MOFO_1High <- top_variables_MOFO_1High %>% 
-  mutate(Feature = ifelse(Feature %in% "Max_Y_AbsSpeed_AtSnap_AnySafety", "Safety's Absolute Horizontal Speed at the Snap", Feature))
-top_variables_MOFO_1High <- top_variables_MOFO_1High %>% 
-  mutate(Feature = ifelse(Feature %in% "Max_Y_SpeedTowardMOF_AtSnap_AnySafety", "Safety's Horizontal Speed Toward MOF at the Snap", Feature))
-top_variables_MOFO_1High <- top_variables_MOFO_1High %>% 
   mutate(Feature = ifelse(Feature %in% "Max_Y_AbsDistFromMOF_AtSnap_AnySafety", "Safety's Horizontal Distance From MOF at the Snap", Feature))
 top_variables_MOFO_1High <- top_variables_MOFO_1High %>% 
   mutate(Feature = ifelse(Feature %in% "min_SafetyAbsHorizDistToMOF_PreSnap", "Safety's Minimum Pre-Snap Horizontal Distance from MOF", Feature))
 top_variables_MOFO_1High <- top_variables_MOFO_1High %>% 
-  mutate(Feature = ifelse(Feature %in% "Max_TotalCreptDistance_ToBall_AnySafety", "Safety's Total Creep Distance Toward Ball", Feature))
+  mutate(Feature = ifelse(Feature %in% "Max_Y_SpeedTowardMOF_AtSnap_AnySafety", "Safety's Horizontal Speed Toward MOF at the Snap", Feature))
+top_variables_MOFO_1High <- top_variables_MOFO_1High %>% 
+  mutate(Feature = ifelse(Feature %in% "Max_Y_AbsSpeed_AtSnap_AnySafety", "Safety's Absolute Horizontal Speed at the Snap", Feature))
+top_variables_MOFO_1High <- top_variables_MOFO_1High %>% 
+  mutate(Feature = ifelse(Feature %in% "Max_Y_AccTowardMOF_AtSnap_AnySafety", "Safety's Horizontal Acc Toward MOF at the Snap", Feature))
+top_variables_MOFO_1High <- top_variables_MOFO_1High %>% 
+  mutate(Feature = ifelse(Feature %in% "Max_Y_AbsAcc_AtSnap_AnySafety", "Safety's Absolute Horizontal Acceleration at the Snap", Feature))
+top_variables_MOFO_1High <- top_variables_MOFO_1High %>% 
+  mutate(Feature = ifelse(Feature %in% "Max_VertCreptDistance_AnySafety", "Safety's Vertical Creep Distance Toward LOS", Feature))
 
 # Re-arrange column order so the actual correlation is on the far-right
 top_variables_MOFO_1High <- top_variables_MOFO_1High %>% select(2, 1)
 
 # Perhaps add an extra "explanation" column??
 top_variables_MOFO_1High <- top_variables_MOFO_1High %>% 
-  mutate(Explanation = c("Safety Accelerating Fast Horizontally --> MOFO more likely", "Safety Moving Fast Horizontally --> MOFO more likely",
-                         "Safety Moving Toward Middle of Field --> MOFC more likely", "Safety Being Far from MOF at the Snap --> MOFO more likely",
-                         "Safety Being Near MOF Before the Snap --> MOFC more likely", "Safety Crept Far Toward Ball --> MOFO more likely"))
+  mutate(Explanation = c("Safety Being Far from MOF at the Snap --> MOFO more likely", "Safety Being Near MOF Before the Snap --> MOFC more likely",
+                         "Safety Moving Toward Middle of Field --> MOFC more likely", "Safety Moving Fast Horizontally --> MOFO more likely",
+                         "Safety Accelerating Horizontally Toward MOF --> MOFC more likely", "Safety Accelerating at the Snap --> MOFO more likely",
+                         "Safety Creeping Forward Before Snap --> MOFO more likely"))
 
 class(top_variables_MOFO_1High) <- "data.frame"
 MOFO_Features_1High_FancyTable <- top_variables_MOFO_1High %>%
@@ -710,3 +762,4 @@ MOFO_Features_1High_FancyTable <- MOFO_Features_1High_FancyTable |>
   )
 
 gtsave(MOFO_Features_1High_FancyTable, "MOFO_Features_1High_FancyTable.png")
+

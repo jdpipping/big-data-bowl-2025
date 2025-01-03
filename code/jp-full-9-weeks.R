@@ -1326,7 +1326,7 @@ NN_DF_abridged <- NN_model_results_DF %>% select(c("gameId", "playId", "p"))
 Dropbacks_Merged <- merge(x = Dropbacks_Merged, y = NN_DF_abridged, 
                           by = c("gameId", "playId"))
 # FIXING DUPLICATION
-Dropbacks_Merged <- Dropbacks_Merged %>% rename(MOFO_probability_FDA = `p`)
+Dropbacks_Merged <- Dropbacks_Merged %>% rename(MOFO_probability = `p`)
 rm(NN_DF_abridged)
 
 setDT(Dropbacks_Merged)
@@ -1492,7 +1492,7 @@ Stats_ByFullPlay_All9Weeks <- final_dropbacks_merged %>%
             X_Diff_BetweenSafeties_AtSnap = max(X_Diff_BetweenSafeties_AtSnap),
             Y_Diff_BetweenSafeties_AtSnap = max(Y_Diff_BetweenSafeties_AtSnap),
             TotDist_BetweenSafeties_AtSnap = max(TotDist_BetweenSafeties_AtSnap),
-            MOFO_probability_FDA = max(MOFO_probability_FDA), min_SafetyAbsHorizDistToMOF_PreSnap = max(min_SafetyAbsHorizDistToMOF_PreSnap),
+            MOFO_probability = max(MOFO_probability), min_SafetyAbsHorizDistToMOF_PreSnap = max(min_SafetyAbsHorizDistToMOF_PreSnap),
             X_Vel_Diff_BetweenSafeties_AtSnap = max(X_Vel_Diff_BetweenSafeties_AtSnap),           
             Y_Vel_Diff_BetweenSafeties_AtSnap = max(Y_Vel_Diff_BetweenSafeties_AtSnap),
             TotSpeed_Diff_BetweenSafeties_AtSnap = max(TotSpeed_Diff_BetweenSafeties_AtSnap),        
@@ -1620,7 +1620,7 @@ Stats_ByFullPlay_All9Weeks <- Stats_ByFullPlay_All9Weeks %>%
 
 # And add the single-snap entropy value 
 Stats_ByFullPlay_All9Weeks <- Stats_ByFullPlay_All9Weeks %>% 
-  mutate(Snap_Entropy = -MOFO_probability_FDA*log(MOFO_probability_FDA, 2) - (1 - MOFO_probability_FDA)*log((1-MOFO_probability_FDA), 2))
+  mutate(Snap_Entropy = -MOFO_probability*log(MOFO_probability, 2) - (1 - MOFO_probability)*log((1-MOFO_probability), 2))
 
 Median_Entropy <- median(Stats_ByFullPlay_All9Weeks$Snap_Entropy)
 
