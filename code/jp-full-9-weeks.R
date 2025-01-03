@@ -3,6 +3,7 @@
 #############
 
 # .rs.restartR()
+rm(list = ls())
 showConnections()
 closeAllConnections()
 gc(reset = TRUE)
