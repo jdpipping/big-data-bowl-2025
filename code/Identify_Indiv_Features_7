@@ -172,11 +172,87 @@ rownames(top_variables_Entropy_1High) # keep in mind Snap_Entropy obviously isn'
 # And make it so the only columns in this new DF align with the rows in that DF
 top_variables_Entropy_1High <- top_variables_Entropy_1High[, colnames(top_variables_Entropy_1High) %in% rownames(top_variables_Entropy_1High)]
 
-# Diagnose features we should be graphing
+PredictedMOFO_Features_AllPlays <- Stats_ByFullPlay_All9Weeks %>%
+  select(c("MOFO_probability_FDA", "X_Diff_BetweenSafeties_AtSnap", "TotDist_BetweenSafeties_AtSnap",
+           "min_SafetyAbsHorizDistToMOF_PreSnap", "X_Vel_Diff_BetweenSafeties_AtSnap",
+           "Y_Vel_Diff_BetweenSafeties_AtSnap", "TotSpeed_Diff_BetweenSafeties_AtSnap",
+           "X_Acc_Diff_BetweenSafeties_AtSnap", "Y_Acc_Diff_BetweenSafeties_AtSnap",           
+           "TotAcc_Diff_BetweenSafeties_AtSnap", "Max_VertCreptDistance_AnySafety",
+           "Max_TotalCreptDistance_ToBall_AnySafety", "Max_PreSnap_X_vel_TowardBall_AnySafety",
+           "Max_PreSnap_X_acc_TowardBall_AnySafety", "Y_AbsDistFromMOF_Diff_BetweenSafeties_AtSnap", 
+           "Max_Y_AbsSpeed_AtSnap_AnySafety", "Max_Y_AbsAcc_AtSnap_AnySafety", "Max_Y_AbsDistFromMOF_AtSnap_AnySafety",
+           "Max_Y_SpeedTowardMOF_AtSnap_AnySafety", "Min_Y_SpeedTowardMOF_AtSnap_AnySafety", "Max_Y_AccTowardMOF_AtSnap_AnySafety",
+           "Min_Y_AccTowardMOF_AtSnap_AnySafety", "Y_SpeedTowardMOF_Diff_BetweenSafeties_AtSnap", "Y_AccTowardMOF_Diff_BetweenSafeties_AtSnap"))
+
+corr_matrix_PredictedMOFO_AllPlays <- PredictedMOFO_Features_AllPlays %>%
+  select(where(is.numeric)) %>%  
+  cor(use = "pairwise.complete.obs") %>%  
+  round(2)  
+# Now see which variables had strongest positive or negative correlation with MOFO_probability_FDA
+corr_df_PredictedMOFO_AllPlays <- as.data.frame(corr_matrix_PredictedMOFO_AllPlays)
+# View(corr_df_PredictedMOFO_AllPlays %>% arrange(desc(MOFO_probability_FDA)))
+rm(corr_matrix_PredictedMOFO_AllPlays)
+
+# Now take all variables with at least a correlation of 0.25 in either direction
+top_variables_PredictedMOFO_AllPlays <- corr_df_PredictedMOFO_AllPlays %>% filter(abs(MOFO_probability_FDA) >= 0.25)
+rownames(top_variables_PredictedMOFO_AllPlays) # keep in mind MOFO_probability_FDA obviously isn't a predictor variable
+# And make it so the only columns in this new DF align with the rows in that DF
+top_variables_PredictedMOFO_AllPlays <- top_variables_PredictedMOFO_AllPlays[, colnames(top_variables_PredictedMOFO_AllPlays) %in% rownames(top_variables_PredictedMOFO_AllPlays)]
+
+PredictedMOFO_Features_2High <- Stats_ByFullPlay_2High %>%
+  select(c("MOFO_probability_FDA", "X_Diff_BetweenSafeties_AtSnap", "TotDist_BetweenSafeties_AtSnap",
+           "min_SafetyAbsHorizDistToMOF_PreSnap", "X_Vel_Diff_BetweenSafeties_AtSnap",
+           "Y_Vel_Diff_BetweenSafeties_AtSnap", "TotSpeed_Diff_BetweenSafeties_AtSnap",
+           "X_Acc_Diff_BetweenSafeties_AtSnap", "Y_Acc_Diff_BetweenSafeties_AtSnap",           
+           "TotAcc_Diff_BetweenSafeties_AtSnap", "Max_VertCreptDistance_AnySafety",
+           "Max_TotalCreptDistance_ToBall_AnySafety", "Max_PreSnap_X_vel_TowardBall_AnySafety",
+           "Max_PreSnap_X_acc_TowardBall_AnySafety", "Y_AbsDistFromMOF_Diff_BetweenSafeties_AtSnap", 
+           "Max_Y_AbsSpeed_AtSnap_AnySafety", "Max_Y_AbsAcc_AtSnap_AnySafety", "Max_Y_AbsDistFromMOF_AtSnap_AnySafety",
+           "Max_Y_SpeedTowardMOF_AtSnap_AnySafety", "Min_Y_SpeedTowardMOF_AtSnap_AnySafety", "Max_Y_AccTowardMOF_AtSnap_AnySafety",
+           "Min_Y_AccTowardMOF_AtSnap_AnySafety", "Y_SpeedTowardMOF_Diff_BetweenSafeties_AtSnap", "Y_AccTowardMOF_Diff_BetweenSafeties_AtSnap"))
+
+corr_matrix_PredictedMOFO_2High <- PredictedMOFO_Features_2High %>%
+  select(where(is.numeric)) %>%  
+  cor(use = "pairwise.complete.obs") %>%  
+  round(2)  
+# Now see which variables had strongest positive or negative correlation with MOFO_probability_FDA
+corr_df_PredictedMOFO_2High <- as.data.frame(corr_matrix_PredictedMOFO_2High)
+# View(corr_df_PredictedMOFO_2High %>% arrange(desc(MOFO_probability_FDA)))
+rm(corr_matrix_PredictedMOFO_2High)
+
+# Now take all variables with at least a correlation of 0.35 in either direction
+top_variables_PredictedMOFO_2High <- corr_df_PredictedMOFO_2High %>% filter(abs(MOFO_probability_FDA) >= 0.35)
+rownames(top_variables_PredictedMOFO_2High) # keep in mind MOFO_probability_FDA obviously isn't a predictor variable
+# And make it so the only columns in this new DF align with the rows in that DF
+top_variables_PredictedMOFO_2High <- top_variables_PredictedMOFO_2High[, colnames(top_variables_PredictedMOFO_2High) %in% rownames(top_variables_PredictedMOFO_2High)]
+
+PredictedMOFO_Features_1High <- Stats_ByFullPlay_1High %>%
+  select(c("MOFO_probability_FDA", "min_SafetyAbsHorizDistToMOF_PreSnap", "Max_VertCreptDistance_AnySafety",
+           "Max_TotalCreptDistance_ToBall_AnySafety", "Max_PreSnap_X_vel_TowardBall_AnySafety",
+           "Max_PreSnap_X_acc_TowardBall_AnySafety", "Max_Y_AbsSpeed_AtSnap_AnySafety", 
+           "Max_Y_AbsAcc_AtSnap_AnySafety", "Max_Y_AbsDistFromMOF_AtSnap_AnySafety",
+           "Max_Y_SpeedTowardMOF_AtSnap_AnySafety", "Max_Y_AccTowardMOF_AtSnap_AnySafety"))
+
+corr_matrix_PredictedMOFO_1High <- PredictedMOFO_Features_1High %>%
+  select(where(is.numeric)) %>%  
+  cor(use = "pairwise.complete.obs") %>%  
+  round(2)  
+# Now see which variables had strongest positive or negative correlation with MOFO_probability_FDA
+corr_df_PredictedMOFO_1High <- as.data.frame(corr_matrix_PredictedMOFO_1High)
+# View(corr_df_PredictedMOFO_1High %>% arrange(desc(MOFO_probability_FDA)))
+rm(corr_matrix_PredictedMOFO_1High)
+
+# Now take all variables with at least a correlation of 0.2 in either direction 
+top_variables_PredictedMOFO_1High <- corr_df_PredictedMOFO_1High %>% filter(abs(MOFO_probability_FDA) >= 0.2)
+rownames(top_variables_PredictedMOFO_1High) # keep in mind MOFO_probability_FDA obviously isn't a predictor variable
+# And make it so the only columns in this new DF align with the rows in that DF
+top_variables_PredictedMOFO_1High <- top_variables_PredictedMOFO_1High[, colnames(top_variables_PredictedMOFO_1High) %in% rownames(top_variables_PredictedMOFO_1High)]
+
+# Diagnose features we should be graphing, starting with actual MOFO rate
 # View(top_variables_MOFO_AllPlays)
 # All plays: X_Diff_BetweenSafeties_AtSnap, X_Vel_Diff_BetweenSafeties_AtSnap, Max_Y_AbsDistFromMOF_AtSnap_AnySafety AND/OR min_SafetyAbsHorizDistToMOF_PreSnap
 Plot6 <- ggplot(data = Stats_ByFullPlay_All9Weeks) +
-  geom_point(aes(x = X_Diff_BetweenSafeties_AtSnap, y = PostSnap_MOF_Num), alpha = 0.05) +
+  # geom_point(aes(x = X_Diff_BetweenSafeties_AtSnap, y = PostSnap_MOF_Num), alpha = 0.05) +
   stat_smooth(mapping = aes(x = X_Diff_BetweenSafeties_AtSnap, y = PostSnap_MOF_Num, color = "red"),
               method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
@@ -189,12 +265,19 @@ Plot6 <- ggplot(data = Stats_ByFullPlay_All9Weeks) +
        caption = "Vertical Stagger: vertical distance b/w safeties at time of snap",
        color = " ") +
   theme_bw() + 
-  theme(plot.title = element_text(size = 10, hjust = 0.5),
-        plot.subtitle = element_text(size = 8, hjust = 0.5),
-        legend.position = "none")
+  theme(plot.title = element_text(size = 18, hjust = 0.5),
+        plot.subtitle = element_text(size = 14, hjust = 0.5),
+        axis.title = element_text(size = 16),
+        axis.text = element_text(size = 16),
+        axis.text.x = element_text(size = 16),
+        plot.caption = element_text(size = 12),
+        legend.text = element_text(size = 12),
+        legend.title = element_text(size = 15),
+        panel.spacing = unit(2, "lines"),
+        legend.position = "none") 
 
 Plot7 <- ggplot(data = Stats_ByFullPlay_All9Weeks) +
-  geom_point(aes(x = X_Vel_Diff_BetweenSafeties_AtSnap, y = PostSnap_MOF_Num), alpha = 0.05) +
+  # geom_point(aes(x = X_Vel_Diff_BetweenSafeties_AtSnap, y = PostSnap_MOF_Num), alpha = 0.05) +
   stat_smooth(mapping = aes(x = X_Vel_Diff_BetweenSafeties_AtSnap, y = PostSnap_MOF_Num, color = "red"),
               method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
@@ -207,12 +290,19 @@ Plot7 <- ggplot(data = Stats_ByFullPlay_All9Weeks) +
        caption = "Vertical Velocities: toward LOS is negative, away from LOS is positive",
        color = " ") +
   theme_bw() + 
-  theme(plot.title = element_text(size = 10, hjust = 0.5),
-        plot.subtitle = element_text(size = 8, hjust = 0.5),
-        legend.position = "none")
+  theme(plot.title = element_text(size = 18, hjust = 0.5),
+        plot.subtitle = element_text(size = 14, hjust = 0.5),
+        axis.title = element_text(size = 16),
+        axis.text = element_text(size = 16),
+        axis.text.x = element_text(size = 16),
+        plot.caption = element_text(size = 12),
+        legend.text = element_text(size = 12),
+        legend.title = element_text(size = 15),
+        panel.spacing = unit(2, "lines"),
+        legend.position = "none") 
 
 Plot8 <- ggplot(data = Stats_ByFullPlay_All9Weeks) +
-  geom_point(aes(x = Max_Y_AbsDistFromMOF_AtSnap_AnySafety, y = PostSnap_MOF_Num), alpha = 0.05) +
+  # geom_point(aes(x = Max_Y_AbsDistFromMOF_AtSnap_AnySafety, y = PostSnap_MOF_Num), alpha = 0.05) +
   stat_smooth(mapping = aes(x = Max_Y_AbsDistFromMOF_AtSnap_AnySafety, y = PostSnap_MOF_Num, color = "red"),
               method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
@@ -225,12 +315,19 @@ Plot8 <- ggplot(data = Stats_ByFullPlay_All9Weeks) +
        caption = "Horizontal Distance from MOF: either right or left is positive",
        color = " ") +
   theme_bw() + 
-  theme(plot.title = element_text(size = 10, hjust = 0.5),
-        plot.subtitle = element_text(size = 8, hjust = 0.5),
-        legend.position = "none")
+  theme(plot.title = element_text(size = 18, hjust = 0.5),
+        plot.subtitle = element_text(size = 14, hjust = 0.5),
+        axis.title = element_text(size = 16),
+        axis.text = element_text(size = 16),
+        axis.text.x = element_text(size = 16),
+        plot.caption = element_text(size = 12),
+        legend.text = element_text(size = 12),
+        legend.title = element_text(size = 15),
+        panel.spacing = unit(2, "lines"),
+        legend.position = "none") 
 
 Plot9 <- ggplot(data = Stats_ByFullPlay_All9Weeks) +
-  geom_point(aes(x =  min_SafetyAbsHorizDistToMOF_PreSnap, y = PostSnap_MOF_Num), alpha = 0.05) +
+  # geom_point(aes(x =  min_SafetyAbsHorizDistToMOF_PreSnap, y = PostSnap_MOF_Num), alpha = 0.05) +
   stat_smooth(mapping = aes(x =  min_SafetyAbsHorizDistToMOF_PreSnap, y = PostSnap_MOF_Num, color = "red"),
               method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
@@ -243,9 +340,16 @@ Plot9 <- ggplot(data = Stats_ByFullPlay_All9Weeks) +
        caption = "Horizontal Distance from MOF: either right or left is positive",
        color = " ") +
   theme_bw() + 
-  theme(plot.title = element_text(size = 10, hjust = 0.5),
-        plot.subtitle = element_text(size = 8, hjust = 0.5),
-        legend.position = "none")
+  theme(plot.title = element_text(size = 18, hjust = 0.5),
+        plot.subtitle = element_text(size = 14, hjust = 0.5),
+        axis.title = element_text(size = 16),
+        axis.text = element_text(size = 16),
+        axis.text.x = element_text(size = 16),
+        plot.caption = element_text(size = 12),
+        legend.text = element_text(size = 12),
+        legend.title = element_text(size = 15),
+        panel.spacing = unit(2, "lines"),
+        legend.position = "none") 
 
 grid.arrange(Plot6, Plot7, ncol = 2)
 # grid.arrange(Plot6, Plot7, Plot8, Plot9, ncol = 4) ... don't use, too crowded
@@ -254,7 +358,7 @@ grid.arrange(Plot6, Plot7, Plot8, Plot9, nrow = 2, ncol = 2)
 # View(top_variables_MOFO_2High)
 # 2-high: X_Diff_BetweenSafeties_AtSnap, Max_VertCreptDistance_AnySafety, X_Vel_Diff_BetweenSafeties_AtSnap AND/OR Max_PreSnap_X_vel_TowardBall_AnySafety
 Plot10 <- ggplot(data = Stats_ByFullPlay_2High) +
-  geom_point(aes(x = X_Diff_BetweenSafeties_AtSnap, y = PostSnap_MOF_Num), alpha = 0.05) +
+  # geom_point(aes(x = X_Diff_BetweenSafeties_AtSnap, y = PostSnap_MOF_Num), alpha = 0.05) +
   stat_smooth(mapping = aes(x = X_Diff_BetweenSafeties_AtSnap, y = PostSnap_MOF_Num, color = "red"),
               method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
@@ -267,12 +371,19 @@ Plot10 <- ggplot(data = Stats_ByFullPlay_2High) +
        caption = "Vertical Stagger: vertical distance b/w safeties at time of snap",
        color = " ") +
   theme_bw() + 
-  theme(plot.title = element_text(size = 10, hjust = 0.5),
-        plot.subtitle = element_text(size = 8, hjust = 0.5),
-        legend.position = "none")
+  theme(plot.title = element_text(size = 18, hjust = 0.5),
+        plot.subtitle = element_text(size = 14, hjust = 0.5),
+        axis.title = element_text(size = 16),
+        axis.text = element_text(size = 16),
+        axis.text.x = element_text(size = 16),
+        plot.caption = element_text(size = 12),
+        legend.text = element_text(size = 12),
+        legend.title = element_text(size = 15),
+        panel.spacing = unit(2, "lines"),
+        legend.position = "none") 
 
 Plot11 <- ggplot(data = Stats_ByFullPlay_2High) +
-  geom_point(aes(x = X_Vel_Diff_BetweenSafeties_AtSnap, y = PostSnap_MOF_Num), alpha = 0.05) +
+  # geom_point(aes(x = X_Vel_Diff_BetweenSafeties_AtSnap, y = PostSnap_MOF_Num), alpha = 0.05) +
   stat_smooth(mapping = aes(x = X_Vel_Diff_BetweenSafeties_AtSnap, y = PostSnap_MOF_Num, color = "red"),
               method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
@@ -285,12 +396,19 @@ Plot11 <- ggplot(data = Stats_ByFullPlay_2High) +
        caption = "Vertical Velocities: toward LOS is negative, away from LOS is positive",
        color = " ") +
   theme_bw() + 
-  theme(plot.title = element_text(size = 10, hjust = 0.5),
-        plot.subtitle = element_text(size = 8, hjust = 0.5),
-        legend.position = "none")
+  theme(plot.title = element_text(size = 18, hjust = 0.5),
+        plot.subtitle = element_text(size = 14, hjust = 0.5),
+        axis.title = element_text(size = 16),
+        axis.text = element_text(size = 16),
+        axis.text.x = element_text(size = 16),
+        plot.caption = element_text(size = 12),
+        legend.text = element_text(size = 12),
+        legend.title = element_text(size = 15),
+        panel.spacing = unit(2, "lines"),
+        legend.position = "none") 
 
 Plot12 <- ggplot(data = Stats_ByFullPlay_2High) +
-  geom_point(aes(x = Max_VertCreptDistance_AnySafety, y = PostSnap_MOF_Num), alpha = 0.05) +
+  # geom_point(aes(x = Max_VertCreptDistance_AnySafety, y = PostSnap_MOF_Num), alpha = 0.05) +
   stat_smooth(mapping = aes(x = Max_VertCreptDistance_AnySafety, y = PostSnap_MOF_Num, color = "red"),
               method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
@@ -303,12 +421,19 @@ Plot12 <- ggplot(data = Stats_ByFullPlay_2High) +
        caption = "Vertical 'Creep' Distance: Safety's Distance Moved Forward b/w O-Line Set and Snap",
        color = " ") +
   theme_bw() + 
-  theme(plot.title = element_text(size = 10, hjust = 0.5),
-        plot.subtitle = element_text(size = 8, hjust = 0.5),
+  theme(plot.title = element_text(size = 18, hjust = 0.5),
+        plot.subtitle = element_text(size = 14, hjust = 0.5),
+        axis.title = element_text(size = 16),
+        axis.text = element_text(size = 16),
+        axis.text.x = element_text(size = 16),
+        plot.caption = element_text(size = 12),
+        legend.text = element_text(size = 12),
+        legend.title = element_text(size = 15),
+        panel.spacing = unit(2, "lines"),
         legend.position = "none") # + theme(aspect.ratio = 1)
 
 Plot13 <- ggplot(data = Stats_ByFullPlay_2High) +
-  geom_point(aes(x = Max_PreSnap_X_vel_TowardBall_AnySafety, y = PostSnap_MOF_Num), alpha = 0.05) +
+  # geom_point(aes(x = Max_PreSnap_X_vel_TowardBall_AnySafety, y = PostSnap_MOF_Num), alpha = 0.05) +
   stat_smooth(mapping = aes(x = Max_PreSnap_X_vel_TowardBall_AnySafety, y = PostSnap_MOF_Num, color = "red"),
               method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
@@ -321,9 +446,16 @@ Plot13 <- ggplot(data = Stats_ByFullPlay_2High) +
        caption = "Max Pre-Snap Speed Toward Ball: highest velocity, in direction of ball, at any point before snap",
        color = " ") +
   theme_bw() + 
-  theme(plot.title = element_text(size = 10, hjust = 0.5),
-        plot.subtitle = element_text(size = 8, hjust = 0.5),
-        legend.position = "none")
+  theme(plot.title = element_text(size = 18, hjust = 0.5),
+        plot.subtitle = element_text(size = 14, hjust = 0.5),
+        axis.title = element_text(size = 16),
+        axis.text = element_text(size = 16),
+        axis.text.x = element_text(size = 16),
+        plot.caption = element_text(size = 12),
+        legend.text = element_text(size = 12),
+        legend.title = element_text(size = 15),
+        panel.spacing = unit(2, "lines"),
+        legend.position = "none") 
 
 grid.arrange(Plot10, Plot11, ncol = 2)
 # grid.arrange(Plot10, Plot11, Plot12, Plot13, ncol = 4) ... don't use, too crowded
@@ -333,7 +465,8 @@ grid.arrange(Plot10, Plot11, Plot12, ncol = 3)
 # Here's how to arrange three plots at once in an "upside-down triangle" format
 (Plot10 | Plot11) / Plot12
 
-# Here's a more complex way to do that ... requires adjustment to the aspect.ratio of the bottom plot
+# Here's a more complex way to do that 
+# Requires adjustment to the aspect.ratio of the bottom plot, and still didn't look great with that
 layout <- c(
   area(t = 1, l = 1, b = 1, r = 1), # Top-left: Plot10
   area(t = 1, l = 2, b = 1, r = 2), # Top-right: Plot11
@@ -345,7 +478,7 @@ wrap_plots(Plot10, Plot11, Plot12, design = layout)
 # View(top_variables_MOFO_1High)
 # 1-high: Max_Y_AbsSpeed_AtSnap_AnySafety AND/OR Max_Y_SpeedTowardMOF_AtSnap_AnySafety, Max_Y_AccTowardMOF_AtSnap_AnySafety (or Max_Y_AbsAcc_AtSnap_AnySafety), Max_Y_AbsDistFromMOF_AtSnap_AnySafety (or min_SafetyAbsHorizDistToMOF_PreSnap)
 Plot14 <- ggplot(data = Stats_ByFullPlay_1High) +
-  geom_point(aes(x = Max_Y_AbsSpeed_AtSnap_AnySafety, y = PostSnap_MOF_Num), alpha = 0.05) +
+  # geom_point(aes(x = Max_Y_AbsSpeed_AtSnap_AnySafety, y = PostSnap_MOF_Num), alpha = 0.05) +
   stat_smooth(mapping = aes(x = Max_Y_AbsSpeed_AtSnap_AnySafety, y = PostSnap_MOF_Num, color = "red"),
               method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
@@ -358,12 +491,19 @@ Plot14 <- ggplot(data = Stats_ByFullPlay_1High) +
        caption = "Abs Horizontal Speed: horizontal speed where either right or left counts as positive",
        color = " ") +
   theme_bw() + 
-  theme(plot.title = element_text(size = 10, hjust = 0.5),
-        plot.subtitle = element_text(size = 8, hjust = 0.5),
-        legend.position = "none")
+  theme(plot.title = element_text(size = 18, hjust = 0.5),
+        plot.subtitle = element_text(size = 14, hjust = 0.5),
+        axis.title = element_text(size = 16),
+        axis.text = element_text(size = 16),
+        axis.text.x = element_text(size = 16),
+        plot.caption = element_text(size = 12),
+        legend.text = element_text(size = 12),
+        legend.title = element_text(size = 15),
+        panel.spacing = unit(2, "lines"),
+        legend.position = "none") 
 
 Plot15 <- ggplot(data = Stats_ByFullPlay_1High) +
-  geom_point(aes(x = Max_Y_SpeedTowardMOF_AtSnap_AnySafety, y = PostSnap_MOF_Num), alpha = 0.05) +
+  # geom_point(aes(x = Max_Y_SpeedTowardMOF_AtSnap_AnySafety, y = PostSnap_MOF_Num), alpha = 0.05) +
   stat_smooth(mapping = aes(x = Max_Y_SpeedTowardMOF_AtSnap_AnySafety, y = PostSnap_MOF_Num, color = "red"),
               method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
@@ -376,12 +516,19 @@ Plot15 <- ggplot(data = Stats_ByFullPlay_1High) +
        caption = "Horizontal Speed Toward MOF: moving horizontally toward MOF is positive, toward sideline is negative",
        color = " ") +
   theme_bw() + 
-  theme(plot.title = element_text(size = 10, hjust = 0.5),
-        plot.subtitle = element_text(size = 8, hjust = 0.5),
-        legend.position = "none")
+  theme(plot.title = element_text(size = 18, hjust = 0.5),
+        plot.subtitle = element_text(size = 14, hjust = 0.5),
+        axis.title = element_text(size = 16),
+        axis.text = element_text(size = 16),
+        axis.text.x = element_text(size = 16),
+        plot.caption = element_text(size = 12),
+        legend.text = element_text(size = 12),
+        legend.title = element_text(size = 15),
+        panel.spacing = unit(2, "lines"),
+        legend.position = "none") 
 
 Plot16 <- ggplot(data = Stats_ByFullPlay_1High) +
-  geom_point(aes(x = Max_Y_AbsDistFromMOF_AtSnap_AnySafety, y = PostSnap_MOF_Num), alpha = 0.05) +
+  # geom_point(aes(x = Max_Y_AbsDistFromMOF_AtSnap_AnySafety, y = PostSnap_MOF_Num), alpha = 0.05) +
   stat_smooth(mapping = aes(x = Max_Y_AbsDistFromMOF_AtSnap_AnySafety, y = PostSnap_MOF_Num, color = "red"),
               method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
@@ -394,12 +541,19 @@ Plot16 <- ggplot(data = Stats_ByFullPlay_1High) +
        caption = "Horizontal Distance from MOF: net distance from middle of field (either right or left counts as positive)",
        color = " ") +
   theme_bw() + 
-  theme(plot.title = element_text(size = 10, hjust = 0.5),
-        plot.subtitle = element_text(size = 8, hjust = 0.5),
-        legend.position = "none")
+  theme(plot.title = element_text(size = 18, hjust = 0.5),
+        plot.subtitle = element_text(size = 14, hjust = 0.5),
+        axis.title = element_text(size = 16),
+        axis.text = element_text(size = 16),
+        axis.text.x = element_text(size = 16),
+        plot.caption = element_text(size = 12),
+        legend.text = element_text(size = 12),
+        legend.title = element_text(size = 15),
+        panel.spacing = unit(2, "lines"),
+        legend.position = "none") 
 
 Plot17 <- ggplot(data = Stats_ByFullPlay_1High) +
-  geom_point(aes(x = Max_Y_AccTowardMOF_AtSnap_AnySafety, y = PostSnap_MOF_Num), alpha = 0.05) +
+  # geom_point(aes(x = Max_Y_AccTowardMOF_AtSnap_AnySafety, y = PostSnap_MOF_Num), alpha = 0.05) +
   stat_smooth(mapping = aes(x = Max_Y_AccTowardMOF_AtSnap_AnySafety, y = PostSnap_MOF_Num, color = "red"),
               method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
@@ -412,17 +566,25 @@ Plot17 <- ggplot(data = Stats_ByFullPlay_1High) +
        caption = "Horizontal Acc Toward MOF: accelerating toward MOF is positive, toward sideline is negative",
        color = " ") +
   theme_bw() + 
-  theme(plot.title = element_text(size = 10, hjust = 0.5),
-        plot.subtitle = element_text(size = 8, hjust = 0.5),
-        legend.position = "none")
+  theme(plot.title = element_text(size = 18, hjust = 0.5),
+        plot.subtitle = element_text(size = 14, hjust = 0.5),
+        axis.title = element_text(size = 16),
+        axis.text = element_text(size = 16),
+        axis.text.x = element_text(size = 16),
+        plot.caption = element_text(size = 12),
+        legend.text = element_text(size = 12),
+        legend.title = element_text(size = 15),
+        panel.spacing = unit(2, "lines"),
+        legend.position = "none") 
 
 grid.arrange(Plot14, Plot15, ncol = 2)
 # grid.arrange(Plot14, Plot15, Plot16, Plot17, ncol = 4) # too messy, don't use
 grid.arrange(Plot14, Plot15, Plot16, Plot17, nrow = 2, ncol = 2)
 
-# Now look into the concept of "strong telegraphs"
+# Now look into the concept of "strong telegraphs" for actual MOFO rate
 # I.e., is there any feature where "when this feature happens, it's MOFO 85+ percent of the time?"
 # NOTE: 1 yard/second is approximately 2.05 MPH (so 2 yards/second is a fast walk)
+
 # Ideas: very low "max horiz distance from MOF by safety at the snap" (see Plot8)
 mean((Stats_ByFullPlay_All9Weeks %>% filter(Max_Y_AbsDistFromMOF_AtSnap_AnySafety < 3))$PostSnap_MOF_Num)
 # It's 0.1269 
@@ -432,7 +594,7 @@ mean((Stats_ByFullPlay_2High %>% filter(X_Diff_BetweenSafeties_AtSnap < 1))$Post
 # It's 0.7923 at < 1 yard, 0.7469 at < 2 yards
 
 mean((Stats_ByFullPlay_2High %>% filter(X_Diff_BetweenSafeties_AtSnap >= 7))$PostSnap_MOF_Num)
-# It's 0.1476 at 6+ yards, 0.1121 at 7+ yards, 0.0926 at 8+ yards
+# It's 0.1476 at 6+ yards, 0.1121 at 7+ yards, 0.0926 at 8+ yards 
 
 # Definitely 2-high plays with high difference in vertical velocities at snap (Plot11)
 mean((Stats_ByFullPlay_2High %>% filter(X_Vel_Diff_BetweenSafeties_AtSnap >= 4))$PostSnap_MOF_Num)
@@ -440,12 +602,12 @@ mean((Stats_ByFullPlay_2High %>% filter(X_Vel_Diff_BetweenSafeties_AtSnap >= 4))
 
 # 2-high plays where a safety had notable vertical creep distance (Plot12)
 mean((Stats_ByFullPlay_2High %>% filter(Max_VertCreptDistance_AnySafety >= 4))$PostSnap_MOF_Num)
-# It's 0.07641 
+# It's 0.07641
 
 # 2-high plays with negative Max_PreSnap_X_vel_TowardBall_AnySafety (Plot13) ... if sample is decent
 mean((Stats_ByFullPlay_2High %>% filter(Max_PreSnap_X_vel_TowardBall_AnySafety < 0))$PostSnap_MOF_Num)
 # View(Stats_ByFullPlay_2High %>% filter(Max_PreSnap_X_vel_TowardBall_AnySafety < 0))
-# It's 0.8309, and sample size is 207 plays
+# It's 0.8309, and sample size is 207 plays 
 
 # 1-high plays with very low absolute horiz speed by safety at snap (Plot14) 
 mean((Stats_ByFullPlay_1High %>% filter(Max_Y_AbsSpeed_AtSnap_AnySafety < 1))$PostSnap_MOF_Num)
@@ -457,12 +619,410 @@ mean((Stats_ByFullPlay_1High %>% filter(Max_Y_SpeedTowardMOF_AtSnap_AnySafety >=
 
 # 1-high plays with very low absolute horiz distance from MOF by safety at snap (Plot16)
 mean((Stats_ByFullPlay_1High %>% filter(Max_Y_AbsDistFromMOF_AtSnap_AnySafety < 2))$PostSnap_MOF_Num)
-# It's 0.1044 
+# It's 0.1044
 
 # Also flip Plot16 for very high absolute horiz distance, if sample is good (like at least 8 yards)
 mean((Stats_ByFullPlay_1High %>% filter(Max_Y_AbsDistFromMOF_AtSnap_AnySafety > 8))$PostSnap_MOF_Num)
 # View(Stats_ByFullPlay_1High %>% filter(Max_Y_AbsDistFromMOF_AtSnap_AnySafety > 8))
 # It's 0.4839, but sample is only 31 plays ... scrap it
+
+# Repeat similar process for plots, but with model's predicted MOFO rate on Y-axis ... start with 2-high plays
+# View(top_variables_PredictedMOFO_2High)
+# X_Diff_BetweenSafeties_AtSnap, Max_VertCreptDistance_AnySafety (or max total), X_Vel_Diff_BetweenSafeties_AtSnap AND/OR Max_PreSnap_X_vel_TowardBall_AnySafety
+Plot10B <- ggplot(data = Stats_ByFullPlay_2High) +
+  # geom_point(aes(x = X_Diff_BetweenSafeties_AtSnap, y = MOFO_probability_FDA), alpha = 0.05) +
+  stat_smooth(mapping = aes(x = X_Diff_BetweenSafeties_AtSnap, y = MOFO_probability_FDA, color = "red"),
+              method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
+  # geom_abline(intercept = 0, slope = 0) +
+  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_x_continuous(breaks = seq(0, 10, 2)) +
+  coord_cartesian(xlim = c(0, 10), ylim = c(0, 1)) +
+  labs(x = "Vertical Stagger b/w Safeties at Snap (Yards)", y = "Predicted MOFO Rate",
+       title = "Predicted MOFO Rate vs. Vertical Stagger Between Safeties",
+       subtitle = "Early Down 2-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022 (n = 3029)",
+       caption = "Vertical Stagger: vertical distance b/w safeties at time of snap",
+       color = " ") +
+  theme_bw() + 
+  theme(plot.title = element_text(size = 18, hjust = 0.5),
+        plot.subtitle = element_text(size = 14, hjust = 0.5),
+        axis.title = element_text(size = 16),
+        axis.text = element_text(size = 16),
+        axis.text.x = element_text(size = 16),
+        plot.caption = element_text(size = 12),
+        legend.text = element_text(size = 12),
+        legend.title = element_text(size = 15),
+        panel.spacing = unit(2, "lines"),
+        legend.position = "none") 
+
+Plot11B <- ggplot(data = Stats_ByFullPlay_2High) +
+  # geom_point(aes(x = X_Vel_Diff_BetweenSafeties_AtSnap, y = MOFO_probability_FDA), alpha = 0.05) +
+  stat_smooth(mapping = aes(x = X_Vel_Diff_BetweenSafeties_AtSnap, y = MOFO_probability_FDA, color = "red"),
+              method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
+  # geom_abline(intercept = 0, slope = 0) +
+  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_x_continuous(breaks = seq(0, 10, 2)) +
+  coord_cartesian(xlim = c(0, 6), ylim = c(0, 1)) +
+  labs(x = "Difference in Vertical Velocities b/w Safeties at Snap (Yds/Sec)", y = "Predicted MOFO Rate",
+       title = "Predicted MOFO Rate vs. Difference in Vertical Velocities b/w Safeties at Snap",
+       subtitle = "Early Down 2-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022 (n = 3029)",
+       caption = "Vertical Velocities: toward LOS is negative, away from LOS is positive",
+       color = " ") +
+  theme_bw() + 
+  theme(plot.title = element_text(size = 18, hjust = 0.5),
+        plot.subtitle = element_text(size = 14, hjust = 0.5),
+        axis.title = element_text(size = 16),
+        axis.text = element_text(size = 16),
+        axis.text.x = element_text(size = 16),
+        plot.caption = element_text(size = 12),
+        legend.text = element_text(size = 12),
+        legend.title = element_text(size = 15),
+        panel.spacing = unit(2, "lines"),
+        legend.position = "none") 
+
+Plot12B <- ggplot(data = Stats_ByFullPlay_2High) +
+  # geom_point(aes(x = Max_VertCreptDistance_AnySafety, y = MOFO_probability_FDA), alpha = 0.05) +
+  stat_smooth(mapping = aes(x = Max_VertCreptDistance_AnySafety, y = MOFO_probability_FDA, color = "red"),
+              method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
+  # geom_abline(intercept = 0, slope = 0) +
+  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_x_continuous(breaks = seq(-4, 10, 2)) +
+  coord_cartesian(xlim = c(-4, 8), ylim = c(0, 1)) +
+  labs(x = "Highest Vertical 'Creep' Distance by a Safety (Yards)", y = "Predicted MOFO Rate",
+       title = "Predicted MOFO Rate vs. Highest Vertical 'Creep' Distance by a Safety",
+       subtitle = "Early Down 2-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022 (n = 3029)",
+       caption = "Vertical 'Creep' Distance: Safety's Distance Moved Forward b/w O-Line Set and Snap",
+       color = " ") +
+  theme_bw() + 
+  theme(plot.title = element_text(size = 18, hjust = 0.5),
+        plot.subtitle = element_text(size = 14, hjust = 0.5),
+        axis.title = element_text(size = 16),
+        axis.text = element_text(size = 16),
+        axis.text.x = element_text(size = 16),
+        plot.caption = element_text(size = 12),
+        legend.text = element_text(size = 12),
+        legend.title = element_text(size = 15),
+        panel.spacing = unit(2, "lines"),
+        legend.position = "none") # + theme(aspect.ratio = 1)
+
+Plot13B <- ggplot(data = Stats_ByFullPlay_2High) +
+  # geom_point(aes(x = Max_PreSnap_X_vel_TowardBall_AnySafety, y = MOFO_probability_FDA), alpha = 0.05) +
+  stat_smooth(mapping = aes(x = Max_PreSnap_X_vel_TowardBall_AnySafety, y = MOFO_probability_FDA, color = "red"),
+              method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
+  # geom_abline(intercept = 0, slope = 0) +
+  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_x_continuous(breaks = seq(0, 10, 2)) +
+  coord_cartesian(xlim = c(-1, 5), ylim = c(0, 1)) +
+  labs(x = "Maximum Pre-Snap Speed Toward Ball by a Safety (Yds/Sec)", y = "Predicted MOFO Rate",
+       title = "Predicted MOFO Rate vs. Maximum Pre-Snap Speed Toward Ball by a Safety",
+       subtitle = "Early Down 2-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022 (n = 3029)",
+       caption = "Max Pre-Snap Speed Toward Ball: highest velocity, in direction of ball, at any point before snap",
+       color = " ") +
+  theme_bw() + 
+  theme(plot.title = element_text(size = 18, hjust = 0.5),
+        plot.subtitle = element_text(size = 14, hjust = 0.5),
+        axis.title = element_text(size = 16),
+        axis.text = element_text(size = 16),
+        axis.text.x = element_text(size = 16),
+        plot.caption = element_text(size = 12),
+        legend.text = element_text(size = 12),
+        legend.title = element_text(size = 15),
+        panel.spacing = unit(2, "lines"),
+        legend.position = "none") 
+
+grid.arrange(Plot10B, Plot11B, ncol = 2)
+# grid.arrange(Plot10B, Plot11B, Plot12B, Plot13B, ncol = 4) ... don't use, too crowded
+grid.arrange(Plot10B, Plot11B, Plot12B, Plot13B, nrow = 2, ncol = 2)
+
+grid.arrange(Plot10B, Plot11B, Plot12B, nrow = 2, ncol = 2)
+grid.arrange(Plot10B, Plot11B, Plot12B, ncol = 3)
+# Here's how to arrange three plots at once in an "upside-down triangle" format
+(Plot10B | Plot11B) / Plot12B
+
+# Here's a more complex way to do that 
+# Requires adjustment to the aspect.ratio of the bottom plot, and still didn't look great with that
+layout <- c(
+  area(t = 1, l = 1, b = 1, r = 1), # Top-left: Plot10B
+  area(t = 1, l = 2, b = 1, r = 2), # Top-right: Plot11B
+  area(t = 2, l = 1, b = 2, r = 2)  # Bottom-center: Plot12B
+)
+
+wrap_plots(Plot10B, Plot11B, Plot12B, design = layout)
+
+# Repeat similar process for 1-high plays, using predicted MOFO rate
+# View(top_variables_PredictedMOFO_1High)
+# Max_Y_AbsDistFromMOF_AtSnap_AnySafety AND/OR min_SafetyAbsHorizDistToMOF_PreSnap, Max_Y_SpeedTowardMOF_AtSnap_AnySafety, Max_PreSnap_X_vel_TowardBall_AnySafety
+Plot14B <- ggplot(data = Stats_ByFullPlay_1High) +
+  # geom_point(aes(x = Max_Y_AbsDistFromMOF_AtSnap_AnySafety, y = MOFO_probability_FDA), alpha = 0.05) +
+  stat_smooth(mapping = aes(x = Max_Y_AbsDistFromMOF_AtSnap_AnySafety, y = MOFO_probability_FDA, color = "red"),
+              method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
+  # geom_abline(intercept = 0, slope = 0) +
+  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_x_continuous(breaks = seq(0, 10, 2)) +
+  coord_cartesian(xlim = c(0, 9), ylim = c(0, 1)) +
+  labs(x = "Safety's Horizontal Distance from MOF at the Snap (Yards)", y = "Predicted MOFO Rate",
+       title = "MOFO Rate vs. Safety's Horizontal Distance from MOF at the Snap",
+       subtitle = "Early Down 1-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022 (n = 1352)",
+       caption = "Horizontal Distance from MOF: net distance from middle of field (either right or left counts as positive)",
+       color = " ") +
+  theme_bw() + 
+  theme(plot.title = element_text(size = 18, hjust = 0.5),
+        plot.subtitle = element_text(size = 14, hjust = 0.5),
+        axis.title = element_text(size = 16),
+        axis.text = element_text(size = 16),
+        axis.text.x = element_text(size = 16),
+        plot.caption = element_text(size = 12),
+        legend.text = element_text(size = 12),
+        legend.title = element_text(size = 15),
+        panel.spacing = unit(2, "lines"),
+        legend.position = "none") 
+
+Plot15B <- ggplot(data = Stats_ByFullPlay_1High) +
+  # geom_point(aes(x = min_SafetyAbsHorizDistToMOF_PreSnap, y = MOFO_probability_FDA), alpha = 0.05) +
+  stat_smooth(mapping = aes(x = min_SafetyAbsHorizDistToMOF_PreSnap, y = MOFO_probability_FDA, color = "red"),
+              method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
+  # geom_abline(intercept = 0, slope = 0) +
+  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_x_continuous(breaks = seq(0, 10, 1)) +
+  coord_cartesian(xlim = c(0, 8), ylim = c(0, 1)) +
+  labs(x = "Safety's Minimum Pre-Snap Horiz Distance from MOF (Yards)", y = "Predicted MOFO Rate",
+       title = "MOFO Rate vs. Safety's Minimum Pre-Snap Horiz Distance from MOF",
+       subtitle = "Early Down 1-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022 (n = 1352)",
+       caption = "Horizontal Distance from MOF: either right or left is positive",
+       color = " ") +
+  theme_bw() + 
+  theme(plot.title = element_text(size = 18, hjust = 0.5),
+        plot.subtitle = element_text(size = 14, hjust = 0.5),
+        axis.title = element_text(size = 16),
+        axis.text = element_text(size = 16),
+        axis.text.x = element_text(size = 16),
+        plot.caption = element_text(size = 12),
+        legend.text = element_text(size = 12),
+        legend.title = element_text(size = 15),
+        panel.spacing = unit(2, "lines"),
+        legend.position = "none") 
+
+Plot16B <- ggplot(data = Stats_ByFullPlay_1High) +
+  # geom_point(aes(x = Max_Y_SpeedTowardMOF_AtSnap_AnySafety, y = MOFO_probability_FDA), alpha = 0.05) +
+  stat_smooth(mapping = aes(x = Max_Y_SpeedTowardMOF_AtSnap_AnySafety, y = MOFO_probability_FDA, color = "red"),
+              method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
+  # geom_abline(intercept = 0, slope = 0) +
+  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_x_continuous(breaks = seq(-5, 5, 1)) +
+  coord_cartesian(xlim = c(-3, 3), ylim = c(0, 1)) +
+  labs(x = "Horizontal Speed Toward MOF by Safety at Snap (Yds/Sec)", y = "Predicted MOFO Rate",
+       title = "MOFO Rate vs. Safety's Horizontal Speed Toward MOF at the Snap",
+       subtitle = "Early Down 1-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022 (n = 1352)",
+       caption = "Horizontal Speed Toward MOF: moving horizontally toward MOF is positive, toward sideline is negative",
+       color = " ") +
+  theme_bw() + 
+  theme(plot.title = element_text(size = 18, hjust = 0.5),
+        plot.subtitle = element_text(size = 14, hjust = 0.5),
+        axis.title = element_text(size = 16),
+        axis.text = element_text(size = 16),
+        axis.text.x = element_text(size = 16),
+        plot.caption = element_text(size = 12),
+        legend.text = element_text(size = 12),
+        legend.title = element_text(size = 15),
+        panel.spacing = unit(2, "lines"),
+        legend.position = "none") 
+
+Plot17B <- ggplot(data = Stats_ByFullPlay_1High) +
+  # geom_point(aes(x = Max_PreSnap_X_vel_TowardBall_AnySafety, y = MOFO_probability_FDA), alpha = 0.05) +
+  stat_smooth(mapping = aes(x = Max_PreSnap_X_vel_TowardBall_AnySafety, y = MOFO_probability_FDA, color = "red"),
+              method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
+  # geom_abline(intercept = 0, slope = 0) +
+  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_x_continuous(breaks = seq(-4, 10, 2)) +
+  coord_cartesian(xlim = c(-2, 2), ylim = c(0, 1)) +
+  labs(x = "Safety's Maximum Pre-Snap Vertical Velocity Toward LOS (Yds/Sec)", y = "Predicted MOFO Rate",
+       title = "MOFO Rate vs. Safety's Maximum Pre-Snap Vertical Velocity Toward LOS",
+       subtitle = "Early Down 1-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022 (n = 1352)",
+       caption = "Vert Velocity Toward LOS: safety moving forward is positive, backward is negative",
+       color = " ") +
+  theme_bw() + 
+  theme(plot.title = element_text(size = 18, hjust = 0.5),
+        plot.subtitle = element_text(size = 14, hjust = 0.5),
+        axis.title = element_text(size = 16),
+        axis.text = element_text(size = 16),
+        axis.text.x = element_text(size = 16),
+        plot.caption = element_text(size = 12),
+        legend.text = element_text(size = 12),
+        legend.title = element_text(size = 15),
+        panel.spacing = unit(2, "lines"),
+        legend.position = "none") 
+
+grid.arrange(Plot14B, Plot15B, ncol = 2)
+# grid.arrange(Plot14B, Plot15B, Plot16B, Plot17B, ncol = 4) # too messy, don't use
+grid.arrange(Plot14B, Plot15B, Plot16B, Plot17B, nrow = 2, ncol = 2)
+
+# Now look into the concept of "strong telegraphs" for predicted MOFO rate
+# I.e., is there any feature where "when this feature happens, model predicts MOFO 85+ percent of the time?"
+# NOTE: 1 yard/second is approximately 2.05 MPH (so 2 yards/second is a fast walk)
+
+# Ideas: 2-high plays with very high or low vertical stagger (Plot10B)
+mean((Stats_ByFullPlay_2High %>% filter(X_Diff_BetweenSafeties_AtSnap < 1))$MOFO_probability_FDA)
+# It's 0.7465 at < 1 yard, 0.7278 at < 2 yards
+
+mean((Stats_ByFullPlay_2High %>% filter(X_Diff_BetweenSafeties_AtSnap >= 6))$MOFO_probability_FDA)
+# It's 0.133 at 6+ yards, 0.1049 at 7+ yards, 0.0890 at 8+ yards 
+
+# Definitely 2-high plays with high difference in vertical velocities at snap (Plot11B)
+mean((Stats_ByFullPlay_2High %>% filter(X_Vel_Diff_BetweenSafeties_AtSnap >= 4))$MOFO_probability_FDA)
+# It's 0.0815 
+
+# 2-high plays where a safety had notable vertical creep distance (Plot12B)
+mean((Stats_ByFullPlay_2High %>% filter(Max_VertCreptDistance_AnySafety >= 4))$MOFO_probability_FDA)
+# It's 0.07488 
+
+# 2-high plays with negative Max_PreSnap_X_vel_TowardBall_AnySafety (Plot13B) ... if sample is decent
+mean((Stats_ByFullPlay_2High %>% filter(Max_PreSnap_X_vel_TowardBall_AnySafety < 0))$MOFO_probability_FDA)
+# View(Stats_ByFullPlay_2High %>% filter(Max_PreSnap_X_vel_TowardBall_AnySafety < 0))
+# It's 0.8174, and sample size is 207 plays
+
+# 1-high plays with very low absolute horiz distance from MOF by safety at snap (Plot14B)
+mean((Stats_ByFullPlay_1High %>% filter(Max_Y_AbsDistFromMOF_AtSnap_AnySafety < 3))$MOFO_probability_FDA)
+# It's 0.1159 for < 2 yards, 0.1209 for < 3 yards
+
+# Also flip Plot 46B for very high absolute horiz distance, if sample is good (like at least 8 yards)
+mean((Stats_ByFullPlay_1High %>% filter(Max_Y_AbsDistFromMOF_AtSnap_AnySafety > 8))$MOFO_probability_FDA)
+# View(Stats_ByFullPlay_1High %>% filter(Max_Y_AbsDistFromMOF_AtSnap_AnySafety > 8))
+# It's 0.5625
+
+# Can repeat similar idea with Plot15B, which refers to safety's min horiz distance from MOF at any point pre-snap
+mean((Stats_ByFullPlay_1High %>% filter(min_SafetyAbsHorizDistToMOF_PreSnap < 3))$MOFO_probability_FDA)
+# It's 0.1287 for < 2 yards, 0.1329 for < 3 yards
+
+# Look into the safety having a positive horiz speed toward MOF at the snap, with Plot16B
+mean((Stats_ByFullPlay_1High %>% filter(Max_Y_SpeedTowardMOF_AtSnap_AnySafety >= 0))$MOFO_probability_FDA)
+# It's 0.1425 
+
+# And look into plays where safety never had a positive vertical velocity before the snap (Plot17B)
+mean((Stats_ByFullPlay_1High %>% filter(Max_PreSnap_X_vel_TowardBall_AnySafety < 0))$MOFO_probability_FDA)
+# It's 0.1332
+
+# Then incorporate a "multiple response variable" concept with actual AND predicted MOFO rates on Y-axis
+Plot10C <- ggplot(data = Stats_ByFullPlay_2High) +
+  stat_smooth(mapping = aes(x = X_Diff_BetweenSafeties_AtSnap, y = MOFO_probability_FDA, color = "Predicted MOFO Rate"),
+              method = "gam", se = F, span = 0.75) +
+  stat_smooth(mapping = aes(x = X_Diff_BetweenSafeties_AtSnap, y = PostSnap_MOF_Num, color = "Actual MOFO Rate"),
+              method = "gam", method.args = list(family = "binomial"), se = F, span = 0.75) +
+  # geom_abline(intercept = 0, slope = 0) +
+  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_x_continuous(breaks = seq(0, 10, 2)) +
+  coord_cartesian(xlim = c(0, 10), ylim = c(0, 1)) +
+  labs(x = "Vertical Stagger b/w Safeties at Snap (Yards)", y = "MOFO Coverage Rate",
+       title = "Predicted and Actual MOFO Rate vs. Vertical Stagger b/w Safeties",
+       subtitle = "Early Down 2-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022 (n = 3029)",
+       caption = "Vertical Stagger: vertical distance b/w safeties at time of snap",
+       color = "Predicted vs. Actual") +
+  theme_bw() + 
+  theme(plot.title = element_text(size = 16, hjust = 0.5),
+        plot.subtitle = element_text(size = 14, hjust = 0.5),
+        axis.title = element_text(size = 16),
+        axis.text = element_text(size = 16),
+        axis.text.x = element_text(size = 16),
+        plot.caption = element_text(size = 12),
+        legend.text = element_text(size = 12),
+        legend.title = element_text(size = 15),
+        panel.spacing = unit(2, "lines"),
+        legend.position = "none") 
+
+Plot11C <- ggplot(data = Stats_ByFullPlay_2High) +
+  stat_smooth(mapping = aes(x = X_Vel_Diff_BetweenSafeties_AtSnap, y = MOFO_probability_FDA, color = "Predicted MOFO Rate"),
+              method = "gam", se = F, span = 0.75) +
+  stat_smooth(mapping = aes(x = X_Vel_Diff_BetweenSafeties_AtSnap, y = PostSnap_MOF_Num, color = "Actual MOFO Rate"),
+              method = "gam", method.args = list(family = "binomial"), se = F, span = 0.75) +
+  # geom_abline(intercept = 0, slope = 0) +
+  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_x_continuous(breaks = seq(0, 10, 2)) +
+  coord_cartesian(xlim = c(0, 8), ylim = c(0, 1)) +
+  labs(x = "Difference in Vertical Velocities b/w Safeties at Snap (Yards)", y = "MOFO Coverage Rate",
+       title = "Predicted & Actual MOFO Rate vs. Diff in Vert Velocities b/w Safeties at Snap",
+       subtitle = "Early Down 2-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022 (n = 3029)",
+       caption = "Vertical Velocities: toward LOS is negative, away from LOS is positive",
+       color = "Predicted vs. Actual") +
+  theme_bw() + 
+  theme(plot.title = element_text(size = 16, hjust = 0.5),
+        plot.subtitle = element_text(size = 14, hjust = 0.5),
+        axis.title = element_text(size = 16),
+        axis.text = element_text(size = 16),
+        axis.text.x = element_text(size = 16),
+        plot.caption = element_text(size = 12),
+        legend.text = element_text(size = 12),
+        legend.title = element_text(size = 15),
+        panel.spacing = unit(2, "lines"),
+        legend.position = "none") 
+
+Plot12C <- ggplot(data = Stats_ByFullPlay_2High) +
+  stat_smooth(mapping = aes(x = Max_VertCreptDistance_AnySafety, y = MOFO_probability_FDA, color = "Predicted MOFO Rate"),
+              method = "gam", se = F, span = 0.75) +
+  stat_smooth(mapping = aes(x = Max_VertCreptDistance_AnySafety, y = PostSnap_MOF_Num, color = "Actual MOFO Rate"),
+              method = "gam", method.args = list(family = "binomial"), se = F, span = 0.75) +
+  # geom_abline(intercept = 0, slope = 0) +
+  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_x_continuous(breaks = seq(-4, 10, 2)) +
+  coord_cartesian(xlim = c(-4, 8), ylim = c(0, 1)) +
+  labs(x = "Highest Vertical 'Creep' Distance by a Safety (Yards)", y = "MOFO Coverage Rate",
+       title = "Predicted & Actual MOFO Rate vs. Highest Vert 'Creep' Distance by a Safety",
+       subtitle = "Early Down 2-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022 (n = 3029)",
+       caption = "Vertical 'Creep' Distance: Safety's Distance Moved Forward b/w O-Line Set and Snap",
+       color = "Predicted vs. Actual") +
+  theme_bw() + 
+  theme(plot.title = element_text(size = 16, hjust = 0.5),
+        plot.subtitle = element_text(size = 14, hjust = 0.5),
+        axis.title = element_text(size = 16),
+        axis.text = element_text(size = 16),
+        axis.text.x = element_text(size = 16),
+        plot.caption = element_text(size = 12),
+        legend.text = element_text(size = 12),
+        legend.title = element_text(size = 15),
+        panel.spacing = unit(2, "lines"),
+        legend.position = "right") # + theme(aspect.ratio = 1)
+
+Plot13C <- ggplot(data = Stats_ByFullPlay_2High) +
+  stat_smooth(mapping = aes(x = Max_PreSnap_X_vel_TowardBall_AnySafety, y = MOFO_probability_FDA, color = "Predicted MOFO Rate"),
+              method = "gam", se = F, span = 0.75) +
+  stat_smooth(mapping = aes(x = Max_PreSnap_X_vel_TowardBall_AnySafety, y = PostSnap_MOF_Num, color = "Actual MOFO Rate"),
+              method = "gam", method.args = list(family = "binomial"), se = F, span = 0.75) +
+  # geom_abline(intercept = 0, slope = 0) +
+  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_x_continuous(breaks = seq(-4, 10, 2)) +
+  coord_cartesian(xlim = c(-1, 5), ylim = c(0, 1)) +
+  labs(x = "Maximum Pre-Snap Speed Toward Ball by a Safety (Yds/Sec)", y = "MOFO Coverage Rate",
+       title = "Predicted & Actual MOFO Rate vs. Max Pre-Snap Speed Toward Ball by a Safety",
+       subtitle = "Early Down 2-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022 (n = 3029)",
+       caption = "Max Pre-Snap Speed Toward Ball: highest velocity, in direction of ball, at any point before snap",
+       color = "Predicted vs. Actual") +
+  theme_bw() + 
+  theme(plot.title = element_text(size = 16, hjust = 0.5),
+        plot.subtitle = element_text(size = 14, hjust = 0.5),
+        axis.title = element_text(size = 16),
+        axis.text = element_text(size = 16),
+        axis.text.x = element_text(size = 16),
+        plot.caption = element_text(size = 12),
+        legend.text = element_text(size = 12),
+        legend.title = element_text(size = 15),
+        panel.spacing = unit(2, "lines"),
+        legend.position = "right")
+
+grid.arrange(Plot10C, Plot11C, ncol = 2)
+# grid.arrange(Plot10C, Plot11C, Plot12C, Plot13C, ncol = 4) ... don't use, too crowded
+grid.arrange(Plot10C, Plot11C, Plot12C, Plot13C, nrow = 2, ncol = 2)
+
+grid.arrange(Plot10C, Plot11C, Plot12C, nrow = 2, ncol = 2)
+grid.arrange(Plot10C, Plot11C, Plot12C, ncol = 3)
+# Here's how to arrange three plots at once in an "upside-down triangle" format
+(Plot10C | Plot11C) / Plot12C
+
+# Here's a more complex way to do that 
+# Requires adjustment to the aspect.ratio of the bottom plot, and still didn't look great with that
+layout <- c(
+  area(t = 1, l = 1, b = 1, r = 1), # Top-left: Plot10C
+  area(t = 1, l = 2, b = 1, r = 2), # Top-right: Plot11C
+  area(t = 2, l = 1, b = 2, r = 2)  # Bottom-center: Plot12C
+)
+
+wrap_plots(Plot10B, Plot11B, Plot12B, design = layout)
 
 # And, make a gt table (either 2-high, or all plays) ranking features by how correlated they are with PostSnap_MOF_Num
 # First, gotta sort in descending order, starting with all plays ... but make it in descending order of ABSOLUTE correlation
