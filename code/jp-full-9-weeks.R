@@ -708,7 +708,7 @@ MergedData <- MergedData %>% mutate(DefWPA = (-1) * wpa)
 # Find other ways to filter the data, e.g. get rid of garbage time
 # MergedData <- MergedData %>% filter(winProbability >= 0.05 & winProbability <= 0.95)
 # Here's how to filter in a data table
-MergedData <- MergedData[wp >= 0.05 & wp <= 0.95]
+MergedData <- MergedData[winProbability >= 0.05 & winProbability <= 0.95]
 
 # Other possible modifications for this specific project:
 MergedData <- MergedData[xpass <= 0.95]
@@ -1458,7 +1458,7 @@ Stats_ByFullPlay_All9Weeks <- final_dropbacks_merged %>%
             # pass_horiz_location = max(pass_location), air_yards = max(air_yards), team_yards_after_catch = max(yards_after_catch), 
             Team_PassTD = max(pass_touchdown), Touchdown = max(touchdown),
             Team_RushTD = max(rush_touchdown), Team_ReturnTD = max(return_touchdown), 
-            td_team = max(td_team), WP = max(wp), WPA = max(wpa), DefWPA = max(DefWPA), WPSuccess = max(WPSuccess),
+            td_team = max(td_team), WP = max(winProbability), WPA = max(wpa), DefWPA = max(DefWPA), WPSuccess = max(WPSuccess),
             # OffTeam_Fumble = max(fumble), OffTeam_LostFumble = max(fumble_lost), 
             penalty_team = max(penalty_team), penalty_type = max(penalty_type), 
             return_team = max(return_team), # return_yards = max(return_yards),
