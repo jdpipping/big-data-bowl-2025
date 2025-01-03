@@ -438,26 +438,24 @@ top_variables_MOFO_AllPlays <- top_variables_MOFO_AllPlays %>% mutate(Feature = 
 # Now manually rename the cells to make them make more sense
 top_variables_MOFO_AllPlays$Feature
 top_variables_MOFO_AllPlays <- top_variables_MOFO_AllPlays %>% 
-  mutate(Feature = ifelse(Feature %in% "Max_PreSnap_X_vel_TowardBall_AnySafety", "Max Pre-Snap Vertical Velocity Toward LOS By a Safety", Feature))
+  mutate(Feature = ifelse(Feature %in% "X_Diff_BetweenSafeties_AtSnap", "Vertical Stagger Between Safeties at the Snap", Feature))
 top_variables_MOFO_AllPlays <- top_variables_MOFO_AllPlays %>% 
   mutate(Feature = ifelse(Feature %in% "X_Vel_Diff_BetweenSafeties_AtSnap", "Difference in Vertical Velocities Between Safeties at the Snap", Feature))
 top_variables_MOFO_AllPlays <- top_variables_MOFO_AllPlays %>% 
-  mutate(Feature = ifelse(Feature %in% "Max_VertCreptDistance_AnySafety", "Max Vertical Creep Distance Foward By a Safety", Feature))
+  mutate(Feature = ifelse(Feature %in% "Max_Y_AbsDistFromMOF_AtSnap_AnySafety", "Max Horizontal Distance From MOF at the Snap By a Safety", Feature))
 top_variables_MOFO_AllPlays <- top_variables_MOFO_AllPlays %>% 
-  mutate(Feature = ifelse(Feature %in% "Max_TotalCreptDistance_ToBall_AnySafety", "Max Total Creep Distance Toward Ball By a Safety", Feature))
+  mutate(Feature = ifelse(Feature %in% "min_SafetyAbsHorizDistToMOF_PreSnap", "Minimum Pre-Snap Horizontal Distance from MOF By a Safety", Feature))
 top_variables_MOFO_AllPlays <- top_variables_MOFO_AllPlays %>% 
-  mutate(Feature = ifelse(Feature %in% "X_Diff_BetweenSafeties_AtSnap", "Vertical Stagger Between Safeties at the Snap", Feature))
-top_variables_MOFO_AllPlays <- top_variables_MOFO_AllPlays %>% 
-  mutate(Feature = ifelse(Feature %in% "Max_PreSnap_X_acc_TowardBall_AnySafety", "Max Pre-Snap Vertical Acceleration Toward LOS By a Safety", Feature))
+  mutate(Feature = ifelse(Feature %in% "X_Acc_Diff_BetweenSafeties_AtSnap", "Difference in Vertical Accelerations Between Safeties at the Snap", Feature))
 
 # Re-arrange column order so the actual correlation is on the far-right
 top_variables_MOFO_AllPlays <- top_variables_MOFO_AllPlays %>% select(2, 1)
 
 # Perhaps add an extra "explanation" column??
 top_variables_MOFO_AllPlays <- top_variables_MOFO_AllPlays %>% 
-  mutate(Explanation = c("Safety Moving Fast Toward LOS --> MOFC more likely", "Safeties Moving in Different Directions --> MOFC more likely",
-                         "Safety Crept Far Forward Vertically --> MOFC more likely", "Safety Crept Far Toward Ball --> MOFC more likely",
-                         "Larger Vertical Stagger --> MOFC more likely", "Safety Accelerating Toward LOS --> MOFC more likely"))
+  mutate(Explanation = c("Larger Vertical Stagger --> MOFC more likely", "Safeties Moving in Different Vertical Directions --> MOFC more likely",
+                         "Safety Far From Middle of Field at the Snap --> MOFO more likely", "Safety Very Close to MOF Before the Snap --> MOFC more likely", 
+                         "Safeties Accelerating in Different Vertical Directions --> MOFC more likely"))
 
 class(top_variables_MOFO_AllPlays) <- "data.frame"
 MOFO_Features_AllPlays_FancyTable <- top_variables_MOFO_AllPlays %>%
@@ -535,15 +533,15 @@ top_variables_MOFO_2High <- top_variables_MOFO_2High %>% mutate(Feature = Rows_t
 # Now manually rename the cells to make them make more sense
 top_variables_MOFO_2High$Feature
 top_variables_MOFO_2High <- top_variables_MOFO_2High %>% 
+  mutate(Feature = ifelse(Feature %in% "X_Diff_BetweenSafeties_AtSnap", "Vertical Stagger Between Safeties at the Snap", Feature))
+top_variables_MOFO_2High <- top_variables_MOFO_2High %>% 
+  mutate(Feature = ifelse(Feature %in% "Max_VertCreptDistance_AnySafety", "Max Vertical Creep Distance Foward By a Safety", Feature))
+top_variables_MOFO_2High <- top_variables_MOFO_2High %>% 
   mutate(Feature = ifelse(Feature %in% "Max_PreSnap_X_vel_TowardBall_AnySafety", "Max Pre-Snap Vertical Velocity Toward LOS By a Safety", Feature))
 top_variables_MOFO_2High <- top_variables_MOFO_2High %>% 
   mutate(Feature = ifelse(Feature %in% "X_Vel_Diff_BetweenSafeties_AtSnap", "Difference in Vertical Velocities Between Safeties at the Snap", Feature))
 top_variables_MOFO_2High <- top_variables_MOFO_2High %>% 
-  mutate(Feature = ifelse(Feature %in% "Max_VertCreptDistance_AnySafety", "Max Vertical Creep Distance Foward By a Safety", Feature))
-top_variables_MOFO_2High <- top_variables_MOFO_2High %>% 
   mutate(Feature = ifelse(Feature %in% "Max_TotalCreptDistance_ToBall_AnySafety", "Max Total Creep Distance Toward Ball By a Safety", Feature))
-top_variables_MOFO_2High <- top_variables_MOFO_2High %>% 
-  mutate(Feature = ifelse(Feature %in% "X_Diff_BetweenSafeties_AtSnap", "Vertical Stagger Between Safeties at the Snap", Feature))
 top_variables_MOFO_2High <- top_variables_MOFO_2High %>% 
   mutate(Feature = ifelse(Feature %in% "Max_PreSnap_X_acc_TowardBall_AnySafety", "Max Pre-Snap Vertical Acceleration Toward LOS By a Safety", Feature))
 
@@ -551,23 +549,23 @@ top_variables_MOFO_2High <- top_variables_MOFO_2High %>%
 top_variables_MOFO_2High <- top_variables_MOFO_2High %>% select(2, 1)
 
 # Perhaps add an extra "explanation" column??
-top_variables_MOFO_2High <- top_variables_MOFO_2High %>% 
-  mutate(Explanation = c("Safety Moving Fast Toward LOS --> MOFC more likely", "Safeties Moving in Different Directions --> MOFC more likely",
-                         "Safety Crept Far Forward Vertically --> MOFC more likely", "Safety Crept Far Toward Ball --> MOFC more likely",
-                         "Larger Vertical Stagger --> MOFC more likely", "Safety Accelerating Toward LOS --> MOFC more likely"))
+# top_variables_MOFO_2High <- top_variables_MOFO_2High %>% 
+#   mutate(Explanation = c("Larger Vertical Stagger --> MOFC more likely", "Safety Crept Far Forward Vertically --> MOFC more likely", 
+#                          "Safety Moving Fast Toward LOS --> MOFC more likely", "Safeties Moving in Different Directions --> MOFC more likely", 
+#                          "Safety Crept Far Toward Ball --> MOFC more likely", "Safety Accelerating Toward LOS --> MOFC more likely"))
 
 class(top_variables_MOFO_2High) <- "data.frame"
 MOFO_Features_2High_FancyTable <- top_variables_MOFO_2High %>%
-  select(c("Feature", "PostSnap_MOF_Num", "Explanation")) %>%
-  head(20) %>% # this is how we limit to the top 20 if necessary
+  select(c("Feature", "PostSnap_MOF_Num")) %>%
+  head(6) %>% # this is how we limit to the top 20 if necessary
   mutate(Rank = row_number(desc(abs(PostSnap_MOF_Num)))) %>%
   relocate("Rank")
 
 MOFO_Features_2High_FancyTable <- MOFO_Features_2High_FancyTable |>
   # filter(officialPosition %in% c("OLB", "DE")) |> 
   # mutate(rank = row_number()) |> 
-  # select(1:2, "Feature", "PostSnap_MOF_Num", "Explanation) |> 
-  head(20) |> 
+  # select(1:2, "Feature", "PostSnap_MOF_Num", "Explanation") |> 
+  head(6) |> 
   gt() |>
   tab_options(
     table.border.top.color = "white",
@@ -594,11 +592,11 @@ MOFO_Features_2High_FancyTable <- MOFO_Features_2High_FancyTable |>
     Rank = md("**Rank**"), # the md is what makes the headers show up as bold
     Feature = md("**Feature**"),
     PostSnap_MOF_Num = html('<span style="text-decoration:overline; font-weight:bold">Correlation with MOFO Rate</span>'),
-    Explanation = md("**Explanation**")
+    # Explanation = md("**Explanation**")
   ) |> 
   cols_align(
     align = "center",
-    columns = Feature:Explanation
+    columns = Feature:PostSnap_MOF_Num
   ) |> 
   tab_header(md("**Top Safety Features that Correlate with MOFO Coverage Rate**"),
              md("(Early Down 2-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022)")) |> # don't forget to adjust your minimum
@@ -632,26 +630,29 @@ top_variables_MOFO_1High <- top_variables_MOFO_1High %>% mutate(Feature = Rows_t
 # Now manually rename the cells to make them make more sense
 top_variables_MOFO_1High$Feature
 top_variables_MOFO_1High <- top_variables_MOFO_1High %>% 
-  mutate(Feature = ifelse(Feature %in% "Max_Y_AbsAcc_AtSnap_AnySafety", "Safety's Absolute Horizontal Acceleration at the Snap", Feature))
-top_variables_MOFO_1High <- top_variables_MOFO_1High %>% 
-  mutate(Feature = ifelse(Feature %in% "Max_Y_AbsSpeed_AtSnap_AnySafety", "Safety's Absolute Horizontal Speed at the Snap", Feature))
-top_variables_MOFO_1High <- top_variables_MOFO_1High %>% 
-  mutate(Feature = ifelse(Feature %in% "Max_Y_SpeedTowardMOF_AtSnap_AnySafety", "Safety's Horizontal Speed Toward MOF at the Snap", Feature))
-top_variables_MOFO_1High <- top_variables_MOFO_1High %>% 
   mutate(Feature = ifelse(Feature %in% "Max_Y_AbsDistFromMOF_AtSnap_AnySafety", "Safety's Horizontal Distance From MOF at the Snap", Feature))
 top_variables_MOFO_1High <- top_variables_MOFO_1High %>% 
   mutate(Feature = ifelse(Feature %in% "min_SafetyAbsHorizDistToMOF_PreSnap", "Safety's Minimum Pre-Snap Horizontal Distance from MOF", Feature))
 top_variables_MOFO_1High <- top_variables_MOFO_1High %>% 
-  mutate(Feature = ifelse(Feature %in% "Max_TotalCreptDistance_ToBall_AnySafety", "Safety's Total Creep Distance Toward Ball", Feature))
+  mutate(Feature = ifelse(Feature %in% "Max_Y_SpeedTowardMOF_AtSnap_AnySafety", "Safety's Horizontal Speed Toward MOF at the Snap", Feature))
+top_variables_MOFO_1High <- top_variables_MOFO_1High %>% 
+  mutate(Feature = ifelse(Feature %in% "Max_Y_AbsSpeed_AtSnap_AnySafety", "Safety's Absolute Horizontal Speed at the Snap", Feature))
+top_variables_MOFO_1High <- top_variables_MOFO_1High %>% 
+  mutate(Feature = ifelse(Feature %in% "Max_Y_AccTowardMOF_AtSnap_AnySafety", "Safety's Horizontal Acc Toward MOF at the Snap", Feature))
+top_variables_MOFO_1High <- top_variables_MOFO_1High %>% 
+  mutate(Feature = ifelse(Feature %in% "Max_Y_AbsAcc_AtSnap_AnySafety", "Safety's Absolute Horizontal Acceleration at the Snap", Feature))
+top_variables_MOFO_1High <- top_variables_MOFO_1High %>% 
+  mutate(Feature = ifelse(Feature %in% "Max_VertCreptDistance_AnySafety", "Safety's Vertical Creep Distance Toward LOS", Feature))
 
 # Re-arrange column order so the actual correlation is on the far-right
 top_variables_MOFO_1High <- top_variables_MOFO_1High %>% select(2, 1)
 
 # Perhaps add an extra "explanation" column??
 top_variables_MOFO_1High <- top_variables_MOFO_1High %>% 
-  mutate(Explanation = c("Safety Accelerating Fast Horizontally --> MOFO more likely", "Safety Moving Fast Horizontally --> MOFO more likely",
-                         "Safety Moving Toward Middle of Field --> MOFC more likely", "Safety Being Far from MOF at the Snap --> MOFO more likely",
-                         "Safety Being Near MOF Before the Snap --> MOFC more likely", "Safety Crept Far Toward Ball --> MOFO more likely"))
+  mutate(Explanation = c("Safety Being Far from MOF at the Snap --> MOFO more likely", "Safety Being Near MOF Before the Snap --> MOFC more likely",
+                         "Safety Moving Toward Middle of Field --> MOFC more likely", "Safety Moving Fast Horizontally --> MOFO more likely",
+                         "Safety Accelerating Horizontally Toward MOF --> MOFC more likely", "Safety Accelerating at the Snap --> MOFO more likely",
+                         "Safety Creeping Forward Before Snap --> MOFO more likely"))
 
 class(top_variables_MOFO_1High) <- "data.frame"
 MOFO_Features_1High_FancyTable <- top_variables_MOFO_1High %>%
@@ -712,3 +713,4 @@ MOFO_Features_1High_FancyTable <- MOFO_Features_1High_FancyTable |>
   )
 
 gtsave(MOFO_Features_1High_FancyTable, "MOFO_Features_1High_FancyTable.png")
+
