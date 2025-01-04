@@ -886,8 +886,8 @@ plot_results_logloss_pScale =
   ggplot(aes(y = reorder(model, mean_logloss), x = p1)) +
   geom_vline(xintercept = 1/2, color="gray60", linetype="dashed", linewidth=0.5) +
   geom_boxplot() +
-  xlab("p = exp(-logloss)") +
-  labs(caption = "the predictor has the same predictive power (out-of-sample logloss),\n over average, as always predicting the correct outcome with prob. p") +
+  xlab("q = exp(-logloss)") +
+  labs(caption = "the predictor has the same predictive power (out-of-sample logloss),\n over average, as always predicting the correct outcome with prob. q") +
   ylab("model")
 ggsave("results_loss_plot_logloss_pScale.png", width=12, height=4)
 
