@@ -281,7 +281,11 @@ anim <- ggplot() +
         plot.caption = element_text(size = 12),
         legend.position = "none") # obviously scrap this if we want to keep the "club" legend
 
-gif_animation_3_pauses <- animate(play_animation_3_pauses, duration = 0.1 * nFrames)
+gif_animation_3_pauses <- animate(play_animation_3_pauses, 
+                                  duration = 0.1 * nFrames,
+                                  width = 800,            # Width of the output GIF
+                                  height = 600,           # Height of the output GIF
+                                  renderer = gifski_renderer())
 
 anim_save('play_animation_3_pauses.gif', gif_animation_3_pauses)
 
@@ -361,7 +365,11 @@ play_animation_4_pauses <- anim +
         plot.caption = element_text(size = 12),
         legend.position = "none") # obviously scrap this if we want to keep the "club" legend
 
-gif_animation_4_pauses <- animate(play_animation_4_pauses, duration = 0.1 * nFrames)
+gif_animation_4_pauses <- animate(play_animation_4_pauses, 
+                                  duration = 0.1 * nFrames,
+                                  width = 800,            # Width of the output GIF
+                                  height = 600,           # Height of the output GIF
+                                  renderer = gifski_renderer())
 
 anim_save('play_animation_4_pauses.gif', gif_animation_4_pauses)
 
