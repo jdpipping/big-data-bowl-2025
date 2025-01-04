@@ -1086,7 +1086,7 @@ MOFO_Features_AllPlays_FancyTable <- MOFO_Features_AllPlays_FancyTable |>
     columns = Feature:Explanation
   ) |> 
   tab_header(md("**Top Safety Features that Correlate with Actual MOFO Coverage Rate**"),
-             md("(Early Down Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022)")) |> # don't forget to adjust your minimum
+             md("Early Down Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022")) |> # don't forget to adjust your minimum
   tab_style(style = cell_borders(sides = "top"),
             locations = cells_title("title")) |> 
   tab_options(
@@ -1188,7 +1188,7 @@ MOFO_Features_2High_FancyTable <- MOFO_Features_2High_FancyTable |>
     columns = Feature:PostSnap_MOF_Num
   ) |> 
   tab_header(md("**Top Safety Features that Correlate with Actual MOFO Coverage Rate**"),
-             md("(Early Down 2-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022)")) |> # don't forget to adjust your minimum
+             md("Early Down 2-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022")) |> # don't forget to adjust your minimum
   tab_style(style = cell_borders(sides = "top"),
             locations = cells_title("title")) |> 
   tab_options(
@@ -1288,7 +1288,7 @@ MOFO_Features_1High_FancyTable <- MOFO_Features_1High_FancyTable |>
     columns = Feature:Explanation
   ) |> 
   tab_header(md("**Top Safety Features that Correlate with Actual MOFO Coverage Rate**"),
-             md("(Early Down 1-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022)")) |> # don't forget to adjust your minimum
+             md("Early Down 1-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022")) |> # don't forget to adjust your minimum
   tab_style(style = cell_borders(sides = "top"),
             locations = cells_title("title")) |> 
   tab_options(
@@ -1390,7 +1390,7 @@ PredictedMOFO_Features_2High_FancyTable <- PredictedMOFO_Features_2High_FancyTab
     columns = Feature:MOFO_probability_FDA
   ) |> 
   tab_header(md("**Top Safety Features that Correlate with Model's Predicted MOFO Rate**"),
-             md("(Early Down 2-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022)")) |> # don't forget to adjust your minimum
+             md("Early Down 2-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022")) |> # don't forget to adjust your minimum
   tab_style(style = cell_borders(sides = "top"),
             locations = cells_title("title")) |> 
   tab_options(
@@ -1531,7 +1531,7 @@ PredAndActual_MOFO_Features_2High_FancyTable <- PredAndActual_MOFO_Features_2Hig
     columns = Feature:MOFO_probability_FDA
   ) |> 
   tab_header(md("**Safety Features that Correlate with Actual and Predicted MOFO Rate**"),
-             md("(Early Down 2-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022)")) |> # don't forget to adjust your minimum
+             md("Early Down 2-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022")) |> # don't forget to adjust your minimum
   tab_style(style = cell_borders(sides = "top"),
             locations = cells_title("title")) |> 
   tab_options(
