@@ -1523,14 +1523,14 @@ PredAndActual_MOFO_Features_2High_FancyTable <- PredAndActual_MOFO_Features_2Hig
     Rank = md("**Rank**"), # the md is what makes the headers show up as bold
     Feature = md("**Feature**"),
     PostSnap_MOF_Num = md("**Correlation w/ Actual MOFO Rate**"),
-    MOFO_probability_FDA = html('<span style="text-decoration:overline; font-weight:bold">Correlation w/ Pred MOFO Rate</span>'),
+    MOFO_probability_FDA = html('<span style="text-decoration:overline; font-weight:bold">Correlation w/ Predicted MOFO Rate</span>'),
     # Explanation = md("**Explanation**")
   ) |> 
   cols_align(
     align = "center",
     columns = Feature:MOFO_probability_FDA
   ) |> 
-  tab_header(md("**Safety Features that Correlate with Predicted and Actual MOFO Rate**"),
+  tab_header(md("**Safety Features that Correlate with Actual and Predicted MOFO Rate**"),
              md("(Early Down 2-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022)")) |> # don't forget to adjust your minimum
   tab_style(style = cell_borders(sides = "top"),
             locations = cells_title("title")) |> 
