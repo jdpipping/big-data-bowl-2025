@@ -265,16 +265,17 @@ Plot6 <- ggplot(data = Stats_ByFullPlay_All9Weeks) +
        caption = "Vertical Stagger: vertical distance b/w safeties at time of snap",
        color = " ") +
   theme_bw() + 
-  theme(plot.title = element_text(size = 18, hjust = 0.5),
+  theme(plot.title = element_text(size = 16, hjust = 0.5),
         plot.subtitle = element_text(size = 14, hjust = 0.5),
-        axis.title = element_text(size = 16),
-        axis.text = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.text.y = element_text(size = 16),
         axis.text.x = element_text(size = 16),
         plot.caption = element_text(size = 12),
         legend.text = element_text(size = 12),
         legend.title = element_text(size = 15),
         panel.spacing = unit(2, "lines"),
-        legend.position = "none") 
+        legend.position = "right")
 
 Plot7 <- ggplot(data = Stats_ByFullPlay_All9Weeks) +
   # geom_point(aes(x = X_Vel_Diff_BetweenSafeties_AtSnap, y = PostSnap_MOF_Num), alpha = 0.05) +
@@ -290,16 +291,17 @@ Plot7 <- ggplot(data = Stats_ByFullPlay_All9Weeks) +
        caption = "Vertical Velocities: toward LOS is negative, away from LOS is positive",
        color = " ") +
   theme_bw() + 
-  theme(plot.title = element_text(size = 18, hjust = 0.5),
+  theme(plot.title = element_text(size = 16, hjust = 0.5),
         plot.subtitle = element_text(size = 14, hjust = 0.5),
-        axis.title = element_text(size = 16),
-        axis.text = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.text.y = element_text(size = 16),
         axis.text.x = element_text(size = 16),
         plot.caption = element_text(size = 12),
         legend.text = element_text(size = 12),
         legend.title = element_text(size = 15),
         panel.spacing = unit(2, "lines"),
-        legend.position = "none") 
+        legend.position = "right")
 
 Plot8 <- ggplot(data = Stats_ByFullPlay_All9Weeks) +
   # geom_point(aes(x = Max_Y_AbsDistFromMOF_AtSnap_AnySafety, y = PostSnap_MOF_Num), alpha = 0.05) +
@@ -315,16 +317,17 @@ Plot8 <- ggplot(data = Stats_ByFullPlay_All9Weeks) +
        caption = "Horizontal Distance from MOF: either right or left is positive",
        color = " ") +
   theme_bw() + 
-  theme(plot.title = element_text(size = 18, hjust = 0.5),
+  theme(plot.title = element_text(size = 16, hjust = 0.5),
         plot.subtitle = element_text(size = 14, hjust = 0.5),
-        axis.title = element_text(size = 16),
-        axis.text = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.text.y = element_text(size = 16),
         axis.text.x = element_text(size = 16),
         plot.caption = element_text(size = 12),
         legend.text = element_text(size = 12),
         legend.title = element_text(size = 15),
         panel.spacing = unit(2, "lines"),
-        legend.position = "none") 
+        legend.position = "right")
 
 Plot9 <- ggplot(data = Stats_ByFullPlay_All9Weeks) +
   # geom_point(aes(x =  min_SafetyAbsHorizDistToMOF_PreSnap, y = PostSnap_MOF_Num), alpha = 0.05) +
@@ -340,16 +343,17 @@ Plot9 <- ggplot(data = Stats_ByFullPlay_All9Weeks) +
        caption = "Horizontal Distance from MOF: either right or left is positive",
        color = " ") +
   theme_bw() + 
-  theme(plot.title = element_text(size = 18, hjust = 0.5),
+  theme(plot.title = element_text(size = 16, hjust = 0.5),
         plot.subtitle = element_text(size = 14, hjust = 0.5),
-        axis.title = element_text(size = 16),
-        axis.text = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.text.y = element_text(size = 16),
         axis.text.x = element_text(size = 16),
         plot.caption = element_text(size = 12),
         legend.text = element_text(size = 12),
         legend.title = element_text(size = 15),
         panel.spacing = unit(2, "lines"),
-        legend.position = "none") 
+        legend.position = "right")
 
 grid.arrange(Plot6, Plot7, ncol = 2)
 # grid.arrange(Plot6, Plot7, Plot8, Plot9, ncol = 4) ... don't use, too crowded
@@ -371,16 +375,17 @@ Plot10 <- ggplot(data = Stats_ByFullPlay_2High) +
        caption = "Vertical Stagger: vertical distance b/w safeties at time of snap",
        color = " ") +
   theme_bw() + 
-  theme(plot.title = element_text(size = 18, hjust = 0.5),
+  theme(plot.title = element_text(size = 16, hjust = 0.5),
         plot.subtitle = element_text(size = 14, hjust = 0.5),
-        axis.title = element_text(size = 16),
-        axis.text = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.text.y = element_text(size = 16),
         axis.text.x = element_text(size = 16),
         plot.caption = element_text(size = 12),
         legend.text = element_text(size = 12),
         legend.title = element_text(size = 15),
         panel.spacing = unit(2, "lines"),
-        legend.position = "none") 
+        legend.position = "right")
 
 Plot11 <- ggplot(data = Stats_ByFullPlay_2High) +
   # geom_point(aes(x = X_Vel_Diff_BetweenSafeties_AtSnap, y = PostSnap_MOF_Num), alpha = 0.05) +
@@ -396,16 +401,17 @@ Plot11 <- ggplot(data = Stats_ByFullPlay_2High) +
        caption = "Vertical Velocities: toward LOS is negative, away from LOS is positive",
        color = " ") +
   theme_bw() + 
-  theme(plot.title = element_text(size = 18, hjust = 0.5),
+  theme(plot.title = element_text(size = 16, hjust = 0.5),
         plot.subtitle = element_text(size = 14, hjust = 0.5),
-        axis.title = element_text(size = 16),
-        axis.text = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.text.y = element_text(size = 16),
         axis.text.x = element_text(size = 16),
         plot.caption = element_text(size = 12),
         legend.text = element_text(size = 12),
         legend.title = element_text(size = 15),
         panel.spacing = unit(2, "lines"),
-        legend.position = "none") 
+        legend.position = "right")
 
 Plot12 <- ggplot(data = Stats_ByFullPlay_2High) +
   # geom_point(aes(x = Max_VertCreptDistance_AnySafety, y = PostSnap_MOF_Num), alpha = 0.05) +
@@ -421,16 +427,17 @@ Plot12 <- ggplot(data = Stats_ByFullPlay_2High) +
        caption = "Vertical 'Creep' Distance: Safety's Distance Moved Forward b/w O-Line Set and Snap",
        color = " ") +
   theme_bw() + 
-  theme(plot.title = element_text(size = 18, hjust = 0.5),
+  theme(plot.title = element_text(size = 16, hjust = 0.5),
         plot.subtitle = element_text(size = 14, hjust = 0.5),
-        axis.title = element_text(size = 16),
-        axis.text = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.text.y = element_text(size = 16),
         axis.text.x = element_text(size = 16),
         plot.caption = element_text(size = 12),
         legend.text = element_text(size = 12),
         legend.title = element_text(size = 15),
         panel.spacing = unit(2, "lines"),
-        legend.position = "none") # + theme(aspect.ratio = 1)
+        legend.position = "right") # + theme(aspect.ratio = 1)
 
 Plot13 <- ggplot(data = Stats_ByFullPlay_2High) +
   # geom_point(aes(x = Max_PreSnap_X_vel_TowardBall_AnySafety, y = PostSnap_MOF_Num), alpha = 0.05) +
@@ -446,16 +453,17 @@ Plot13 <- ggplot(data = Stats_ByFullPlay_2High) +
        caption = "Max Pre-Snap Speed Toward Ball: highest velocity, in direction of ball, at any point before snap",
        color = " ") +
   theme_bw() + 
-  theme(plot.title = element_text(size = 18, hjust = 0.5),
+  theme(plot.title = element_text(size = 16, hjust = 0.5),
         plot.subtitle = element_text(size = 14, hjust = 0.5),
-        axis.title = element_text(size = 16),
-        axis.text = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.text.y = element_text(size = 16),
         axis.text.x = element_text(size = 16),
         plot.caption = element_text(size = 12),
         legend.text = element_text(size = 12),
         legend.title = element_text(size = 15),
         panel.spacing = unit(2, "lines"),
-        legend.position = "none") 
+        legend.position = "right")
 
 grid.arrange(Plot10, Plot11, ncol = 2)
 # grid.arrange(Plot10, Plot11, Plot12, Plot13, ncol = 4) ... don't use, too crowded
@@ -491,16 +499,17 @@ Plot14 <- ggplot(data = Stats_ByFullPlay_1High) +
        caption = "Abs Horizontal Speed: horizontal speed where either right or left counts as positive",
        color = " ") +
   theme_bw() + 
-  theme(plot.title = element_text(size = 18, hjust = 0.5),
+  theme(plot.title = element_text(size = 16, hjust = 0.5),
         plot.subtitle = element_text(size = 14, hjust = 0.5),
-        axis.title = element_text(size = 16),
-        axis.text = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.text.y = element_text(size = 16),
         axis.text.x = element_text(size = 16),
         plot.caption = element_text(size = 12),
         legend.text = element_text(size = 12),
         legend.title = element_text(size = 15),
         panel.spacing = unit(2, "lines"),
-        legend.position = "none") 
+        legend.position = "right")
 
 Plot15 <- ggplot(data = Stats_ByFullPlay_1High) +
   # geom_point(aes(x = Max_Y_SpeedTowardMOF_AtSnap_AnySafety, y = PostSnap_MOF_Num), alpha = 0.05) +
@@ -516,16 +525,17 @@ Plot15 <- ggplot(data = Stats_ByFullPlay_1High) +
        caption = "Horizontal Speed Toward MOF: moving horizontally toward MOF is positive, toward sideline is negative",
        color = " ") +
   theme_bw() + 
-  theme(plot.title = element_text(size = 18, hjust = 0.5),
+  theme(plot.title = element_text(size = 16, hjust = 0.5),
         plot.subtitle = element_text(size = 14, hjust = 0.5),
-        axis.title = element_text(size = 16),
-        axis.text = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.text.y = element_text(size = 16),
         axis.text.x = element_text(size = 16),
         plot.caption = element_text(size = 12),
         legend.text = element_text(size = 12),
         legend.title = element_text(size = 15),
         panel.spacing = unit(2, "lines"),
-        legend.position = "none") 
+        legend.position = "right")
 
 Plot16 <- ggplot(data = Stats_ByFullPlay_1High) +
   # geom_point(aes(x = Max_Y_AbsDistFromMOF_AtSnap_AnySafety, y = PostSnap_MOF_Num), alpha = 0.05) +
@@ -541,16 +551,17 @@ Plot16 <- ggplot(data = Stats_ByFullPlay_1High) +
        caption = "Horizontal Distance from MOF: net distance from middle of field (either right or left counts as positive)",
        color = " ") +
   theme_bw() + 
-  theme(plot.title = element_text(size = 18, hjust = 0.5),
+  theme(plot.title = element_text(size = 16, hjust = 0.5),
         plot.subtitle = element_text(size = 14, hjust = 0.5),
-        axis.title = element_text(size = 16),
-        axis.text = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.text.y = element_text(size = 16),
         axis.text.x = element_text(size = 16),
         plot.caption = element_text(size = 12),
         legend.text = element_text(size = 12),
         legend.title = element_text(size = 15),
         panel.spacing = unit(2, "lines"),
-        legend.position = "none") 
+        legend.position = "right")
 
 Plot17 <- ggplot(data = Stats_ByFullPlay_1High) +
   # geom_point(aes(x = Max_Y_AccTowardMOF_AtSnap_AnySafety, y = PostSnap_MOF_Num), alpha = 0.05) +
@@ -566,16 +577,17 @@ Plot17 <- ggplot(data = Stats_ByFullPlay_1High) +
        caption = "Horizontal Acc Toward MOF: accelerating toward MOF is positive, toward sideline is negative",
        color = " ") +
   theme_bw() + 
-  theme(plot.title = element_text(size = 18, hjust = 0.5),
+  theme(plot.title = element_text(size = 16, hjust = 0.5),
         plot.subtitle = element_text(size = 14, hjust = 0.5),
-        axis.title = element_text(size = 16),
-        axis.text = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.text.y = element_text(size = 16),
         axis.text.x = element_text(size = 16),
         plot.caption = element_text(size = 12),
         legend.text = element_text(size = 12),
         legend.title = element_text(size = 15),
         panel.spacing = unit(2, "lines"),
-        legend.position = "none") 
+        legend.position = "right")
 
 grid.arrange(Plot14, Plot15, ncol = 2)
 # grid.arrange(Plot14, Plot15, Plot16, Plot17, ncol = 4) # too messy, don't use
@@ -633,16 +645,17 @@ Plot10B <- ggplot(data = Stats_ByFullPlay_2High) +
        caption = "Vertical Stagger: vertical distance b/w safeties at time of snap",
        color = " ") +
   theme_bw() + 
-  theme(plot.title = element_text(size = 18, hjust = 0.5),
+  theme(plot.title = element_text(size = 16, hjust = 0.5),
         plot.subtitle = element_text(size = 14, hjust = 0.5),
-        axis.title = element_text(size = 16),
-        axis.text = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.text.y = element_text(size = 16),
         axis.text.x = element_text(size = 16),
         plot.caption = element_text(size = 12),
         legend.text = element_text(size = 12),
         legend.title = element_text(size = 15),
         panel.spacing = unit(2, "lines"),
-        legend.position = "none") 
+        legend.position = "right")
 
 Plot11B <- ggplot(data = Stats_ByFullPlay_2High) +
   # geom_point(aes(x = X_Vel_Diff_BetweenSafeties_AtSnap, y = MOFO_probability_FDA), alpha = 0.05) +
@@ -658,16 +671,17 @@ Plot11B <- ggplot(data = Stats_ByFullPlay_2High) +
        caption = "Vertical Velocities: toward LOS is negative, away from LOS is positive",
        color = " ") +
   theme_bw() + 
-  theme(plot.title = element_text(size = 18, hjust = 0.5),
+  theme(plot.title = element_text(size = 16, hjust = 0.5),
         plot.subtitle = element_text(size = 14, hjust = 0.5),
-        axis.title = element_text(size = 16),
-        axis.text = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.text.y = element_text(size = 16),
         axis.text.x = element_text(size = 16),
         plot.caption = element_text(size = 12),
         legend.text = element_text(size = 12),
         legend.title = element_text(size = 15),
         panel.spacing = unit(2, "lines"),
-        legend.position = "none") 
+        legend.position = "right")
 
 Plot12B <- ggplot(data = Stats_ByFullPlay_2High) +
   # geom_point(aes(x = Max_VertCreptDistance_AnySafety, y = MOFO_probability_FDA), alpha = 0.05) +
@@ -683,16 +697,17 @@ Plot12B <- ggplot(data = Stats_ByFullPlay_2High) +
        caption = "Vertical 'Creep' Distance: Safety's Distance Moved Forward b/w O-Line Set and Snap",
        color = " ") +
   theme_bw() + 
-  theme(plot.title = element_text(size = 18, hjust = 0.5),
+  theme(plot.title = element_text(size = 16, hjust = 0.5),
         plot.subtitle = element_text(size = 14, hjust = 0.5),
-        axis.title = element_text(size = 16),
-        axis.text = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.text.y = element_text(size = 16),
         axis.text.x = element_text(size = 16),
         plot.caption = element_text(size = 12),
         legend.text = element_text(size = 12),
         legend.title = element_text(size = 15),
         panel.spacing = unit(2, "lines"),
-        legend.position = "none") # + theme(aspect.ratio = 1)
+        legend.position = "right") # + theme(aspect.ratio = 1)
 
 Plot13B <- ggplot(data = Stats_ByFullPlay_2High) +
   # geom_point(aes(x = Max_PreSnap_X_vel_TowardBall_AnySafety, y = MOFO_probability_FDA), alpha = 0.05) +
@@ -708,16 +723,17 @@ Plot13B <- ggplot(data = Stats_ByFullPlay_2High) +
        caption = "Max Pre-Snap Speed Toward Ball: highest velocity, in direction of ball, at any point before snap",
        color = " ") +
   theme_bw() + 
-  theme(plot.title = element_text(size = 18, hjust = 0.5),
+  theme(plot.title = element_text(size = 16, hjust = 0.5),
         plot.subtitle = element_text(size = 14, hjust = 0.5),
-        axis.title = element_text(size = 16),
-        axis.text = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.text.y = element_text(size = 16),
         axis.text.x = element_text(size = 16),
         plot.caption = element_text(size = 12),
         legend.text = element_text(size = 12),
         legend.title = element_text(size = 15),
         panel.spacing = unit(2, "lines"),
-        legend.position = "none") 
+        legend.position = "right")
 
 grid.arrange(Plot10B, Plot11B, ncol = 2)
 # grid.arrange(Plot10B, Plot11B, Plot12B, Plot13B, ncol = 4) ... don't use, too crowded
@@ -755,16 +771,17 @@ Plot14B <- ggplot(data = Stats_ByFullPlay_1High) +
        caption = "Horizontal Distance from MOF: net distance from middle of field (either right or left counts as positive)",
        color = " ") +
   theme_bw() + 
-  theme(plot.title = element_text(size = 18, hjust = 0.5),
+  theme(plot.title = element_text(size = 16, hjust = 0.5),
         plot.subtitle = element_text(size = 14, hjust = 0.5),
-        axis.title = element_text(size = 16),
-        axis.text = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.text.y = element_text(size = 16),
         axis.text.x = element_text(size = 16),
         plot.caption = element_text(size = 12),
         legend.text = element_text(size = 12),
         legend.title = element_text(size = 15),
         panel.spacing = unit(2, "lines"),
-        legend.position = "none") 
+        legend.position = "right")
 
 Plot15B <- ggplot(data = Stats_ByFullPlay_1High) +
   # geom_point(aes(x = min_SafetyAbsHorizDistToMOF_PreSnap, y = MOFO_probability_FDA), alpha = 0.05) +
@@ -780,16 +797,17 @@ Plot15B <- ggplot(data = Stats_ByFullPlay_1High) +
        caption = "Horizontal Distance from MOF: either right or left is positive",
        color = " ") +
   theme_bw() + 
-  theme(plot.title = element_text(size = 18, hjust = 0.5),
+  theme(plot.title = element_text(size = 16, hjust = 0.5),
         plot.subtitle = element_text(size = 14, hjust = 0.5),
-        axis.title = element_text(size = 16),
-        axis.text = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.text.y = element_text(size = 16),
         axis.text.x = element_text(size = 16),
         plot.caption = element_text(size = 12),
         legend.text = element_text(size = 12),
         legend.title = element_text(size = 15),
         panel.spacing = unit(2, "lines"),
-        legend.position = "none") 
+        legend.position = "right")
 
 Plot16B <- ggplot(data = Stats_ByFullPlay_1High) +
   # geom_point(aes(x = Max_Y_SpeedTowardMOF_AtSnap_AnySafety, y = MOFO_probability_FDA), alpha = 0.05) +
@@ -805,16 +823,17 @@ Plot16B <- ggplot(data = Stats_ByFullPlay_1High) +
        caption = "Horizontal Speed Toward MOF: moving horizontally toward MOF is positive, toward sideline is negative",
        color = " ") +
   theme_bw() + 
-  theme(plot.title = element_text(size = 18, hjust = 0.5),
+  theme(plot.title = element_text(size = 16, hjust = 0.5),
         plot.subtitle = element_text(size = 14, hjust = 0.5),
-        axis.title = element_text(size = 16),
-        axis.text = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.text.y = element_text(size = 16),
         axis.text.x = element_text(size = 16),
         plot.caption = element_text(size = 12),
         legend.text = element_text(size = 12),
         legend.title = element_text(size = 15),
         panel.spacing = unit(2, "lines"),
-        legend.position = "none") 
+        legend.position = "right")
 
 Plot17B <- ggplot(data = Stats_ByFullPlay_1High) +
   # geom_point(aes(x = Max_PreSnap_X_vel_TowardBall_AnySafety, y = MOFO_probability_FDA), alpha = 0.05) +
@@ -830,16 +849,17 @@ Plot17B <- ggplot(data = Stats_ByFullPlay_1High) +
        caption = "Vert Velocity Toward LOS: safety moving forward is positive, backward is negative",
        color = " ") +
   theme_bw() + 
-  theme(plot.title = element_text(size = 18, hjust = 0.5),
+  theme(plot.title = element_text(size = 16, hjust = 0.5),
         plot.subtitle = element_text(size = 14, hjust = 0.5),
-        axis.title = element_text(size = 16),
-        axis.text = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.text.y = element_text(size = 16),
         axis.text.x = element_text(size = 16),
         plot.caption = element_text(size = 12),
         legend.text = element_text(size = 12),
         legend.title = element_text(size = 15),
         panel.spacing = unit(2, "lines"),
-        legend.position = "none") 
+        legend.position = "right")
 
 grid.arrange(Plot14B, Plot15B, ncol = 2)
 # grid.arrange(Plot14B, Plot15B, Plot16B, Plot17B, ncol = 4) # too messy, don't use
@@ -898,14 +918,15 @@ Plot10C <- ggplot(data = Stats_ByFullPlay_2High) +
   theme_bw() + 
   theme(plot.title = element_text(size = 16, hjust = 0.5),
         plot.subtitle = element_text(size = 14, hjust = 0.5),
-        axis.title = element_text(size = 16),
-        axis.text = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.text.y = element_text(size = 16),
         axis.text.x = element_text(size = 16),
         plot.caption = element_text(size = 12),
         legend.text = element_text(size = 12),
         legend.title = element_text(size = 15),
         panel.spacing = unit(2, "lines"),
-        legend.position = "none") 
+        legend.position = "right")
 
 Plot11C <- ggplot(data = Stats_ByFullPlay_2High) +
   stat_smooth(mapping = aes(x = X_Vel_Diff_BetweenSafeties_AtSnap, y = MOFO_probability_FDA, color = "Predicted MOFO Rate"),
@@ -924,14 +945,15 @@ Plot11C <- ggplot(data = Stats_ByFullPlay_2High) +
   theme_bw() + 
   theme(plot.title = element_text(size = 16, hjust = 0.5),
         plot.subtitle = element_text(size = 14, hjust = 0.5),
-        axis.title = element_text(size = 16),
-        axis.text = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.text.y = element_text(size = 16),
         axis.text.x = element_text(size = 16),
         plot.caption = element_text(size = 12),
         legend.text = element_text(size = 12),
         legend.title = element_text(size = 15),
         panel.spacing = unit(2, "lines"),
-        legend.position = "none") 
+        legend.position = "right")
 
 Plot12C <- ggplot(data = Stats_ByFullPlay_2High) +
   stat_smooth(mapping = aes(x = Max_VertCreptDistance_AnySafety, y = MOFO_probability_FDA, color = "Predicted MOFO Rate"),
@@ -950,8 +972,9 @@ Plot12C <- ggplot(data = Stats_ByFullPlay_2High) +
   theme_bw() + 
   theme(plot.title = element_text(size = 16, hjust = 0.5),
         plot.subtitle = element_text(size = 14, hjust = 0.5),
-        axis.title = element_text(size = 16),
-        axis.text = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.text.y = element_text(size = 16),
         axis.text.x = element_text(size = 16),
         plot.caption = element_text(size = 12),
         legend.text = element_text(size = 12),
@@ -976,8 +999,9 @@ Plot13C <- ggplot(data = Stats_ByFullPlay_2High) +
   theme_bw() + 
   theme(plot.title = element_text(size = 16, hjust = 0.5),
         plot.subtitle = element_text(size = 14, hjust = 0.5),
-        axis.title = element_text(size = 16),
-        axis.text = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.text.y = element_text(size = 16),
         axis.text.x = element_text(size = 16),
         plot.caption = element_text(size = 12),
         legend.text = element_text(size = 12),
