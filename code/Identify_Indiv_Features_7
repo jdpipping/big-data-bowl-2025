@@ -1569,3 +1569,9 @@ PredAndActual_MOFO_Features_2High_FancyTable <- PredAndActual_MOFO_Features_2Hig
   )
 
 gtsave(PredAndActual_MOFO_Features_2High_FancyTable, "PredAndActual_MOFO_Features_2High_FancyTable.png")
+
+# If needed, here's how to export to a CSV
+write.csv(Stats_ByFullPlay_Final, "Stats_ByFullPlay_Final.csv")
+write.csv(Stats_ByFullPlay_All9Weeks, "Stats_ByFullPlay_All9Weeks.csv")
+write.csv(Stats_ByFullPlay_2High, "Stats_ByFullPlay_2High.csv")
+write.csv(Stats_ByFullPlay_1High, "Stats_ByFullPlay_1High.csv")
