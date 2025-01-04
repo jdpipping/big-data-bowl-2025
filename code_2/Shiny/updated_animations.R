@@ -283,6 +283,7 @@ anim <- ggplot() +
 
 gif_animation_3_pauses <- animate(play_animation_3_pauses, 
                                   duration = 0.1 * nFrames,
+                                  fps = 10,
                                   width = 800,            # Width of the output GIF
                                   height = 600,           # Height of the output GIF
                                   renderer = gifski_renderer())
@@ -367,6 +368,7 @@ play_animation_4_pauses <- anim +
 
 gif_animation_4_pauses <- animate(play_animation_4_pauses, 
                                   duration = 0.1 * nFrames,
+                                  fps = 10,
                                   width = 800,            # Width of the output GIF
                                   height = 600,           # Height of the output GIF
                                   renderer = gifski_renderer())
