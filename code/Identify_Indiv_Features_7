@@ -1085,7 +1085,7 @@ MOFO_Features_AllPlays_FancyTable <- MOFO_Features_AllPlays_FancyTable |>
     align = "center",
     columns = Feature:Explanation
   ) |> 
-  tab_header(md("**Top Safety Features that Correlate with MOFO Coverage Rate**"),
+  tab_header(md("**Top Safety Features that Correlate with Actual MOFO Coverage Rate**"),
              md("(Early Down Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022)")) |> # don't forget to adjust your minimum
   tab_style(style = cell_borders(sides = "top"),
             locations = cells_title("title")) |> 
@@ -1187,7 +1187,7 @@ MOFO_Features_2High_FancyTable <- MOFO_Features_2High_FancyTable |>
     align = "center",
     columns = Feature:PostSnap_MOF_Num
   ) |> 
-  tab_header(md("**Top Safety Features that Correlate with MOFO Coverage Rate**"),
+  tab_header(md("**Top Safety Features that Correlate with Actual MOFO Coverage Rate**"),
              md("(Early Down 2-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022)")) |> # don't forget to adjust your minimum
   tab_style(style = cell_borders(sides = "top"),
             locations = cells_title("title")) |> 
@@ -1225,9 +1225,9 @@ top_variables_MOFO_1High <- top_variables_MOFO_1High %>%
 top_variables_MOFO_1High <- top_variables_MOFO_1High %>% 
   mutate(Feature = ifelse(Feature %in% "Max_Y_SpeedTowardMOF_AtSnap_AnySafety", "Safety's Horizontal Speed Toward MOF at the Snap", Feature))
 top_variables_MOFO_1High <- top_variables_MOFO_1High %>% 
-  mutate(Feature = ifelse(Feature %in% "Max_Y_AbsSpeed_AtSnap_AnySafety", "Safety's Absolute Horizontal Speed at the Snap", Feature))
-top_variables_MOFO_1High <- top_variables_MOFO_1High %>% 
   mutate(Feature = ifelse(Feature %in% "Max_Y_AccTowardMOF_AtSnap_AnySafety", "Safety's Horizontal Acc Toward MOF at the Snap", Feature))
+top_variables_MOFO_1High <- top_variables_MOFO_1High %>% 
+  mutate(Feature = ifelse(Feature %in% "Max_Y_AbsSpeed_AtSnap_AnySafety", "Safety's Absolute Horizontal Speed at the Snap", Feature))
 top_variables_MOFO_1High <- top_variables_MOFO_1High %>% 
   mutate(Feature = ifelse(Feature %in% "Max_Y_AbsAcc_AtSnap_AnySafety", "Safety's Absolute Horizontal Acceleration at the Snap", Feature))
 top_variables_MOFO_1High <- top_variables_MOFO_1High %>% 
@@ -1239,8 +1239,8 @@ top_variables_MOFO_1High <- top_variables_MOFO_1High %>% select(2, 1)
 # Perhaps add an extra "explanation" column??
 top_variables_MOFO_1High <- top_variables_MOFO_1High %>% 
   mutate(Explanation = c("Safety Being Far from MOF at the Snap --> MOFO more likely", "Safety Being Near MOF Before the Snap --> MOFC more likely",
-                         "Safety Moving Toward Middle of Field --> MOFC more likely", "Safety Moving Fast Horizontally --> MOFO more likely",
-                         "Safety Accelerating Horizontally Toward MOF --> MOFC more likely", "Safety Accelerating at the Snap --> MOFO more likely",
+                         "Safety Moving Toward Middle of Field --> MOFC more likely", "Safety Accelerating Horizontally Toward MOF --> MOFC more likely", 
+                         "Safety Moving Fast Horizontally --> MOFO more likely", "Safety Accelerating at the Snap --> MOFO more likely",
                          "Safety Creeping Forward Before Snap --> MOFO more likely"))
 
 class(top_variables_MOFO_1High) <- "data.frame"
@@ -1287,7 +1287,7 @@ MOFO_Features_1High_FancyTable <- MOFO_Features_1High_FancyTable |>
     align = "center",
     columns = Feature:Explanation
   ) |> 
-  tab_header(md("**Top Safety Features that Correlate with MOFO Coverage Rate**"),
+  tab_header(md("**Top Safety Features that Correlate with Actual MOFO Coverage Rate**"),
              md("(Early Down 1-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022)")) |> # don't forget to adjust your minimum
   tab_style(style = cell_borders(sides = "top"),
             locations = cells_title("title")) |> 
@@ -1303,3 +1303,245 @@ MOFO_Features_1High_FancyTable <- MOFO_Features_1High_FancyTable |>
 
 gtsave(MOFO_Features_1High_FancyTable, "MOFO_Features_1High_FancyTable.png")
 
+# Now make a version of the 2-high table that includes correlation with predicted MOFO rates
+top_variables_PredictedMOFO_2High <- top_variables_PredictedMOFO_2High %>% arrange(desc(abs(MOFO_probability_FDA)))
+
+# Select only the column with the correlations we care about
+top_variables_PredictedMOFO_2High <- top_variables_PredictedMOFO_2High %>% select(MOFO_probability_FDA)
+
+# Now get rid of the MOFO_probability_FDA row
+top_variables_PredictedMOFO_2High <- top_variables_PredictedMOFO_2High[-1, , drop = FALSE] # the drop argument ensure that it remains a data frame
+
+# And now create a new column called "Feature" that corresponds with the current row names (i.e., the features)
+Rows_top_variables_PredictedMOFO_2High <- rownames(top_variables_PredictedMOFO_2High)
+top_variables_PredictedMOFO_2High <- top_variables_PredictedMOFO_2High %>% mutate(Feature = Rows_top_variables_PredictedMOFO_2High)
+
+# Now manually rename the cells to make them make more sense
+top_variables_PredictedMOFO_2High$Feature
+top_variables_PredictedMOFO_2High <- top_variables_PredictedMOFO_2High %>% 
+  mutate(Feature = ifelse(Feature %in% "X_Diff_BetweenSafeties_AtSnap", "Vertical Stagger Between Safeties at the Snap", Feature))
+top_variables_PredictedMOFO_2High <- top_variables_PredictedMOFO_2High %>% 
+  mutate(Feature = ifelse(Feature %in% "Max_VertCreptDistance_AnySafety", "Max Vertical Creep Distance Foward By a Safety", Feature))
+top_variables_PredictedMOFO_2High <- top_variables_PredictedMOFO_2High %>% 
+  mutate(Feature = ifelse(Feature %in% "Max_PreSnap_X_vel_TowardBall_AnySafety", "Max Pre-Snap Vertical Velocity Toward LOS By a Safety", Feature))
+top_variables_PredictedMOFO_2High <- top_variables_PredictedMOFO_2High %>% 
+  mutate(Feature = ifelse(Feature %in% "Max_TotalCreptDistance_ToBall_AnySafety", "Max Total Creep Distance Toward Ball By a Safety", Feature))
+top_variables_PredictedMOFO_2High <- top_variables_PredictedMOFO_2High %>% 
+  mutate(Feature = ifelse(Feature %in% "X_Vel_Diff_BetweenSafeties_AtSnap", "Difference in Vertical Velocities Between Safeties at the Snap", Feature))
+top_variables_PredictedMOFO_2High <- top_variables_PredictedMOFO_2High %>% 
+  mutate(Feature = ifelse(Feature %in% "Max_PreSnap_X_acc_TowardBall_AnySafety", "Max Pre-Snap Vertical Acceleration Toward LOS By a Safety", Feature))
+top_variables_PredictedMOFO_2High <- top_variables_PredictedMOFO_2High %>% 
+  mutate(Feature = ifelse(Feature %in% "min_SafetyAbsHorizDistToMOF_PreSnap", "Minimum Pre-Snap Horiz Distance to MOF by a Safety", Feature))
+top_variables_PredictedMOFO_2High <- top_variables_PredictedMOFO_2High %>% 
+  mutate(Feature = ifelse(Feature %in% "Max_Y_SpeedTowardMOF_AtSnap_AnySafety", "Max Horizontal Speed Toward MOF By a Safety at the Snap", Feature))
+
+# Re-arrange column order so the actual correlation is on the far-right
+top_variables_PredictedMOFO_2High <- top_variables_PredictedMOFO_2High %>% select(2, 1)
+
+# Perhaps add an extra "explanation" column??
+# top_variables_PredictedMOFO_2High <- top_variables_PredictedMOFO_2High %>% 
+#   mutate(Explanation = c("Larger Vertical Stagger --> MOFC more likely", "Safety Crept Far Forward Vertically --> MOFC more likely", 
+#                          "Safety Moving Fast Toward LOS --> MOFC more likely", "Safety Crept Far Toward Ball --> MOFC more likely",
+#                           "Safeties Moving in Different Directions --> MOFC more likely",  "Safety Accelerating Toward LOS --> MOFC more likely",
+#                          "Safety Close to MOF Before Snap --> MOFC more likely", "Safety Moving Toward MOF --> MOFC more likely"))
+
+class(top_variables_PredictedMOFO_2High) <- "data.frame"
+PredictedMOFO_Features_2High_FancyTable <- top_variables_PredictedMOFO_2High %>%
+  select(c("Feature", "MOFO_probability_FDA")) %>%
+  head(6) %>% # this is how we limit to the top 6
+  mutate(Rank = row_number(desc(abs(MOFO_probability_FDA)))) %>%
+  relocate("Rank")
+
+PredictedMOFO_Features_2High_FancyTable <- PredictedMOFO_Features_2High_FancyTable |>
+  # filter(officialPosition %in% c("OLB", "DE")) |> 
+  # mutate(rank = row_number()) |> 
+  # select(1:2, "Feature", "MOFO_probability_FDA", "Explanation") |> 
+  head(6) |> 
+  gt() |>
+  tab_options(
+    table.border.top.color = "white",
+    row.striping.include_table_body = FALSE
+  ) |>
+  opt_table_font(
+    font = list(
+      google_font("Chivo"),
+      default_fonts()
+    )
+  ) |>
+  fmt_number(
+    columns = c(MOFO_probability_FDA),
+    decimals = 2,
+  ) |>
+  data_color(
+    columns = c(MOFO_probability_FDA),
+    colors = scales::col_numeric(
+      palette = c("darkgreen", "green"),
+      domain = NULL
+    )
+  ) |> 
+  cols_label(
+    Rank = md("**Rank**"), # the md is what makes the headers show up as bold
+    Feature = md("**Feature**"),
+    MOFO_probability_FDA = html('<span style="text-decoration:overline; font-weight:bold">Correlation with Pred MOFO Rate</span>'),
+    # Explanation = md("**Explanation**")
+  ) |> 
+  cols_align(
+    align = "center",
+    columns = Feature:MOFO_probability_FDA
+  ) |> 
+  tab_header(md("**Top Safety Features that Correlate with Model's Predicted MOFO Rate**"),
+             md("(Early Down 2-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022)")) |> # don't forget to adjust your minimum
+  tab_style(style = cell_borders(sides = "top"),
+            locations = cells_title("title")) |> 
+  tab_options(
+    table.border.top.style = "a"
+  ) |> 
+  tab_footnote(
+    footnote = "Negative correlation means a higher value in that feature results in LOWER likelihood of MOFO",
+    locations = cells_column_labels(
+      columns = MOFO_probability_FDA
+    )
+  )
+
+gtsave(PredictedMOFO_Features_2High_FancyTable, "PredictedMOFO_Features_2High_FancyTable.png")
+
+# Now make a version of the 2-high table that includes correlations with predicted AND actual MOFO rates
+PredAndActual_MOFO_Features_2High <- Stats_ByFullPlay_2High %>%
+  select(c("MOFO_probability_FDA", "PostSnap_MOF_Num", "X_Diff_BetweenSafeties_AtSnap", "TotDist_BetweenSafeties_AtSnap",
+           "min_SafetyAbsHorizDistToMOF_PreSnap", "X_Vel_Diff_BetweenSafeties_AtSnap",
+           "Y_Vel_Diff_BetweenSafeties_AtSnap", "TotSpeed_Diff_BetweenSafeties_AtSnap",
+           "X_Acc_Diff_BetweenSafeties_AtSnap", "Y_Acc_Diff_BetweenSafeties_AtSnap",           
+           "TotAcc_Diff_BetweenSafeties_AtSnap", "Max_VertCreptDistance_AnySafety",
+           "Max_TotalCreptDistance_ToBall_AnySafety", "Max_PreSnap_X_vel_TowardBall_AnySafety",
+           "Max_PreSnap_X_acc_TowardBall_AnySafety", "Y_AbsDistFromMOF_Diff_BetweenSafeties_AtSnap", 
+           "Max_Y_AbsSpeed_AtSnap_AnySafety", "Max_Y_AbsAcc_AtSnap_AnySafety", "Max_Y_AbsDistFromMOF_AtSnap_AnySafety",
+           "Max_Y_SpeedTowardMOF_AtSnap_AnySafety", "Min_Y_SpeedTowardMOF_AtSnap_AnySafety", "Max_Y_AccTowardMOF_AtSnap_AnySafety",
+           "Min_Y_AccTowardMOF_AtSnap_AnySafety", "Y_SpeedTowardMOF_Diff_BetweenSafeties_AtSnap", "Y_AccTowardMOF_Diff_BetweenSafeties_AtSnap"))
+
+corr_matrix_PredAndActual_MOFO_2High <- PredAndActual_MOFO_Features_2High %>%
+  select(where(is.numeric)) %>%  
+  cor(use = "pairwise.complete.obs") %>%  
+  round(2)  
+# Now see which variables had strongest positive or negative correlation with MOFO_probability_FDA
+corr_df_PredAndActual_MOFO_2High <- as.data.frame(corr_matrix_PredAndActual_MOFO_2High)
+# View(corr_df_PredAndActual_MOFO_2High %>% arrange(desc(MOFO_probability_FDA)))
+rm(corr_matrix_PredAndActual_MOFO_2High)
+
+# Now take all variables with at least a correlation of 0.35 in either direction
+top_variables_PredAndActual_MOFO_2High <- corr_df_PredAndActual_MOFO_2High %>% filter(abs(MOFO_probability_FDA) >= 0.35)
+rownames(top_variables_PredAndActual_MOFO_2High) # keep in mind MOFO_probability_FDA obviously isn't a predictor variable
+# And make it so the only columns in this new DF align with the rows in that DF
+top_variables_PredAndActual_MOFO_2High <- top_variables_PredAndActual_MOFO_2High[, colnames(top_variables_PredAndActual_MOFO_2High) %in% rownames(top_variables_PredAndActual_MOFO_2High)]
+
+# Arrange in descending order of MOFO_probability_FDA, but stil using absolute value
+top_variables_PredAndActual_MOFO_2High <- top_variables_PredAndActual_MOFO_2High %>% arrange(desc(abs(MOFO_probability_FDA)))
+
+# Select only the columns with the correlations we care about (NOW that means two columns)
+top_variables_PredAndActual_MOFO_2High <- top_variables_PredAndActual_MOFO_2High %>% select(MOFO_probability_FDA, PostSnap_MOF_Num)
+
+# Now get rid of the MOFO_probability_FDA and PostSnap_MOF_Num rows
+top_variables_PredAndActual_MOFO_2High <- top_variables_PredAndActual_MOFO_2High[-(1:2), , drop = FALSE] # the drop argument ensure that it remains a data frame
+
+# And now create a new column called "Feature" that corresponds with the current row names (i.e., the features)
+Rows_top_variables_PredAndActual_MOFO_2High <- rownames(top_variables_PredAndActual_MOFO_2High)
+top_variables_PredAndActual_MOFO_2High <- top_variables_PredAndActual_MOFO_2High %>% mutate(Feature = Rows_top_variables_PredAndActual_MOFO_2High)
+
+# Now manually rename the cells to make them make more sense
+top_variables_PredAndActual_MOFO_2High$Feature
+top_variables_PredAndActual_MOFO_2High <- top_variables_PredAndActual_MOFO_2High %>% 
+  mutate(Feature = ifelse(Feature %in% "X_Diff_BetweenSafeties_AtSnap", "Vertical Stagger Between Safeties at the Snap", Feature))
+top_variables_PredAndActual_MOFO_2High <- top_variables_PredAndActual_MOFO_2High %>% 
+  mutate(Feature = ifelse(Feature %in% "Max_VertCreptDistance_AnySafety", "Max Vertical Creep Distance Foward By a Safety", Feature))
+top_variables_PredAndActual_MOFO_2High <- top_variables_PredAndActual_MOFO_2High %>% 
+  mutate(Feature = ifelse(Feature %in% "Max_PreSnap_X_vel_TowardBall_AnySafety", "Max Pre-Snap Vertical Velocity Toward LOS By a Safety", Feature))
+top_variables_PredAndActual_MOFO_2High <- top_variables_PredAndActual_MOFO_2High %>% 
+  mutate(Feature = ifelse(Feature %in% "Max_TotalCreptDistance_ToBall_AnySafety", "Max Total Creep Distance Toward Ball By a Safety", Feature))
+top_variables_PredAndActual_MOFO_2High <- top_variables_PredAndActual_MOFO_2High %>% 
+  mutate(Feature = ifelse(Feature %in% "X_Vel_Diff_BetweenSafeties_AtSnap", "Difference in Vertical Velocities Between Safeties at the Snap", Feature))
+top_variables_PredAndActual_MOFO_2High <- top_variables_PredAndActual_MOFO_2High %>% 
+  mutate(Feature = ifelse(Feature %in% "Max_PreSnap_X_acc_TowardBall_AnySafety", "Max Pre-Snap Vertical Acceleration Toward LOS By a Safety", Feature))
+top_variables_PredAndActual_MOFO_2High <- top_variables_PredAndActual_MOFO_2High %>% 
+  mutate(Feature = ifelse(Feature %in% "min_SafetyAbsHorizDistToMOF_PreSnap", "Minimum Pre-Snap Horiz Distance to MOF by a Safety", Feature))
+top_variables_PredAndActual_MOFO_2High <- top_variables_PredAndActual_MOFO_2High %>% 
+  mutate(Feature = ifelse(Feature %in% "Max_Y_SpeedTowardMOF_AtSnap_AnySafety", "Max Horizontal Speed Toward MOF By a Safety at the Snap", Feature))
+
+# Re-arrange column order so the "Feature" goes on far left, and correlation with MOFO_probability_FDA is on far right
+top_variables_PredAndActual_MOFO_2High <- top_variables_PredAndActual_MOFO_2High %>% select(3, 2, 1)
+
+# Perhaps add an extra "explanation" column??
+# top_variables_PredAndActual_MOFO_2High <- top_variables_PredAndActual_MOFO_2High %>% 
+#   mutate(Explanation = c("Larger Vertical Stagger --> MOFC more likely", "Safety Crept Far Forward Vertically --> MOFC more likely", 
+#                          "Safety Moving Fast Toward LOS --> MOFC more likely", "Safety Crept Far Toward Ball --> MOFC more likely",
+#                           "Safeties Moving in Different Directions --> MOFC more likely",  "Safety Accelerating Toward LOS --> MOFC more likely",
+#                          "Safety Close to MOF Before Snap --> MOFC more likely", "Safety Moving Toward MOF --> MOFC more likely"))
+
+class(top_variables_PredAndActual_MOFO_2High) <- "data.frame"
+PredAndActual_MOFO_Features_2High_FancyTable <- top_variables_PredAndActual_MOFO_2High %>%
+  select(c("Feature", "PostSnap_MOF_Num", "MOFO_probability_FDA")) %>%
+  head(6) %>% # this is how we limit to the top 6
+  mutate(Rank = row_number(desc(abs(MOFO_probability_FDA)))) %>%
+  relocate("Rank")
+
+PredAndActual_MOFO_Features_2High_FancyTable <- PredAndActual_MOFO_Features_2High_FancyTable |>
+  # filter(officialPosition %in% c("OLB", "DE")) |> 
+  # mutate(rank = row_number()) |> 
+  # select(1:2, "Feature", "PostSnap_MOF_Num", "MOFO_probability_FDA") |> 
+  head(6) |> 
+  gt() |>
+  tab_options(
+    table.border.top.color = "white",
+    row.striping.include_table_body = FALSE
+  ) |>
+  opt_table_font(
+    font = list(
+      google_font("Chivo"),
+      default_fonts()
+    )
+  ) |>
+  fmt_number(
+    columns = c(PostSnap_MOF_Num),
+    decimals = 2,
+  ) |>
+  fmt_number(
+    columns = c(MOFO_probability_FDA),
+    decimals = 2,
+  ) |>
+  data_color(
+    columns = c(PostSnap_MOF_Num),
+    colors = scales::col_numeric(
+      palette = c("darkgreen", "green"),
+      domain = NULL
+    )
+  ) |> data_color(
+    columns = c(MOFO_probability_FDA),
+    colors = scales::col_numeric(
+      palette = c("darkgreen", "green"),
+      domain = NULL
+    )
+  ) |> 
+  cols_label(
+    Rank = md("**Rank**"), # the md is what makes the headers show up as bold
+    Feature = md("**Feature**"),
+    PostSnap_MOF_Num = md("**Correlation w/ Actual MOFO Rate**"),
+    MOFO_probability_FDA = html('<span style="text-decoration:overline; font-weight:bold">Correlation w/ Pred MOFO Rate</span>'),
+    # Explanation = md("**Explanation**")
+  ) |> 
+  cols_align(
+    align = "center",
+    columns = Feature:MOFO_probability_FDA
+  ) |> 
+  tab_header(md("**Safety Features that Correlate with Predicted and Actual MOFO Rate**"),
+             md("(Early Down 2-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022)")) |> # don't forget to adjust your minimum
+  tab_style(style = cell_borders(sides = "top"),
+            locations = cells_title("title")) |> 
+  tab_options(
+    table.border.top.style = "a"
+  ) |> 
+  tab_footnote(
+    footnote = "Negative correlation means a higher value in that feature results in LOWER likelihood of MOFO",
+    locations = cells_column_labels(
+      columns = MOFO_probability_FDA
+    )
+  )
+
+gtsave(PredAndActual_MOFO_Features_2High_FancyTable, "PredAndActual_MOFO_Features_2High_FancyTable.png")
