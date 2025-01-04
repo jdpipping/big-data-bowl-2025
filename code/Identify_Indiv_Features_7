@@ -886,7 +886,7 @@ mean((Stats_ByFullPlay_2High %>% filter(Max_PreSnap_X_vel_TowardBall_AnySafety <
 # 1-high plays with very low absolute horiz distance from MOF by safety at snap (Plot14B)
 mean((Stats_ByFullPlay_1High %>% filter(Max_Y_AbsDistFromMOF_AtSnap_AnySafety < 3))$MOFO_probability_FDA)
 # It's 0.1158 for < 2 yards, 0.121 for < 3 yards # Use this
-# Also flip Plot 46B for very high absolute horiz distance, if sample is good (like at least 8 yards)
+# Also flip Plot 14B for very high absolute horiz distance, if sample is good (like at least 8 yards)
 mean((Stats_ByFullPlay_1High %>% filter(Max_Y_AbsDistFromMOF_AtSnap_AnySafety > 8))$MOFO_probability_FDA)
 # View(Stats_ByFullPlay_1High %>% filter(Max_Y_AbsDistFromMOF_AtSnap_AnySafety > 8))
 # It's 0.5625, but sample is only 31 plays ... scrap it
