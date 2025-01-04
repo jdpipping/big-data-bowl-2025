@@ -1382,7 +1382,7 @@ PredictedMOFO_Features_2High_FancyTable <- PredictedMOFO_Features_2High_FancyTab
   cols_label(
     Rank = md("**Rank**"), # the md is what makes the headers show up as bold
     Feature = md("**Feature**"),
-    MOFO_probability_FDA = html('<span style="text-decoration:overline; font-weight:bold">Correlation with Pred MOFO Rate</span>'),
+    MOFO_probability_FDA = html('<span style="text-decoration:overline; font-weight:bold">Correlation w/ Estimated MOFO Probability</span>'),
     # Explanation = md("**Explanation**")
   ) |> 
   cols_align(
@@ -1523,7 +1523,7 @@ PredAndActual_MOFO_Features_2High_FancyTable <- PredAndActual_MOFO_Features_2Hig
     Rank = md("**Rank**"), # the md is what makes the headers show up as bold
     Feature = md("**Feature**"),
     PostSnap_MOF_Num = md("**Correlation w/ Actual MOFO Rate**"),
-    MOFO_probability_FDA = html('<span style="text-decoration:overline; font-weight:bold">Correlation w/ Predicted MOFO Rate</span>'),
+    MOFO_probability_FDA = html('<span style="text-decoration:overline; font-weight:bold">Correlation w/ Estimated MOFO Probability</span>'),
     # Explanation = md("**Explanation**")
   ) |> 
   cols_align(
