@@ -15,6 +15,7 @@ library(tidyselect)
 library(naniar)
 library(tidyr)
 # library(plyr) ... only use if needed, can get in the way of dplyr
+library(statsr)
 library(nnet)
 library(mlogit)
 library(reactable)
