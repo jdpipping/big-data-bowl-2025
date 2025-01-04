@@ -1554,7 +1554,7 @@ PredAndActual_MOFO_Features_2High_FancyTable <- PredAndActual_MOFO_Features_2Hig
     align = "center",
     columns = Feature:MOFO_probability_FDA
   ) |> 
-  tab_header(md("**Safety Features that Correlate with Actual and Predicted MOFO Rate**"),
+  tab_header(md("**Safety Features that Correlate with Observed and Estimated MOFO Rate**"),
              md("Early Down 2-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022")) |> # don't forget to adjust your minimum
   tab_style(style = cell_borders(sides = "top"),
             locations = cells_title("title")) |> 
