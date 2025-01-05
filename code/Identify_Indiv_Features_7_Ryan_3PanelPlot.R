@@ -20,6 +20,7 @@ Stats_ByFullPlay_2High <- Stats_ByFullPlay_All9Weeks %>% filter(num_safeties_pre
 Stats_ByFullPlay_1High <- Stats_ByFullPlay_All9Weeks %>% filter(num_safeties_pre_snap == 1)
 
 ###
+#FIXME MANUALLY ADD THE 3 SEPARATE X AXES...
 # facet_x1 = "Vertical Stagger \nb/w Safeties at Snap (Yards)"
 # facet_x2 = "Difference in Vert Velocities \nb/w Safeties at Snap (Yds/Sec)"
 # facet_x3 = "Highest Vertical 'Creep' Distance \nby Safety (Yards)"
