@@ -20,9 +20,12 @@ Stats_ByFullPlay_2High <- Stats_ByFullPlay_All9Weeks %>% filter(num_safeties_pre
 Stats_ByFullPlay_1High <- Stats_ByFullPlay_All9Weeks %>% filter(num_safeties_pre_snap == 1)
 
 ###
-facet_x1 = "Vertical Stagger \nb/w Safeties at Snap (Yards)"
-facet_x2 = "Difference in Vert Velocities \nb/w Safeties at Snap (Yds/Sec)"
-facet_x3 = "Highest Vertical 'Creep' Distance \nby Safety (Yards)"
+# facet_x1 = "Vertical Stagger \nb/w Safeties at Snap (Yards)"
+# facet_x2 = "Difference in Vert Velocities \nb/w Safeties at Snap (Yds/Sec)"
+# facet_x3 = "Highest Vertical 'Creep' Distance \nby Safety (Yards)"
+facet_x1 = "Vertical Stagger \nb/w Safeties at Snap"
+facet_x2 = "Difference in Vert Velocities \nb/w Safeties at Snap"
+facet_x3 = "Highest Vertical 'Creep' Distance \nby Safety"
 caption_text = paste0(
   # str_remove_all(facet_x1,"\n"), ": ", " XX,\n",
   # str_remove_all(facet_x2,"\n"), ": ", " XX,\n",
@@ -77,7 +80,8 @@ final_plot_A =
   scale_color_manual(values = c("firebrick2", "dodgerblue2")) +
   theme_bw() + 
   labs(
-   x = "Feature",
+    x = "",
+    # x = "Feature",
    y = "MOFO Probability",
    title = "How Estimated & Observed MOFO Rate Depend on Key Features",
    caption = caption_text,
