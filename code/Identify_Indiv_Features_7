@@ -17,12 +17,6 @@ Stats_ByFullPlay_9Weeks <- Stats_ByFullPlay_9Weeks %>%
 Stats_ByFullPlay_9Weeks <- Stats_ByFullPlay_9Weeks %>% 
   mutate(Max_PreSnap_X_acc_TowardBall_AnySafety = -1 * Min_PreSnap_X_acc_component_AnySafety)
 Stats_ByFullPlay_9Weeks <- Stats_ByFullPlay_9Weeks %>% select(-c("Min_PreSnap_X_vel_component_AnySafety", "Min_PreSnap_X_acc_component_AnySafety"))
-# We can also directly mutate variables for the max/min X (i.e. vertical) velocity by a safety at the snap
-# Use the same pmax() format seen earlier in the project
-Stats_ByFullPlay_All9Weeks <- Stats_ByFullPlay_All9Weeks %>% 
-  mutate(Max_X_vel_TowardBall_AnySafety_AtSnap = pmax(Safety1_x_vel_component_AtSnap, Safety2_x_vel_component_AtSnap, na.rm = TRUE))
-Stats_ByFullPlay_All9Weeks <- Stats_ByFullPlay_All9Weeks %>% 
-  mutate(Min_X_vel_TowardBall_AnySafety_AtSnap = pmin(Safety1_x_vel_component_AtSnap, Safety2_x_vel_component_AtSnap, na.rm = TRUE))
 
 Stats_ByFullPlay_2High <- Stats_ByFullPlay_All9Weeks %>% filter(num_safeties_pre_snap == 2)
 Stats_ByFullPlay_1High <- Stats_ByFullPlay_All9Weeks %>% filter(num_safeties_pre_snap == 1)
