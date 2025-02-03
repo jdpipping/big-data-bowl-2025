@@ -596,6 +596,10 @@ grid.arrange(Plot14, Plot15, Plot16, Plot17, nrow = 2, ncol = 2)
 # Now look into the concept of "strong telegraphs" for actual MOFO rate
 # I.e., is there any feature where "when this feature happens, it's MOFO 85+ percent of the time?"
 # NOTE: 1 yard/second is approximately 2.05 MPH (so 2 yards/second is a fast walk)
+# View(top_variables_MOFO_AllPlays)
+# View(top_variables_MOFO_2High)
+# View(top_variables_MOFO_1High)
+
 # Ideas: very low "max horiz distance from MOF by safety at the snap" (see Plot8)
 mean((Stats_ByFullPlay_All9Weeks %>% filter(Max_Y_AbsDistFromMOF_AtSnap_AnySafety < 3))$PostSnap_MOF_Num)
 # It's 0.1282 ... but probably better to look into a stat like that for 2-high or 1-high plays
@@ -868,6 +872,10 @@ grid.arrange(Plot14B, Plot15B, Plot16B, Plot17B, nrow = 2, ncol = 2)
 # Now look into the concept of "strong telegraphs" for predicted MOFO rate
 # I.e., is there any feature where "when this feature happens, model predicts MOFO 85+ percent of the time?"
 # NOTE: 1 yard/second is approximately 2.05 MPH (so 2 yards/second is a fast walk)
+# View(top_variables_PredictedMOFO_AllPlays)
+# View(top_variables_PredictedMOFO_2High)
+# View(top_variables_PredictedMOFO_1High)
+
 # Ideas: 2-high plays with very high or low vertical stagger (Plot10B)
 mean((Stats_ByFullPlay_2High %>% filter(X_Diff_BetweenSafeties_AtSnap < 1))$MOFO_probability_FDA)
 # It's 0.7475 at < 1 yard, 0.7281 at < 2 yards (use vert creep instead of this)
