@@ -6,7 +6,7 @@ library(tidyverse)
 # Read in data if necessary: 
 # Stats_ByFullPlay_Final <- fread("Stats_ByFullPlay_Final.csv")
 Stats_ByFullPlay_All9Weeks <- fread("Stats_ByFullPlay_All9Weeks.csv")
-# mean(Stats_ByFullPlay_All9Weeks$PostSnap_MOF_Num) ... NOTE that across all plays, MOFO rate is 39.6%
+# mean(Stats_ByFullPlay_All9Weeks$PostSnap_MOF_Num) ... NOTE that across all of our project's plays, MOFO rate is 39.6%
 
 colnames(Stats_ByFullPlay_9Weeks) # recall that Snap_Entropy is the continuous play-level one (HighEntropy is binary)
 
