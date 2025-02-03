@@ -17,9 +17,15 @@ Stats_ByFullPlay_9Weeks <- Stats_ByFullPlay_9Weeks %>%
 Stats_ByFullPlay_9Weeks <- Stats_ByFullPlay_9Weeks %>% 
   mutate(Max_PreSnap_X_acc_TowardBall_AnySafety = -1 * Min_PreSnap_X_acc_component_AnySafety)
 Stats_ByFullPlay_9Weeks <- Stats_ByFullPlay_9Weeks %>% select(-c("Min_PreSnap_X_vel_component_AnySafety", "Min_PreSnap_X_acc_component_AnySafety"))
+# We can also directly mutate variables for the max/min X (i.e. vertical) velocity by a safety at the snap
+# Use the same pmax() format seen earlier in the project
+Stats_ByFullPlay_All9Weeks <- Stats_ByFullPlay_All9Weeks %>% 
+  mutate(Max_X_vel_TowardBall_AnySafety_AtSnap = pmax(Safety1_x_vel_component_AtSnap, Safety2_x_vel_component_AtSnap, na.rm = TRUE))
+Stats_ByFullPlay_All9Weeks <- Stats_ByFullPlay_All9Weeks %>% 
+  mutate(Min_X_vel_TowardBall_AnySafety_AtSnap = pmin(Safety1_x_vel_component_AtSnap, Safety2_x_vel_component_AtSnap, na.rm = TRUE))
 
-Stats_ByFullPlay_2High <- Stats_ByFullPlay_9Weeks %>% filter(num_safeties_pre_snap == 2)
-Stats_ByFullPlay_1High <- Stats_ByFullPlay_9Weeks %>% filter(num_safeties_pre_snap == 1)
+Stats_ByFullPlay_2High <- Stats_ByFullPlay_All9Weeks %>% filter(num_safeties_pre_snap == 2)
+Stats_ByFullPlay_1High <- Stats_ByFullPlay_All9Weeks %>% filter(num_safeties_pre_snap == 1)
 
 MOFO_Features_AllPlays <- Stats_ByFullPlay_All9Weeks %>%
   select(c("PostSnap_MOF_Num", "X_Diff_BetweenSafeties_AtSnap", "TotDist_BetweenSafeties_AtSnap",
@@ -28,6 +34,7 @@ MOFO_Features_AllPlays <- Stats_ByFullPlay_All9Weeks %>%
            "X_Acc_Diff_BetweenSafeties_AtSnap", "Y_Acc_Diff_BetweenSafeties_AtSnap",           
            "TotAcc_Diff_BetweenSafeties_AtSnap", "Max_VertCreptDistance_AnySafety",
            "Max_TotalCreptDistance_ToBall_AnySafety", "Max_PreSnap_X_vel_TowardBall_AnySafety",
+           "Max_X_vel_TowardBall_AnySafety_AtSnap", "Min_X_vel_TowardBall_AnySafety_AtSnap",
            "Max_PreSnap_X_acc_TowardBall_AnySafety", "Y_AbsDistFromMOF_Diff_BetweenSafeties_AtSnap", 
            "Max_Y_AbsSpeed_AtSnap_AnySafety", "Max_Y_AbsAcc_AtSnap_AnySafety", "Max_Y_AbsDistFromMOF_AtSnap_AnySafety",
            "Max_Y_SpeedTowardMOF_AtSnap_AnySafety", "Min_Y_SpeedTowardMOF_AtSnap_AnySafety", "Max_Y_AccTowardMOF_AtSnap_AnySafety",
@@ -55,6 +62,7 @@ MOFO_Features_2High <- Stats_ByFullPlay_2High %>%
            "X_Acc_Diff_BetweenSafeties_AtSnap", "Y_Acc_Diff_BetweenSafeties_AtSnap",           
            "TotAcc_Diff_BetweenSafeties_AtSnap", "Max_VertCreptDistance_AnySafety",
            "Max_TotalCreptDistance_ToBall_AnySafety", "Max_PreSnap_X_vel_TowardBall_AnySafety",
+           "Max_X_vel_TowardBall_AnySafety_AtSnap", "Min_X_vel_TowardBall_AnySafety_AtSnap",
            "Max_PreSnap_X_acc_TowardBall_AnySafety", "Y_AbsDistFromMOF_Diff_BetweenSafeties_AtSnap", 
            "Max_Y_AbsSpeed_AtSnap_AnySafety", "Max_Y_AbsAcc_AtSnap_AnySafety", "Max_Y_AbsDistFromMOF_AtSnap_AnySafety",
            "Max_Y_SpeedTowardMOF_AtSnap_AnySafety", "Min_Y_SpeedTowardMOF_AtSnap_AnySafety", "Max_Y_AccTowardMOF_AtSnap_AnySafety",
@@ -78,6 +86,7 @@ top_variables_MOFO_2High <- top_variables_MOFO_2High[, colnames(top_variables_MO
 MOFO_Features_1High <- Stats_ByFullPlay_1High %>%
   select(c("PostSnap_MOF_Num", "min_SafetyAbsHorizDistToMOF_PreSnap", "Max_VertCreptDistance_AnySafety",
            "Max_TotalCreptDistance_ToBall_AnySafety", "Max_PreSnap_X_vel_TowardBall_AnySafety",
+           "Max_X_vel_TowardBall_AnySafety_AtSnap",
            "Max_PreSnap_X_acc_TowardBall_AnySafety", "Max_Y_AbsSpeed_AtSnap_AnySafety", 
            "Max_Y_AbsAcc_AtSnap_AnySafety", "Max_Y_AbsDistFromMOF_AtSnap_AnySafety",
            "Max_Y_SpeedTowardMOF_AtSnap_AnySafety", "Max_Y_AccTowardMOF_AtSnap_AnySafety"))
@@ -104,6 +113,7 @@ Entropy_Features_AllPlays <- Stats_ByFullPlay_All9Weeks %>%
            "X_Acc_Diff_BetweenSafeties_AtSnap", "Y_Acc_Diff_BetweenSafeties_AtSnap",           
            "TotAcc_Diff_BetweenSafeties_AtSnap", "Max_VertCreptDistance_AnySafety",
            "Max_TotalCreptDistance_ToBall_AnySafety", "Max_PreSnap_X_vel_TowardBall_AnySafety",
+           "Max_X_vel_TowardBall_AnySafety_AtSnap", "Min_X_vel_TowardBall_AnySafety_AtSnap",
            "Max_PreSnap_X_acc_TowardBall_AnySafety", "Y_AbsDistFromMOF_Diff_BetweenSafeties_AtSnap", 
            "Max_Y_AbsSpeed_AtSnap_AnySafety", "Max_Y_AbsAcc_AtSnap_AnySafety", "Max_Y_AbsDistFromMOF_AtSnap_AnySafety",
            "Max_Y_SpeedTowardMOF_AtSnap_AnySafety", "Min_Y_SpeedTowardMOF_AtSnap_AnySafety", "Max_Y_AccTowardMOF_AtSnap_AnySafety",
@@ -131,6 +141,7 @@ Entropy_Features_2High <- Stats_ByFullPlay_2High %>%
            "X_Acc_Diff_BetweenSafeties_AtSnap", "Y_Acc_Diff_BetweenSafeties_AtSnap",           
            "TotAcc_Diff_BetweenSafeties_AtSnap", "Max_VertCreptDistance_AnySafety",
            "Max_TotalCreptDistance_ToBall_AnySafety", "Max_PreSnap_X_vel_TowardBall_AnySafety",
+           "Max_X_vel_TowardBall_AnySafety_AtSnap", "Min_X_vel_TowardBall_AnySafety_AtSnap", 
            "Max_PreSnap_X_acc_TowardBall_AnySafety", "Y_AbsDistFromMOF_Diff_BetweenSafeties_AtSnap", 
            "Max_Y_AbsSpeed_AtSnap_AnySafety", "Max_Y_AbsAcc_AtSnap_AnySafety", "Max_Y_AbsDistFromMOF_AtSnap_AnySafety",
            "Max_Y_SpeedTowardMOF_AtSnap_AnySafety", "Min_Y_SpeedTowardMOF_AtSnap_AnySafety", "Max_Y_AccTowardMOF_AtSnap_AnySafety",
@@ -154,6 +165,7 @@ top_variables_Entropy_2High <- top_variables_Entropy_2High[, colnames(top_variab
 Entropy_Features_1High <- Stats_ByFullPlay_1High %>%
   select(c("Snap_Entropy", "min_SafetyAbsHorizDistToMOF_PreSnap", "Max_VertCreptDistance_AnySafety",
            "Max_TotalCreptDistance_ToBall_AnySafety", "Max_PreSnap_X_vel_TowardBall_AnySafety",
+           "Max_X_vel_TowardBall_AnySafety_AtSnap",
            "Max_PreSnap_X_acc_TowardBall_AnySafety", "Max_Y_AbsSpeed_AtSnap_AnySafety", 
            "Max_Y_AbsAcc_AtSnap_AnySafety", "Max_Y_AbsDistFromMOF_AtSnap_AnySafety",
            "Max_Y_SpeedTowardMOF_AtSnap_AnySafety", "Max_Y_AccTowardMOF_AtSnap_AnySafety"))
@@ -180,6 +192,7 @@ PredictedMOFO_Features_AllPlays <- Stats_ByFullPlay_All9Weeks %>%
            "X_Acc_Diff_BetweenSafeties_AtSnap", "Y_Acc_Diff_BetweenSafeties_AtSnap",           
            "TotAcc_Diff_BetweenSafeties_AtSnap", "Max_VertCreptDistance_AnySafety",
            "Max_TotalCreptDistance_ToBall_AnySafety", "Max_PreSnap_X_vel_TowardBall_AnySafety",
+           "Max_X_vel_TowardBall_AnySafety_AtSnap", "Min_X_vel_TowardBall_AnySafety_AtSnap",
            "Max_PreSnap_X_acc_TowardBall_AnySafety", "Y_AbsDistFromMOF_Diff_BetweenSafeties_AtSnap", 
            "Max_Y_AbsSpeed_AtSnap_AnySafety", "Max_Y_AbsAcc_AtSnap_AnySafety", "Max_Y_AbsDistFromMOF_AtSnap_AnySafety",
            "Max_Y_SpeedTowardMOF_AtSnap_AnySafety", "Min_Y_SpeedTowardMOF_AtSnap_AnySafety", "Max_Y_AccTowardMOF_AtSnap_AnySafety",
@@ -207,6 +220,7 @@ PredictedMOFO_Features_2High <- Stats_ByFullPlay_2High %>%
            "X_Acc_Diff_BetweenSafeties_AtSnap", "Y_Acc_Diff_BetweenSafeties_AtSnap",           
            "TotAcc_Diff_BetweenSafeties_AtSnap", "Max_VertCreptDistance_AnySafety",
            "Max_TotalCreptDistance_ToBall_AnySafety", "Max_PreSnap_X_vel_TowardBall_AnySafety",
+           "Max_X_vel_TowardBall_AnySafety_AtSnap", "Min_X_vel_TowardBall_AnySafety_AtSnap",
            "Max_PreSnap_X_acc_TowardBall_AnySafety", "Y_AbsDistFromMOF_Diff_BetweenSafeties_AtSnap", 
            "Max_Y_AbsSpeed_AtSnap_AnySafety", "Max_Y_AbsAcc_AtSnap_AnySafety", "Max_Y_AbsDistFromMOF_AtSnap_AnySafety",
            "Max_Y_SpeedTowardMOF_AtSnap_AnySafety", "Min_Y_SpeedTowardMOF_AtSnap_AnySafety", "Max_Y_AccTowardMOF_AtSnap_AnySafety",
@@ -230,6 +244,7 @@ top_variables_PredictedMOFO_2High <- top_variables_PredictedMOFO_2High[, colname
 PredictedMOFO_Features_1High <- Stats_ByFullPlay_1High %>%
   select(c("MOFO_probability_FDA", "min_SafetyAbsHorizDistToMOF_PreSnap", "Max_VertCreptDistance_AnySafety",
            "Max_TotalCreptDistance_ToBall_AnySafety", "Max_PreSnap_X_vel_TowardBall_AnySafety",
+           "Max_X_vel_TowardBall_AnySafety_AtSnap", 
            "Max_PreSnap_X_acc_TowardBall_AnySafety", "Max_Y_AbsSpeed_AtSnap_AnySafety", 
            "Max_Y_AbsAcc_AtSnap_AnySafety", "Max_Y_AbsDistFromMOF_AtSnap_AnySafety",
            "Max_Y_SpeedTowardMOF_AtSnap_AnySafety", "Max_Y_AccTowardMOF_AtSnap_AnySafety"))
