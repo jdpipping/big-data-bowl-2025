@@ -275,7 +275,7 @@ Plot6 <- ggplot(data = Stats_ByFullPlay_All9Weeks) +
         legend.text = element_text(size = 12),
         legend.title = element_text(size = 15),
         panel.spacing = unit(2, "lines"),
-        legend.position = "right")
+        legend.position = "none")
 
 Plot7 <- ggplot(data = Stats_ByFullPlay_All9Weeks) +
   # geom_point(aes(x = X_Vel_Diff_BetweenSafeties_AtSnap, y = PostSnap_MOF_Num), alpha = 0.05) +
@@ -301,7 +301,7 @@ Plot7 <- ggplot(data = Stats_ByFullPlay_All9Weeks) +
         legend.text = element_text(size = 12),
         legend.title = element_text(size = 15),
         panel.spacing = unit(2, "lines"),
-        legend.position = "right")
+        legend.position = "none")
 
 Plot8 <- ggplot(data = Stats_ByFullPlay_All9Weeks) +
   # geom_point(aes(x = Max_Y_AbsDistFromMOF_AtSnap_AnySafety, y = PostSnap_MOF_Num), alpha = 0.05) +
@@ -327,7 +327,7 @@ Plot8 <- ggplot(data = Stats_ByFullPlay_All9Weeks) +
         legend.text = element_text(size = 12),
         legend.title = element_text(size = 15),
         panel.spacing = unit(2, "lines"),
-        legend.position = "right")
+        legend.position = "none")
 
 Plot9 <- ggplot(data = Stats_ByFullPlay_All9Weeks) +
   # geom_point(aes(x =  min_SafetyAbsHorizDistToMOF_PreSnap, y = PostSnap_MOF_Num), alpha = 0.05) +
@@ -353,7 +353,7 @@ Plot9 <- ggplot(data = Stats_ByFullPlay_All9Weeks) +
         legend.text = element_text(size = 12),
         legend.title = element_text(size = 15),
         panel.spacing = unit(2, "lines"),
-        legend.position = "right")
+        legend.position = "none")
 
 grid.arrange(Plot6, Plot7, ncol = 2)
 # grid.arrange(Plot6, Plot7, Plot8, Plot9, ncol = 4) ... don't use, too crowded
@@ -385,7 +385,7 @@ Plot10 <- ggplot(data = Stats_ByFullPlay_2High) +
         legend.text = element_text(size = 12),
         legend.title = element_text(size = 15),
         panel.spacing = unit(2, "lines"),
-        legend.position = "right")
+        legend.position = "none")
 
 Plot11 <- ggplot(data = Stats_ByFullPlay_2High) +
   # geom_point(aes(x = X_Vel_Diff_BetweenSafeties_AtSnap, y = PostSnap_MOF_Num), alpha = 0.05) +
@@ -411,7 +411,7 @@ Plot11 <- ggplot(data = Stats_ByFullPlay_2High) +
         legend.text = element_text(size = 12),
         legend.title = element_text(size = 15),
         panel.spacing = unit(2, "lines"),
-        legend.position = "right")
+        legend.position = "none")
 
 Plot12 <- ggplot(data = Stats_ByFullPlay_2High) +
   # geom_point(aes(x = Max_VertCreptDistance_AnySafety, y = PostSnap_MOF_Num), alpha = 0.05) +
@@ -437,7 +437,7 @@ Plot12 <- ggplot(data = Stats_ByFullPlay_2High) +
         legend.text = element_text(size = 12),
         legend.title = element_text(size = 15),
         panel.spacing = unit(2, "lines"),
-        legend.position = "right") # + theme(aspect.ratio = 1)
+        legend.position = "none") # + theme(aspect.ratio = 1)
 
 Plot13 <- ggplot(data = Stats_ByFullPlay_2High) +
   # geom_point(aes(x = Max_PreSnap_X_vel_TowardBall_AnySafety, y = PostSnap_MOF_Num), alpha = 0.05) +
@@ -463,7 +463,7 @@ Plot13 <- ggplot(data = Stats_ByFullPlay_2High) +
         legend.text = element_text(size = 12),
         legend.title = element_text(size = 15),
         panel.spacing = unit(2, "lines"),
-        legend.position = "right")
+        legend.position = "none")
 
 grid.arrange(Plot10, Plot11, ncol = 2)
 # grid.arrange(Plot10, Plot11, Plot12, Plot13, ncol = 4) ... don't use, too crowded
@@ -509,7 +509,7 @@ Plot14 <- ggplot(data = Stats_ByFullPlay_1High) +
         legend.text = element_text(size = 12),
         legend.title = element_text(size = 15),
         panel.spacing = unit(2, "lines"),
-        legend.position = "right")
+        legend.position = "none")
 
 Plot15 <- ggplot(data = Stats_ByFullPlay_1High) +
   # geom_point(aes(x = Max_Y_SpeedTowardMOF_AtSnap_AnySafety, y = PostSnap_MOF_Num), alpha = 0.05) +
@@ -535,7 +535,7 @@ Plot15 <- ggplot(data = Stats_ByFullPlay_1High) +
         legend.text = element_text(size = 12),
         legend.title = element_text(size = 15),
         panel.spacing = unit(2, "lines"),
-        legend.position = "right")
+        legend.position = "none")
 
 Plot16 <- ggplot(data = Stats_ByFullPlay_1High) +
   # geom_point(aes(x = Max_Y_AbsDistFromMOF_AtSnap_AnySafety, y = PostSnap_MOF_Num), alpha = 0.05) +
@@ -561,7 +561,7 @@ Plot16 <- ggplot(data = Stats_ByFullPlay_1High) +
         legend.text = element_text(size = 12),
         legend.title = element_text(size = 15),
         panel.spacing = unit(2, "lines"),
-        legend.position = "right")
+        legend.position = "none")
 
 Plot17 <- ggplot(data = Stats_ByFullPlay_1High) +
   # geom_point(aes(x = Max_Y_AccTowardMOF_AtSnap_AnySafety, y = PostSnap_MOF_Num), alpha = 0.05) +
@@ -587,7 +587,7 @@ Plot17 <- ggplot(data = Stats_ByFullPlay_1High) +
         legend.text = element_text(size = 12),
         legend.title = element_text(size = 15),
         panel.spacing = unit(2, "lines"),
-        legend.position = "right")
+        legend.position = "none")
 
 grid.arrange(Plot14, Plot15, ncol = 2)
 # grid.arrange(Plot14, Plot15, Plot16, Plot17, ncol = 4) # too messy, don't use
@@ -655,7 +655,7 @@ Plot10B <- ggplot(data = Stats_ByFullPlay_2High) +
         legend.text = element_text(size = 12),
         legend.title = element_text(size = 15),
         panel.spacing = unit(2, "lines"),
-        legend.position = "right")
+        legend.position = "none")
 
 Plot11B <- ggplot(data = Stats_ByFullPlay_2High) +
   # geom_point(aes(x = X_Vel_Diff_BetweenSafeties_AtSnap, y = MOFO_probability_FDA), alpha = 0.05) +
@@ -681,7 +681,7 @@ Plot11B <- ggplot(data = Stats_ByFullPlay_2High) +
         legend.text = element_text(size = 12),
         legend.title = element_text(size = 15),
         panel.spacing = unit(2, "lines"),
-        legend.position = "right")
+        legend.position = "none")
 
 Plot12B <- ggplot(data = Stats_ByFullPlay_2High) +
   # geom_point(aes(x = Max_VertCreptDistance_AnySafety, y = MOFO_probability_FDA), alpha = 0.05) +
@@ -707,7 +707,7 @@ Plot12B <- ggplot(data = Stats_ByFullPlay_2High) +
         legend.text = element_text(size = 12),
         legend.title = element_text(size = 15),
         panel.spacing = unit(2, "lines"),
-        legend.position = "right") # + theme(aspect.ratio = 1)
+        legend.position = "none") # + theme(aspect.ratio = 1)
 
 Plot13B <- ggplot(data = Stats_ByFullPlay_2High) +
   # geom_point(aes(x = Max_PreSnap_X_vel_TowardBall_AnySafety, y = MOFO_probability_FDA), alpha = 0.05) +
@@ -733,7 +733,7 @@ Plot13B <- ggplot(data = Stats_ByFullPlay_2High) +
         legend.text = element_text(size = 12),
         legend.title = element_text(size = 15),
         panel.spacing = unit(2, "lines"),
-        legend.position = "right")
+        legend.position = "none")
 
 grid.arrange(Plot10B, Plot11B, ncol = 2)
 # grid.arrange(Plot10B, Plot11B, Plot12B, Plot13B, ncol = 4) ... don't use, too crowded
@@ -781,7 +781,7 @@ Plot14B <- ggplot(data = Stats_ByFullPlay_1High) +
         legend.text = element_text(size = 12),
         legend.title = element_text(size = 15),
         panel.spacing = unit(2, "lines"),
-        legend.position = "right")
+        legend.position = "none")
 
 Plot15B <- ggplot(data = Stats_ByFullPlay_1High) +
   # geom_point(aes(x = min_SafetyAbsHorizDistToMOF_PreSnap, y = MOFO_probability_FDA), alpha = 0.05) +
@@ -807,7 +807,7 @@ Plot15B <- ggplot(data = Stats_ByFullPlay_1High) +
         legend.text = element_text(size = 12),
         legend.title = element_text(size = 15),
         panel.spacing = unit(2, "lines"),
-        legend.position = "right")
+        legend.position = "none")
 
 Plot16B <- ggplot(data = Stats_ByFullPlay_1High) +
   # geom_point(aes(x = Max_Y_SpeedTowardMOF_AtSnap_AnySafety, y = MOFO_probability_FDA), alpha = 0.05) +
@@ -833,7 +833,7 @@ Plot16B <- ggplot(data = Stats_ByFullPlay_1High) +
         legend.text = element_text(size = 12),
         legend.title = element_text(size = 15),
         panel.spacing = unit(2, "lines"),
-        legend.position = "right")
+        legend.position = "none")
 
 Plot17B <- ggplot(data = Stats_ByFullPlay_1High) +
   # geom_point(aes(x = Max_PreSnap_X_vel_TowardBall_AnySafety, y = MOFO_probability_FDA), alpha = 0.05) +
@@ -859,7 +859,7 @@ Plot17B <- ggplot(data = Stats_ByFullPlay_1High) +
         legend.text = element_text(size = 12),
         legend.title = element_text(size = 15),
         panel.spacing = unit(2, "lines"),
-        legend.position = "right")
+        legend.position = "none")
 
 grid.arrange(Plot14B, Plot15B, ncol = 2)
 # grid.arrange(Plot14B, Plot15B, Plot16B, Plot17B, ncol = 4) # too messy, don't use
