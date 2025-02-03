@@ -18,6 +18,14 @@ Stats_ByFullPlay_9Weeks <- Stats_ByFullPlay_9Weeks %>%
   mutate(Max_PreSnap_X_acc_TowardBall_AnySafety = -1 * Min_PreSnap_X_acc_component_AnySafety)
 Stats_ByFullPlay_9Weeks <- Stats_ByFullPlay_9Weeks %>% select(-c("Min_PreSnap_X_vel_component_AnySafety", "Min_PreSnap_X_acc_component_AnySafety"))
 
+# Repeat the same idea to avoid the "double negative" that we used for pre-snap vertical velocity
+# I.e., now the vertical velocity will show up as positive if the safety is moving closer to LOS at the snap
+Stats_ByFullPlay_All9Weeks <- Stats_ByFullPlay_All9Weeks %>% 
+  mutate(Max_X_vel_TowardBall_AnySafety_AtSnap = -1 * Max_X_vel_component_AnySafety_AtSnap)
+Stats_ByFullPlay_All9Weeks <- Stats_ByFullPlay_All9Weeks %>% 
+  mutate(Min_X_vel_TowardBall_AnySafety_AtSnap = -1 * Min_X_vel_component_AnySafety_AtSnap)
+Stats_ByFullPlay_All9Weeks <- Stats_ByFullPlay_All9Weeks %>% select(-c("Max_X_vel_component_AnySafety_AtSnap", "Min_X_vel_component_AnySafety_AtSnap"))
+
 Stats_ByFullPlay_2High <- Stats_ByFullPlay_All9Weeks %>% filter(num_safeties_pre_snap == 2)
 Stats_ByFullPlay_1High <- Stats_ByFullPlay_All9Weeks %>% filter(num_safeties_pre_snap == 1)
 
