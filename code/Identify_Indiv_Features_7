@@ -1284,7 +1284,7 @@ Plot13D_Alt <- ggplot(data = Stats_ByFullPlay_2High) +
        title = " ",
        subtitle = " ",
        caption = "Vertical Velocity: moving toward LOS is positive, back-pedaling is negative",
-       color = " ") +
+       color = "Predicted vs. Actual") +
   theme_bw() + 
   theme(plot.title = element_text(size = 16, hjust = 0.5),
         plot.subtitle = element_text(size = 14, hjust = 0.5),
