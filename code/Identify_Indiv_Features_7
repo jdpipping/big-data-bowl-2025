@@ -483,11 +483,11 @@ Plot13 <- ggplot(data = Stats_ByFullPlay_2High) +
         panel.spacing = unit(2, "lines"),
         legend.position = "none")
 
-# Also try one incorporating the vertical speed, using Min_X_vel_TowardBall_AnySafety_AtSnap
+# Also try one incorporating the vertical speed, using Max_X_vel_TowardBall_AnySafety_AtSnap
 # Really good ... similar to Plot 11 (difference in vertical velocities), but still could've used both if this was built earlier
 Plot13_Alt <- ggplot(data = Stats_ByFullPlay_2High) +
-  # geom_point(aes(x = Min_X_vel_TowardBall_AnySafety_AtSnap, y = PostSnap_MOF_Num), alpha = 0.05) +
-  stat_smooth(mapping = aes(x = Min_X_vel_TowardBall_AnySafety_AtSnap, y = PostSnap_MOF_Num, color = "red"),
+  # geom_point(aes(x = Max_X_vel_TowardBall_AnySafety_AtSnap, y = PostSnap_MOF_Num), alpha = 0.05) +
+  stat_smooth(mapping = aes(x = Max_X_vel_TowardBall_AnySafety_AtSnap, y = PostSnap_MOF_Num, color = "red"),
               method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
   geom_vline(xintercept = 0, col = "black", lty = 2) +
@@ -787,11 +787,11 @@ Plot13B <- ggplot(data = Stats_ByFullPlay_2High) +
         panel.spacing = unit(2, "lines"),
         legend.position = "none")
 
-# Also try one incorporating the vertical speed, using Min_X_vel_TowardBall_AnySafety_AtSnap
+# Also try one incorporating the vertical speed, using Max_X_vel_TowardBall_AnySafety_AtSnap
 # Really good ... similar to Plot 11B (difference in vertical velocities), but still could've used both if this was built earlier
 Plot13B_Alt <- ggplot(data = Stats_ByFullPlay_2High) +
-  # geom_point(aes(x = Min_X_vel_TowardBall_AnySafety_AtSnap, y = MOFO_probability_FDA), alpha = 0.05) +
-  stat_smooth(mapping = aes(x = Min_X_vel_TowardBall_AnySafety_AtSnap, y = MOFO_probability_FDA, color = "red"),
+  # geom_point(aes(x = Max_X_vel_TowardBall_AnySafety_AtSnap, y = MOFO_probability_FDA), alpha = 0.05) +
+  stat_smooth(mapping = aes(x = Max_X_vel_TowardBall_AnySafety_AtSnap, y = MOFO_probability_FDA, color = "red"),
               method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
   geom_vline(xintercept = 0, col = "black", lty = 2) +
@@ -1095,13 +1095,13 @@ Plot13C <- ggplot(data = Stats_ByFullPlay_2High) +
         panel.spacing = unit(2, "lines"),
         legend.position = "right")
 
-# Also try one incorporating the vertical speed, using Min_X_vel_TowardBall_AnySafety_AtSnap
+# Also try one incorporating the vertical speed, using Max_X_vel_TowardBall_AnySafety_AtSnap
 # Really good ... similar to Plot 11C (difference in vertical velocities), but still could've used both if this was built earlier
 Plot13C_Alt <- ggplot(data = Stats_ByFullPlay_2High) +
-  # geom_point(aes(x = Min_X_vel_TowardBall_AnySafety_AtSnap, y = MOFO_probability_FDA), alpha = 0.05) +
-  stat_smooth(mapping = aes(x = Min_X_vel_TowardBall_AnySafety_AtSnap, y = MOFO_probability_FDA, color = "Predicted MOFO Rate"),
+  # geom_point(aes(x = Max_X_vel_TowardBall_AnySafety_AtSnap, y = MOFO_probability_FDA), alpha = 0.05) +
+  stat_smooth(mapping = aes(x = Max_X_vel_TowardBall_AnySafety_AtSnap, y = MOFO_probability_FDA, color = "Predicted MOFO Rate"),
               method = "gam", method.args = list(family = "binomial"), se = F, span = 0.75) +
-  stat_smooth(mapping = aes(x = Min_X_vel_TowardBall_AnySafety_AtSnap, y = PostSnap_MOF_Num, color = "Actual MOFO Rate"),
+  stat_smooth(mapping = aes(x = Max_X_vel_TowardBall_AnySafety_AtSnap, y = PostSnap_MOF_Num, color = "Actual MOFO Rate"),
               method = "gam", method.args = list(family = "binomial"), se = F, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
   geom_vline(xintercept = 0, col = "black", lty = 2) +
@@ -1255,13 +1255,13 @@ Plot13D <- ggplot(data = Stats_ByFullPlay_2High) +
         panel.spacing = unit(2, "lines"),
         legend.position = "right")
 
-# Also try one incorporating the vertical speed, using Min_X_vel_TowardBall_AnySafety_AtSnap
+# Also try one incorporating the vertical speed, using Max_X_vel_TowardBall_AnySafety_AtSnap
 # Really good ... similar to Plot 11D (difference in vertical velocities), but still could've used both if this was built earlier
 Plot13D_Alt <- ggplot(data = Stats_ByFullPlay_2High) +
-  # geom_point(aes(x = Min_X_vel_TowardBall_AnySafety_AtSnap, y = MOFO_probability_FDA), alpha = 0.05) +
-  stat_smooth(mapping = aes(x = Min_X_vel_TowardBall_AnySafety_AtSnap, y = MOFO_probability_FDA, color = "Estimated \nMOFO \nProbability\n"),
+  # geom_point(aes(x = Max_X_vel_TowardBall_AnySafety_AtSnap, y = MOFO_probability_FDA), alpha = 0.05) +
+  stat_smooth(mapping = aes(x = Max_X_vel_TowardBall_AnySafety_AtSnap, y = MOFO_probability_FDA, color = "Estimated \nMOFO \nProbability\n"),
               method = "gam", se = F, span = 0.75) +
-  stat_smooth(mapping = aes(x = Min_X_vel_TowardBall_AnySafety_AtSnap, y = PostSnap_MOF_Num, color = "Observed \nMOFO \nRate\n"),
+  stat_smooth(mapping = aes(x = Max_X_vel_TowardBall_AnySafety_AtSnap, y = PostSnap_MOF_Num, color = "Observed \nMOFO \nRate\n"),
               method = "gam", method.args = list(family = "binomial"), se = F, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
   geom_vline(xintercept = 0, col = "black", lty = 2) +
