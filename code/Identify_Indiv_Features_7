@@ -483,9 +483,43 @@ Plot13 <- ggplot(data = Stats_ByFullPlay_2High) +
         panel.spacing = unit(2, "lines"),
         legend.position = "none")
 
+# Also try one incorporating the vertical speed, using Min_X_vel_TowardBall_AnySafety_AtSnap
+# Really good ... similar to Plot 11 (difference in vertical velocities), but still could've used both if this was built earlier
+Plot13_Alt <- ggplot(data = Stats_ByFullPlay_2High) +
+  # geom_point(aes(x = Min_X_vel_TowardBall_AnySafety_AtSnap, y = PostSnap_MOF_Num), alpha = 0.05) +
+  stat_smooth(mapping = aes(x = Min_X_vel_TowardBall_AnySafety_AtSnap, y = PostSnap_MOF_Num, color = "red"),
+              method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
+  # geom_abline(intercept = 0, slope = 0) +
+  geom_vline(xintercept = 0, col = "black", lty = 2) +
+  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_x_continuous(breaks = seq(-4, 10, 2)) +
+  coord_cartesian(xlim = c(-2, 4), ylim = c(0, 1)) +
+  labs(x = "Vertical Velocity by Safety at Snap (Yds/Sec)", y = "MOFO Coverage Rate",
+       title = "MOFO Rate vs. Minimum Vertical Velocity Toward LOS at Snap by a Safety",
+       subtitle = "Early Down 2-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022 (n = 3029)",
+       caption = "Vertical Velocity: moving toward LOS is positive, back-pedaling is negative",
+       color = " ") +
+  theme_bw() + 
+  theme(plot.title = element_text(size = 16, hjust = 0.5),
+        plot.subtitle = element_text(size = 14, hjust = 0.5),
+        axis.title.y = element_text(size = 16),
+        axis.title.x = element_text(size = 16),
+        axis.text.y = element_text(size = 16),
+        axis.text.x = element_text(size = 16),
+        plot.caption = element_text(size = 12),
+        legend.text = element_text(size = 12),
+        legend.title = element_text(size = 15),
+        panel.spacing = unit(2, "lines"),
+        legend.position = "none") +
+  annotate("text", label = glue("Left of line: both safeties are \nback-pedaling at snap"),
+           y = 0.4, x = -1, size = 3, color = "darkgreen") +
+  annotate("text", label = glue("Right of line: at least one safety \nis moving forward at snap"),
+           y = 0.6, x = 2, size = 3, color = "darkgreen") 
+
 grid.arrange(Plot10, Plot11, ncol = 2)
 # grid.arrange(Plot10, Plot11, Plot12, Plot13, ncol = 4) ... don't use, too crowded
 grid.arrange(Plot10, Plot11, Plot12, Plot13, nrow = 2, ncol = 2)
+grid.arrange(Plot10, Plot11, Plot12, Plot13_Alt, nrow = 2, ncol = 2)
 grid.arrange(Plot10, Plot11, Plot12, nrow = 2, ncol = 2)
 grid.arrange(Plot10, Plot11, Plot12, ncol = 3)
 # Here's how to arrange three plots at once in an "upside-down triangle" format
@@ -757,9 +791,43 @@ Plot13B <- ggplot(data = Stats_ByFullPlay_2High) +
         panel.spacing = unit(2, "lines"),
         legend.position = "none")
 
+# Also try one incorporating the vertical speed, using Min_X_vel_TowardBall_AnySafety_AtSnap
+# Really good ... similar to Plot 11B (difference in vertical velocities), but still could've used both if this was built earlier
+Plot13B_Alt <- ggplot(data = Stats_ByFullPlay_2High) +
+  # geom_point(aes(x = Min_X_vel_TowardBall_AnySafety_AtSnap, y = MOFO_probability_FDA), alpha = 0.05) +
+  stat_smooth(mapping = aes(x = Min_X_vel_TowardBall_AnySafety_AtSnap, y = MOFO_probability_FDA, color = "red"),
+              method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
+  # geom_abline(intercept = 0, slope = 0) +
+  geom_vline(xintercept = 0, col = "black", lty = 2) +
+  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_x_continuous(breaks = seq(-4, 10, 2)) +
+  coord_cartesian(xlim = c(-2, 4), ylim = c(0, 1)) +
+  labs(x = "Vertical Velocity by Safety at Snap (Yds/Sec)", y = "Predicted MOFO Rate",
+       title = "Predicted MOFO Rate vs. Minimum Vertical Velocity Toward LOS at Snap by a Safety",
+       subtitle = "Early Down 2-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022 (n = 3029)",
+       caption = "Vertical Velocity: moving toward LOS is positive, back-pedaling is negative",
+       color = " ") +
+  theme_bw() + 
+  theme(plot.title = element_text(size = 16, hjust = 0.5),
+        plot.subtitle = element_text(size = 14, hjust = 0.5),
+        axis.title.y = element_text(size = 16),
+        axis.title.x = element_text(size = 16),
+        axis.text.y = element_text(size = 16),
+        axis.text.x = element_text(size = 16),
+        plot.caption = element_text(size = 12),
+        legend.text = element_text(size = 12),
+        legend.title = element_text(size = 15),
+        panel.spacing = unit(2, "lines"),
+        legend.position = "none") +
+  annotate("text", label = glue("Left of line: both safeties are \nback-pedaling at snap"),
+           y = 0.4, x = -1, size = 3, color = "darkgreen") +
+  annotate("text", label = glue("Right of line: at least one safety \nis moving forward at snap"),
+           y = 0.6, x = 2, size = 3, color = "darkgreen") 
+
 grid.arrange(Plot10B, Plot11B, ncol = 2)
 # grid.arrange(Plot10B, Plot11B, Plot12B, Plot13B, ncol = 4) ... don't use, too crowded
 grid.arrange(Plot10B, Plot11B, Plot12B, Plot13B, nrow = 2, ncol = 2)
+grid.arrange(Plot10B, Plot11B, Plot12B, Plot13B_Alt, nrow = 2, ncol = 2)
 
 grid.arrange(Plot10B, Plot11B, Plot12B, nrow = 2, ncol = 2)
 grid.arrange(Plot10B, Plot11B, Plot12B, ncol = 3)
@@ -1035,9 +1103,45 @@ Plot13C <- ggplot(data = Stats_ByFullPlay_2High) +
         panel.spacing = unit(2, "lines"),
         legend.position = "right")
 
+# Also try one incorporating the vertical speed, using Min_X_vel_TowardBall_AnySafety_AtSnap
+# Really good ... similar to Plot 11C (difference in vertical velocities), but still could've used both if this was built earlier
+Plot13C_Alt <- ggplot(data = Stats_ByFullPlay_2High) +
+  # geom_point(aes(x = Min_X_vel_TowardBall_AnySafety_AtSnap, y = MOFO_probability_FDA), alpha = 0.05) +
+  stat_smooth(mapping = aes(x = Min_X_vel_TowardBall_AnySafety_AtSnap, y = MOFO_probability_FDA, color = "red"),
+              method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
+  stat_smooth(mapping = aes(x = Min_X_vel_TowardBall_AnySafety_AtSnap, y = PostSnap_MOF_Num, color = "Actual MOFO Rate"),
+              method = "gam", method.args = list(family = "binomial"), se = F, span = 0.75) +
+  # geom_abline(intercept = 0, slope = 0) +
+  geom_vline(xintercept = 0, col = "black", lty = 2) +
+  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_x_continuous(breaks = seq(-4, 10, 2)) +
+  coord_cartesian(xlim = c(-2, 4), ylim = c(0, 1)) +
+  labs(x = "Vertical Velocity by Safety at Snap (Yds/Sec)", y = "MOFO Coverage Rate",
+       title = "Predicted & Actual MOFO Rate vs. Minimum Vertical Velocity Toward LOS at Snap by a Safety",
+       subtitle = "Early Down 2-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022 (n = 3029)",
+       caption = "Vertical Velocity: moving toward LOS is positive, back-pedaling is negative",
+       color = " ") +
+  theme_bw() + 
+  theme(plot.title = element_text(size = 16, hjust = 0.5),
+        plot.subtitle = element_text(size = 14, hjust = 0.5),
+        axis.title.y = element_text(size = 16),
+        axis.title.x = element_text(size = 16),
+        axis.text.y = element_text(size = 16),
+        axis.text.x = element_text(size = 16),
+        plot.caption = element_text(size = 12),
+        legend.text = element_text(size = 12),
+        legend.title = element_text(size = 15),
+        panel.spacing = unit(2, "lines"),
+        legend.position = "none") +
+  annotate("text", label = glue("Left of line: both safeties are \nback-pedaling at snap"),
+           y = 0.4, x = -1, size = 3, color = "darkgreen") +
+  annotate("text", label = glue("Right of line: at least one safety \nis moving forward at snap"),
+           y = 0.6, x = 2, size = 3, color = "darkgreen") 
+
 grid.arrange(Plot10C, Plot11C, ncol = 2)
 # grid.arrange(Plot10C, Plot11C, Plot12C, Plot13C, ncol = 4) ... don't use, too crowded
 grid.arrange(Plot10C, Plot11C, Plot12C, Plot13C, nrow = 2, ncol = 2)
+grid.arrange(Plot10C, Plot11C, Plot12C, Plot13C_Alt, nrow = 2, ncol = 2)
 
 grid.arrange(Plot10C, Plot11C, Plot12C, nrow = 2, ncol = 2)
 grid.arrange(Plot10C, Plot11C, Plot12C, ncol = 3)
@@ -1163,9 +1267,45 @@ Plot13D <- ggplot(data = Stats_ByFullPlay_2High) +
         panel.spacing = unit(2, "lines"),
         legend.position = "right")
 
+# Also try one incorporating the vertical speed, using Min_X_vel_TowardBall_AnySafety_AtSnap
+# Really good ... similar to Plot 11D (difference in vertical velocities), but still could've used both if this was built earlier
+Plot13D_Alt <- ggplot(data = Stats_ByFullPlay_2High) +
+  # geom_point(aes(x = Min_X_vel_TowardBall_AnySafety_AtSnap, y = MOFO_probability_FDA), alpha = 0.05) +
+  stat_smooth(mapping = aes(x = Min_X_vel_TowardBall_AnySafety_AtSnap, y = MOFO_probability_FDA, color = "Estimated \nMOFO \nProbability\n"),
+              method = "gam", se = F, span = 0.75) +
+  stat_smooth(mapping = aes(x = Min_X_vel_TowardBall_AnySafety_AtSnap, y = PostSnap_MOF_Num, color = "Observed \nMOFO \nRate\n"),
+              method = "gam", method.args = list(family = "binomial"), se = F, span = 0.75) +
+  # geom_abline(intercept = 0, slope = 0) +
+  geom_vline(xintercept = 0, col = "black", lty = 2) +
+  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_x_continuous(breaks = seq(-4, 10, 2)) +
+  coord_cartesian(xlim = c(-2, 4), ylim = c(0, 1)) +
+  labs(x = "Vertical Velocity by Safety at Snap (Yds/Sec)", y = "MOFO Coverage Rate",
+       title = "Predicted & Actual MOFO Rate vs. Minimum Vertical Velocity Toward LOS at Snap by a Safety",
+       subtitle = "Early Down 2-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022 (n = 3029)",
+       caption = "Vertical Velocity: moving toward LOS is positive, back-pedaling is negative",
+       color = " ") +
+  theme_bw() + 
+  theme(plot.title = element_text(size = 16, hjust = 0.5),
+        plot.subtitle = element_text(size = 14, hjust = 0.5),
+        axis.title.y = element_text(size = 18),
+        axis.title.x = element_text(size = 14),
+        axis.text.y = element_text(size = 14),
+        axis.text.x = element_text(size = 14),
+        plot.caption = element_text(size = 12),
+        legend.text = element_text(size = 12),
+        legend.title = element_text(size = 0),
+        panel.spacing = unit(2, "lines"),
+        legend.position = "right") +
+  annotate("text", label = glue("Left of line: both safeties are \nback-pedaling at snap"),
+           y = 0.4, x = -1, size = 3, color = "darkgreen") +
+  annotate("text", label = glue("Right of line: at least one safety \nis moving forward at snap"),
+           y = 0.6, x = 2, size = 3, color = "darkgreen") 
+
 grid.arrange(Plot10D, Plot11D, ncol = 2)
 # grid.arrange(Plot10D, Plot11D, Plot12D, Plot13D, ncol = 4) ... don't use, too crowded
 grid.arrange(Plot10D, Plot11D, Plot12D, Plot13D, nrow = 2, ncol = 2)
+grid.arrange(Plot10D, Plot11D, Plot12D, Plot13D_Alt, nrow = 2, ncol = 2)
 grid.arrange(Plot10D, Plot11D, Plot12D, ncol = 3)
 
 # Here's how to still include the legend only once, but not distort that specific plot (Plot12D in this case)
