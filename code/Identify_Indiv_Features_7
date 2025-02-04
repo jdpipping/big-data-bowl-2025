@@ -1132,7 +1132,7 @@ Plot13C_Alt <- ggplot(data = Stats_ByFullPlay_2High) +
         legend.text = element_text(size = 12),
         legend.title = element_text(size = 15),
         panel.spacing = unit(2, "lines"),
-        legend.position = "none") +
+        legend.position = "right") +
   annotate("text", label = glue("Left of line: both safeties are \nback-pedaling at snap"),
            y = 0.4, x = -1, size = 3, color = "darkgreen") +
   annotate("text", label = glue("Right of line: at least one safety \nis moving forward at snap"),
