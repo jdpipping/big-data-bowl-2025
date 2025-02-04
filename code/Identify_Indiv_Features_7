@@ -510,11 +510,7 @@ Plot13_Alt <- ggplot(data = Stats_ByFullPlay_2High) +
         legend.text = element_text(size = 12),
         legend.title = element_text(size = 15),
         panel.spacing = unit(2, "lines"),
-        legend.position = "none") +
-  annotate("text", label = glue("Left of line: both safeties are \nback-pedaling at snap"),
-           y = 0.4, x = -1, size = 3, color = "darkgreen") +
-  annotate("text", label = glue("Right of line: at least one safety \nis moving forward at snap"),
-           y = 0.6, x = 2, size = 3, color = "darkgreen") 
+        legend.position = "none") 
 
 grid.arrange(Plot10, Plot11, ncol = 2)
 # grid.arrange(Plot10, Plot11, Plot12, Plot13, ncol = 4) ... don't use, too crowded
@@ -818,11 +814,7 @@ Plot13B_Alt <- ggplot(data = Stats_ByFullPlay_2High) +
         legend.text = element_text(size = 12),
         legend.title = element_text(size = 15),
         panel.spacing = unit(2, "lines"),
-        legend.position = "none") +
-  annotate("text", label = glue("Left of line: both safeties are \nback-pedaling at snap"),
-           y = 0.4, x = -1, size = 3, color = "darkgreen") +
-  annotate("text", label = glue("Right of line: at least one safety \nis moving forward at snap"),
-           y = 0.6, x = 2, size = 3, color = "darkgreen") 
+        legend.position = "none") 
 
 grid.arrange(Plot10B, Plot11B, ncol = 2)
 # grid.arrange(Plot10B, Plot11B, Plot12B, Plot13B, ncol = 4) ... don't use, too crowded
@@ -1132,11 +1124,7 @@ Plot13C_Alt <- ggplot(data = Stats_ByFullPlay_2High) +
         legend.text = element_text(size = 12),
         legend.title = element_text(size = 15),
         panel.spacing = unit(2, "lines"),
-        legend.position = "right") +
-  annotate("text", label = glue("Left of line: both safeties are \nback-pedaling at snap"),
-           y = 0.4, x = -1, size = 3, color = "darkgreen") +
-  annotate("text", label = glue("Right of line: at least one safety \nis moving forward at snap"),
-           y = 0.6, x = 2, size = 3, color = "darkgreen") 
+        legend.position = "right") 
 
 grid.arrange(Plot10C, Plot11C, ncol = 2)
 # grid.arrange(Plot10C, Plot11C, Plot12C, Plot13C, ncol = 4) ... don't use, too crowded
@@ -1296,11 +1284,7 @@ Plot13D_Alt <- ggplot(data = Stats_ByFullPlay_2High) +
         legend.text = element_text(size = 12),
         legend.title = element_text(size = 0),
         panel.spacing = unit(2, "lines"),
-        legend.position = "right") +
-  annotate("text", label = glue("Left of line: both safeties are \nback-pedaling at snap"),
-           y = 0.4, x = -1, size = 3, color = "darkgreen") +
-  annotate("text", label = glue("Right of line: at least one safety \nis moving forward at snap"),
-           y = 0.6, x = 2, size = 3, color = "darkgreen") 
+        legend.position = "right") 
 
 grid.arrange(Plot10D, Plot11D, ncol = 2)
 # grid.arrange(Plot10D, Plot11D, Plot12D, Plot13D, ncol = 4) ... don't use, too crowded
