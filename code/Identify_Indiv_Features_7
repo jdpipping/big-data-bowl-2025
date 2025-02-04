@@ -788,7 +788,7 @@ Plot14B <- ggplot(data = Stats_ByFullPlay_1High) +
   scale_x_continuous(breaks = seq(0, 10, 2)) +
   coord_cartesian(xlim = c(0, 9), ylim = c(0, 1)) +
   labs(x = "Safety's Horizontal Distance from MOF at the Snap (Yards)", y = "Predicted MOFO Rate",
-       title = "MOFO Rate vs. Safety's Horizontal Distance from MOF at the Snap",
+       title = "Predicted MOFO Rate vs. Safety's Horizontal Distance from MOF at the Snap",
        subtitle = "Early Down 1-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022 (n = 1352)",
        caption = "Horizontal Distance from MOF: net distance from middle of field (either right or left counts as positive)",
        color = " ") +
@@ -814,7 +814,7 @@ Plot15B <- ggplot(data = Stats_ByFullPlay_1High) +
   scale_x_continuous(breaks = seq(0, 10, 1)) +
   coord_cartesian(xlim = c(0, 8), ylim = c(0, 1)) +
   labs(x = "Safety's Minimum Pre-Snap Horiz Distance from MOF (Yards)", y = "Predicted MOFO Rate",
-       title = "MOFO Rate vs. Safety's Minimum Pre-Snap Horiz Distance from MOF",
+       title = "Predicted MOFO Rate vs. Safety's Minimum Pre-Snap Horiz Distance from MOF",
        subtitle = "Early Down 1-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022 (n = 1352)",
        caption = "Horizontal Distance from MOF: either right or left is positive",
        color = " ") +
@@ -840,7 +840,7 @@ Plot16B <- ggplot(data = Stats_ByFullPlay_1High) +
   scale_x_continuous(breaks = seq(-5, 5, 1)) +
   coord_cartesian(xlim = c(-3, 3), ylim = c(0, 1)) +
   labs(x = "Horizontal Speed Toward MOF by Safety at Snap (Yds/Sec)", y = "Predicted MOFO Rate",
-       title = "MOFO Rate vs. Safety's Horizontal Speed Toward MOF at the Snap",
+       title = "Predicted MOFO Rate vs. Safety's Horizontal Speed Toward MOF at the Snap",
        subtitle = "Early Down 1-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022 (n = 1352)",
        caption = "Horizontal Speed Toward MOF: moving horizontally toward MOF is positive, toward sideline is negative",
        color = " ") +
@@ -866,7 +866,7 @@ Plot17B <- ggplot(data = Stats_ByFullPlay_1High) +
   scale_x_continuous(breaks = seq(-4, 10, 2)) +
   coord_cartesian(xlim = c(-2, 2), ylim = c(0, 1)) +
   labs(x = "Safety's Maximum Pre-Snap Vertical Velocity Toward LOS (Yds/Sec)", y = "Predicted MOFO Rate",
-       title = "MOFO Rate vs. Safety's Maximum Pre-Snap Vertical Velocity Toward LOS",
+       title = "Predicted MOFO Rate vs. Safety's Maximum Pre-Snap Vertical Velocity Toward LOS",
        subtitle = "Early Down 1-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022 (n = 1352)",
        caption = "Vert Velocity Toward LOS: safety moving forward is positive, backward is negative",
        color = " ") +
