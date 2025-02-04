@@ -1296,7 +1296,7 @@ Plot13D_Alt <- ggplot(data = Stats_ByFullPlay_2High) +
         legend.text = element_text(size = 12),
         legend.title = element_text(size = 0),
         panel.spacing = unit(2, "lines"),
-        legend.position = "none") +
+        legend.position = "right") +
   annotate("text", label = glue("Left of line: both safeties are \nback-pedaling at snap"),
            y = 0.4, x = -1, size = 3, color = "darkgreen") +
   annotate("text", label = glue("Right of line: at least one safety \nis moving forward at snap"),
@@ -1318,6 +1318,17 @@ final_plot <- (Plot10D + theme(legend.position = "none")) +
 
 # Display the final plot
 print(final_plot)
+
+# Alternate version of that format which includes four plots
+final_plot_2 <- (Plot10D + theme(legend.position = "none")) +
+  (Plot11D + theme(legend.position = "none")) +
+  (Plot12D + theme(legend.position = "none")) +
+  Plot13D_Alt +
+  plot_layout(ncol = 4, guides = "collect") &
+  theme(legend.position = "right")
+
+# Display the final plot
+print(final_plot_2)
 
 # And, make a gt table (either 2-high, or all plays) ranking features by how correlated they are with PostSnap_MOF_Num
 # First, gotta sort in descending order, starting with all plays ... but make it in descending order of ABSOLUTE correlation
