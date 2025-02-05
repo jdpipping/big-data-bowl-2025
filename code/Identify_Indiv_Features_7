@@ -28,6 +28,8 @@ Stats_ByFullPlay_All9Weeks <- Stats_ByFullPlay_All9Weeks %>% select(-c("Max_X_ve
 
 Stats_ByFullPlay_2High <- Stats_ByFullPlay_All9Weeks %>% filter(num_safeties_pre_snap == 2)
 Stats_ByFullPlay_1High <- Stats_ByFullPlay_All9Weeks %>% filter(num_safeties_pre_snap == 1)
+# mean(Stats_ByFullPlay_2High$PostSnap_MOF_Num); it's 0.5016
+# mean(Stats_ByFullPlay_1High$PostSnap_MOF_Num); it's 0.1559
 
 MOFO_Features_AllPlays <- Stats_ByFullPlay_All9Weeks %>%
   select(c("PostSnap_MOF_Num", "X_Diff_BetweenSafeties_AtSnap", "TotDist_BetweenSafeties_AtSnap",
