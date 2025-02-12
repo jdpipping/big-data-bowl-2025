@@ -1102,7 +1102,7 @@ Plot13C <- ggplot(data = Stats_ByFullPlay_2High) +
 Plot13C_Alt <- ggplot(data = Stats_ByFullPlay_2High) +
   # geom_point(aes(x = Max_X_vel_TowardBall_AnySafety_AtSnap, y = MOFO_probability_FDA), alpha = 0.05) +
   stat_smooth(mapping = aes(x = Max_X_vel_TowardBall_AnySafety_AtSnap, y = MOFO_probability_FDA, color = "Predicted MOFO Rate"),
-              method = "gam", method.args = list(family = "binomial"), se = F, span = 0.75) +
+              method = "gam", se = F, span = 0.75) +
   stat_smooth(mapping = aes(x = Max_X_vel_TowardBall_AnySafety_AtSnap, y = PostSnap_MOF_Num, color = "Actual MOFO Rate"),
               method = "gam", method.args = list(family = "binomial"), se = F, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
