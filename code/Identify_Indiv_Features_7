@@ -983,7 +983,7 @@ Plot17B_Alt <- ggplot(data = Stats_ByFullPlay_1High) +
   # scale_y_continuous(breaks = seq(70, 130, 20)) +
   scale_x_continuous(breaks = seq(-4, 10, 2)) +
   coord_cartesian(xlim = c(-2, 2), ylim = c(0, 1)) +
-  labs(x = "Vertical Velocity by Safety at Snap (Yds/Sec)", y = "MOFO Coverage Rate",
+  labs(x = "Vertical Velocity by Safety at Snap (Yds/Sec)", y = "Predicted MOFO Rate",
        title = "Predicted MOFO Rate vs. Safety's Vertical Velocity Toward LOS at Snap",
        subtitle = "Early Down 1-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022 (n = 1352)",
        caption = "Vertical Velocity: moving toward LOS is positive, back-pedaling is negative",
@@ -1657,7 +1657,7 @@ Plot17D_Alt <- ggplot(data = Stats_ByFullPlay_1High) +
   # scale_y_continuous(breaks = seq(70, 130, 20)) +
   scale_x_continuous(breaks = seq(-4, 10, 2)) +
   coord_cartesian(xlim = c(-2, 2), ylim = c(0, 1)) +
-  labs(x = "Vertical Velocity by Safety at Snap (Yds/Sec)", y = "MOFO Coverage Rate",
+  labs(x = "Vertical Velocity by Safety at Snap (Yds/Sec)", y = "MOFO Probability",
        title = " ",
        subtitle = " ",
        caption = "Vertical Velocity: toward LOS is positive, back-pedaling is negative",
