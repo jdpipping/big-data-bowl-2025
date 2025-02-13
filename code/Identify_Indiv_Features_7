@@ -572,7 +572,7 @@ Plot15 <- ggplot(data = Stats_ByFullPlay_1High) +
   labs(x = "Horizontal Speed Toward MOF by Safety at Snap (Yds/Sec)", y = "MOFO Coverage Rate",
        title = "MOFO Rate vs. Safety's Horizontal Speed Toward MOF at the Snap",
        subtitle = "Early Down 1-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022 (n = 1352)",
-       caption = "Horizontal Speed Toward MOF: moving horizontally toward MOF is positive, toward sideline is negative",
+       caption = "Horizontal Speed Toward MOF: moving toward MOF is positive, toward sideline is negative",
        color = " ") +
   theme_bw() + 
   theme(plot.title = element_text(size = 16, hjust = 0.5),
@@ -932,7 +932,7 @@ Plot16B <- ggplot(data = Stats_ByFullPlay_1High) +
   labs(x = "Horizontal Speed Toward MOF by Safety at Snap (Yds/Sec)", y = "Predicted MOFO Rate",
        title = "Predicted MOFO Rate vs. Safety's Horizontal Speed Toward MOF at the Snap",
        subtitle = "Early Down 1-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022 (n = 1352)",
-       caption = "Horizontal Speed Toward MOF: moving horizontally toward MOF is positive, toward sideline is negative",
+       caption = "Horizontal Speed Toward MOF: moving toward MOF is positive, toward sideline is negative",
        color = " ") +
   theme_bw() + 
   theme(plot.title = element_text(size = 16, hjust = 0.5),
@@ -1444,7 +1444,7 @@ Plot16C <- ggplot(data = Stats_ByFullPlay_1High) +
   labs(x = "Horizontal Speed Toward MOF by Safety at Snap (Yds/Sec)", y = "MOFO Coverage Rate",
        title = "Predicted & Observed MOFO Rate vs. Safety's Horizontal Speed Toward MOF at the Snap",
        subtitle = "Early Down 1-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022 (n = 1352)",
-       caption = "Horizontal Speed Toward MOF: moving horizontally toward MOF is positive, toward sideline is negative",
+       caption = "Horizontal Speed Toward MOF: moving toward MOF is positive, toward sideline is negative",
        color = " ") +
   theme_bw() + 
   theme(plot.title = element_text(size = 16, hjust = 0.5),
@@ -1605,7 +1605,7 @@ Plot16D <- ggplot(data = Stats_ByFullPlay_1High) +
   labs(x = "Horizontal Speed Toward MOF by Safety at Snap (Yds/Sec)", y = "MOFO Probability",
        title = "How Estimated and Observed MOFO Rate Depend on Key Features",
        subtitle = "Early Down 1-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022 (n = 1352)",
-       caption = "Horizontal Speed Toward MOF: moving horizontally toward MOF is positive, toward sideline is negative",
+       caption = "Horizontal Speed Toward MOF: moving toward MOF is positive, toward sideline is negative",
        color = "Predicted vs. Observed") +
   theme_bw() + 
   theme(plot.title = element_text(size = 16, hjust = 0.5),
