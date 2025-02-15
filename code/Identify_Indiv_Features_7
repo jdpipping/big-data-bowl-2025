@@ -1692,6 +1692,55 @@ final_plot_1High <- (Plot14D + theme(legend.position = "none")) +
 # Display the final plot
 print(final_plot_1High)
 
+# Now turn the top "telegraphs" into a reactable 
+# Start with 2-high
+Telegraphs_2High_Variables <- c("One safety crept 4+ yards up vertically", "Safeties’ diff in vertical velocities at the snap is 4+ yards/sec", "Safeties have vertical stagger of 7+ yards at snap")
+Telegraphs_2High_PredictedMOFC <- c(1 - mean((Stats_ByFullPlay_2High %>% filter(Max_VertCreptDistance_AnySafety >= 4))$MOFO_probability_FDA), 1 - mean((Stats_ByFullPlay_2High %>% filter(X_Vel_Diff_BetweenSafeties_AtSnap >= 4))$MOFO_probability_FDA), 1 - mean((Stats_ByFullPlay_2High %>% filter(X_Diff_BetweenSafeties_AtSnap >= 7))$MOFO_probability_FDA))
+Telegraphs_2High_ObservedMOFC <- c(1 - mean((Stats_ByFullPlay_2High %>% filter(Max_VertCreptDistance_AnySafety >= 4))$PostSnap_MOF_Num), 1 - mean((Stats_ByFullPlay_2High %>% filter(X_Vel_Diff_BetweenSafeties_AtSnap >= 4))$PostSnap_MOF_Num), 1 - mean((Stats_ByFullPlay_2High %>% filter(X_Diff_BetweenSafeties_AtSnap >= 7))$PostSnap_MOF_Num))
+Telegraphs_2High_DF <- cbind(Telegraphs_2High_Variables, Telegraphs_2High_PredictedMOFC, Telegraphs_2High_ObservedMOFC)
+colnames(Telegraphs_2High_DF) <- c("Variable", "Predicted MOFC Rate", "Observed MOFC Rate")
+Telegraphs_2High_DF <- as.data.frame(Telegraphs_2High_DF)
+class(Telegraphs_2High_DF$`Predicted MOFC Rate`) <- "numeric"
+class(Telegraphs_2High_DF$`Observed MOFC Rate`) <- "numeric"
+
+# Function to count the maximum number of decimal places in a numeric column, for reactable() purposes
+# This isn't necessary if we don't care about how many significant digits show up
+max_decimals <- function(x) {
+  x <- na.omit(x)
+  if (length(x) == 0) return(0)
+  max(sapply(x, function(y) {
+    if (floor(y) == y) {
+      return(0)
+    } else {
+      nchar(strsplit(as.character(y), "\\.")[[1]][2])
+    }
+  }))
+}
+
+# Now, create reactable with that conditional formatting
+reactable(Telegraphs_2High_DF, defaultPageSize = 20, columns = map(Telegraphs_2High_DF, ~ if (is.numeric(.x) && max_decimals(.x) > 3) {
+  colDef(format = colFormat(digits = 3))
+} else {
+  colDef()
+}))
+
+# Now repeat for 1-high
+Telegraphs_1High_Variables <- c("Safety is within 3 horiz yards of MOF at snap", "Safety is moving horizontally toward MOF at snap", "Safety is moving away from LOS at snap")
+Telegraphs_1High_PredictedMOFC <- c(1 - mean((Stats_ByFullPlay_1High %>% filter(Max_Y_AbsDistFromMOF_AtSnap_AnySafety < 3))$MOFO_probability_FDA), 1 - mean((Stats_ByFullPlay_1High %>% filter(Max_Y_SpeedTowardMOF_AtSnap_AnySafety >= 0))$MOFO_probability_FDA), 1 - mean((Stats_ByFullPlay_1High %>% filter(Max_X_vel_TowardBall_AnySafety_AtSnap < 0))$MOFO_probability_FDA))
+Telegraphs_1High_ObservedMOFC <- c(1 - mean((Stats_ByFullPlay_1High %>% filter(Max_Y_AbsDistFromMOF_AtSnap_AnySafety < 3))$PostSnap_MOF_Num), 1 - mean((Stats_ByFullPlay_1High %>% filter(Max_Y_SpeedTowardMOF_AtSnap_AnySafety >= 0))$PostSnap_MOF_Num), 1 - mean((Stats_ByFullPlay_1High %>% filter(Max_X_vel_TowardBall_AnySafety_AtSnap < 0))$PostSnap_MOF_Num))
+Telegraphs_1High_DF <- cbind(Telegraphs_1High_Variables, Telegraphs_1High_PredictedMOFC, Telegraphs_1High_ObservedMOFC)
+colnames(Telegraphs_1High_DF) <- c("Variable", "Predicted MOFC Rate", "Observed MOFC Rate")
+Telegraphs_1High_DF <- as.data.frame(Telegraphs_1High_DF)
+class(Telegraphs_1High_DF$`Predicted MOFC Rate`) <- "numeric"
+class(Telegraphs_1High_DF$`Observed MOFC Rate`) <- "numeric"
+
+# Now, create reactable with that conditional formatting
+reactable(Telegraphs_1High_DF, defaultPageSize = 20, columns = map(Telegraphs_1High_DF, ~ if (is.numeric(.x) && max_decimals(.x) > 3) {
+  colDef(format = colFormat(digits = 3))
+} else {
+  colDef()
+}))
+
 # And, make a gt table (either 2-high, or all plays) ranking features by how correlated they are with PostSnap_MOF_Num
 # First, gotta sort in descending order, starting with all plays ... but make it in descending order of ABSOLUTE correlation
 # If we wanted all possible features instead of just the top few, use corr_df_MOFO_AllPlays instead of top_variables
