@@ -1511,6 +1511,8 @@ Stats_ByFullPlay_All9Weeks <- final_dropbacks_merged %>%
             Max_TotalCreptDistance_ToBall_AnySafety = max(Max_TotalCreptDistance_ToBall_AnySafety),
             Min_PreSnap_X_vel_component_AnySafety = min(Min_PreSnap_X_vel_component_AnySafety),    
             Min_PreSnap_X_acc_component_AnySafety = min(Min_PreSnap_X_acc_component_AnySafety),
+            Max_X_vel_component_AnySafety_AtSnap = max(Max_X_vel_component_AnySafety_AtSnap),
+            Min_X_vel_component_AnySafety_AtSnap = min(Min_X_vel_component_AnySafety_AtSnap),
             Y_AbsDistFromMOF_Diff_BetweenSafeties_AtSnap = max(Y_AbsDistFromMOF_Diff_BetweenSafeties_AtSnap),
             Y_SpeedTowardMOF_Diff_BetweenSafeties_AtSnap = max(Y_SpeedTowardMOF_Diff_BetweenSafeties_AtSnap),
             Y_AccTowardMOF_Diff_BetweenSafeties_AtSnap = max(Y_AccTowardMOF_Diff_BetweenSafeties_AtSnap),
