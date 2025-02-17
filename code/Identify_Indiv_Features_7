@@ -1702,6 +1702,7 @@ colnames(Telegraphs_2High_DF) <- c("Variable", "Observed MOFC Rate", "Predicted 
 Telegraphs_2High_DF <- as.data.frame(Telegraphs_2High_DF)
 class(Telegraphs_2High_DF$`Observed MOFC Rate`) <- "numeric"
 class(Telegraphs_2High_DF$`Predicted MOFC Rate`) <- "numeric"
+Telegraphs_2High_DF <- Telegraphs_2High_DF %>% arrange(desc(`Predicted MOFC Rate`))
 
 # Function to count the maximum number of decimal places in a numeric column, for reactable() purposes
 # This isn't necessary if we don't care about how many significant digits show up
@@ -1733,6 +1734,7 @@ colnames(Telegraphs_1High_DF) <- c("Variable", "Observed MOFC Rate", "Predicted 
 Telegraphs_1High_DF <- as.data.frame(Telegraphs_1High_DF)
 class(Telegraphs_1High_DF$`Observed MOFC Rate`) <- "numeric"
 class(Telegraphs_1High_DF$`Predicted MOFC Rate`) <- "numeric"
+Telegraphs_1High_DF <- Telegraphs_1High_DF %>% arrange(desc(`Predicted MOFC Rate`))
 
 # Now, create reactable with that conditional formatting
 reactable(Telegraphs_1High_DF, defaultPageSize = 20, columns = map(Telegraphs_1High_DF, ~ if (is.numeric(.x) && max_decimals(.x) > 3) {
