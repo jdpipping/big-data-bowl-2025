@@ -1695,13 +1695,13 @@ print(final_plot_1High)
 # Now turn the top "telegraphs" into a reactable 
 # Start with 2-high
 Telegraphs_2High_Variables <- c("One safety crept 4+ yards up vertically", "Safeties’ diff in vertical velocities at the snap is 4+ yards/sec", "Safeties have vertical stagger of 7+ yards at snap")
-Telegraphs_2High_PredictedMOFC <- c(1 - mean((Stats_ByFullPlay_2High %>% filter(Max_VertCreptDistance_AnySafety >= 4))$MOFO_probability_FDA), 1 - mean((Stats_ByFullPlay_2High %>% filter(X_Vel_Diff_BetweenSafeties_AtSnap >= 4))$MOFO_probability_FDA), 1 - mean((Stats_ByFullPlay_2High %>% filter(X_Diff_BetweenSafeties_AtSnap >= 7))$MOFO_probability_FDA))
 Telegraphs_2High_ObservedMOFC <- c(1 - mean((Stats_ByFullPlay_2High %>% filter(Max_VertCreptDistance_AnySafety >= 4))$PostSnap_MOF_Num), 1 - mean((Stats_ByFullPlay_2High %>% filter(X_Vel_Diff_BetweenSafeties_AtSnap >= 4))$PostSnap_MOF_Num), 1 - mean((Stats_ByFullPlay_2High %>% filter(X_Diff_BetweenSafeties_AtSnap >= 7))$PostSnap_MOF_Num))
-Telegraphs_2High_DF <- cbind(Telegraphs_2High_Variables, Telegraphs_2High_PredictedMOFC, Telegraphs_2High_ObservedMOFC)
-colnames(Telegraphs_2High_DF) <- c("Variable", "Predicted MOFC Rate", "Observed MOFC Rate")
+Telegraphs_2High_PredictedMOFC <- c(1 - mean((Stats_ByFullPlay_2High %>% filter(Max_VertCreptDistance_AnySafety >= 4))$MOFO_probability_FDA), 1 - mean((Stats_ByFullPlay_2High %>% filter(X_Vel_Diff_BetweenSafeties_AtSnap >= 4))$MOFO_probability_FDA), 1 - mean((Stats_ByFullPlay_2High %>% filter(X_Diff_BetweenSafeties_AtSnap >= 7))$MOFO_probability_FDA))
+Telegraphs_2High_DF <- cbind(Telegraphs_2High_Variables, Telegraphs_2High_ObservedMOFC, Telegraphs_2High_PredictedMOFC)
+colnames(Telegraphs_2High_DF) <- c("Variable", "Observed MOFC Rate", "Predicted MOFC Rate")
 Telegraphs_2High_DF <- as.data.frame(Telegraphs_2High_DF)
-class(Telegraphs_2High_DF$`Predicted MOFC Rate`) <- "numeric"
 class(Telegraphs_2High_DF$`Observed MOFC Rate`) <- "numeric"
+class(Telegraphs_2High_DF$`Predicted MOFC Rate`) <- "numeric"
 
 # Function to count the maximum number of decimal places in a numeric column, for reactable() purposes
 # This isn't necessary if we don't care about how many significant digits show up
@@ -1726,13 +1726,13 @@ reactable(Telegraphs_2High_DF, defaultPageSize = 20, columns = map(Telegraphs_2H
 
 # Now repeat for 1-high
 Telegraphs_1High_Variables <- c("Safety is within 3 horiz yards of MOF at snap", "Safety is moving horizontally toward MOF at snap", "Safety is moving away from LOS at snap")
-Telegraphs_1High_PredictedMOFC <- c(1 - mean((Stats_ByFullPlay_1High %>% filter(Max_Y_AbsDistFromMOF_AtSnap_AnySafety < 3))$MOFO_probability_FDA), 1 - mean((Stats_ByFullPlay_1High %>% filter(Max_Y_SpeedTowardMOF_AtSnap_AnySafety >= 0))$MOFO_probability_FDA), 1 - mean((Stats_ByFullPlay_1High %>% filter(Max_X_vel_TowardBall_AnySafety_AtSnap < 0))$MOFO_probability_FDA))
 Telegraphs_1High_ObservedMOFC <- c(1 - mean((Stats_ByFullPlay_1High %>% filter(Max_Y_AbsDistFromMOF_AtSnap_AnySafety < 3))$PostSnap_MOF_Num), 1 - mean((Stats_ByFullPlay_1High %>% filter(Max_Y_SpeedTowardMOF_AtSnap_AnySafety >= 0))$PostSnap_MOF_Num), 1 - mean((Stats_ByFullPlay_1High %>% filter(Max_X_vel_TowardBall_AnySafety_AtSnap < 0))$PostSnap_MOF_Num))
-Telegraphs_1High_DF <- cbind(Telegraphs_1High_Variables, Telegraphs_1High_PredictedMOFC, Telegraphs_1High_ObservedMOFC)
-colnames(Telegraphs_1High_DF) <- c("Variable", "Predicted MOFC Rate", "Observed MOFC Rate")
+Telegraphs_1High_PredictedMOFC <- c(1 - mean((Stats_ByFullPlay_1High %>% filter(Max_Y_AbsDistFromMOF_AtSnap_AnySafety < 3))$MOFO_probability_FDA), 1 - mean((Stats_ByFullPlay_1High %>% filter(Max_Y_SpeedTowardMOF_AtSnap_AnySafety >= 0))$MOFO_probability_FDA), 1 - mean((Stats_ByFullPlay_1High %>% filter(Max_X_vel_TowardBall_AnySafety_AtSnap < 0))$MOFO_probability_FDA))
+Telegraphs_1High_DF <- cbind(Telegraphs_1High_Variables, Telegraphs_1High_ObservedMOFC, Telegraphs_1High_PredictedMOFC)
+colnames(Telegraphs_1High_DF) <- c("Variable", "Observed MOFC Rate", "Predicted MOFC Rate")
 Telegraphs_1High_DF <- as.data.frame(Telegraphs_1High_DF)
-class(Telegraphs_1High_DF$`Predicted MOFC Rate`) <- "numeric"
 class(Telegraphs_1High_DF$`Observed MOFC Rate`) <- "numeric"
+class(Telegraphs_1High_DF$`Predicted MOFC Rate`) <- "numeric"
 
 # Now, create reactable with that conditional formatting
 reactable(Telegraphs_1High_DF, defaultPageSize = 20, columns = map(Telegraphs_1High_DF, ~ if (is.numeric(.x) && max_decimals(.x) > 3) {
@@ -1740,6 +1740,254 @@ reactable(Telegraphs_1High_DF, defaultPageSize = 20, columns = map(Telegraphs_1H
 } else {
   colDef()
 }))
+
+# Instead of reactables, try out Telegraphs_2High_DF and Telegraphs_1High_DF with gt tables
+Telegraphs_2High_FancyTable_WithColors <- Telegraphs_2High_DF |>
+  # filter(officialPosition %in% c("OLB", "DE")) |> 
+  # mutate(rank = row_number()) |> 
+  # select(1:2, "Feature", "PostSnap_MOF_Num", "Explanation") |> 
+  head(20) |> 
+  gt() |>
+  tab_options(
+    table.border.top.color = "white",
+    row.striping.include_table_body = FALSE
+  ) |>
+  opt_table_font(
+    font = list(
+      google_font("Chivo"),
+      default_fonts()
+    )
+  ) |>
+  fmt_number(
+    columns = c(`Observed MOFC Rate`),
+    decimals = 3,
+  ) |>
+  fmt_number(
+    columns = c(`Predicted MOFC Rate`),
+    decimals = 3,
+  ) |>
+  data_color(
+    columns = c(`Observed MOFC Rate`),
+    colors = scales::col_numeric(
+      palette = c("darkgreen", "green"),
+      domain = NULL
+    )
+  ) |> 
+  data_color(
+    columns = c(`Predicted MOFC Rate`),
+    colors = scales::col_numeric(
+      palette = c("darkgreen", "green"),
+      domain = NULL
+    )
+  ) |> 
+  cols_label(
+    Variable = md("**Variable**"), # the md is what makes the headers show up as bold
+    `Observed MOFC Rate` = md("**Observed MOFC Rate**"),
+    `Predicted MOFC Rate` = md("**Predicted MOFC Rate**"),
+    # `Predicted MOFC Rate` = html('<span style="text-decoration:overline; font-weight:bold">Predicted MOFC Rate</span>') ... use that only if we include a footnote
+  ) |> 
+  cols_align(
+    align = "center",
+    columns = Variable:`Observed MOFC Rate`
+  ) |> 
+  cols_align(
+    align = "center",
+    columns = Variable:`Predicted MOFC Rate`
+  ) |> 
+  tab_header(md("**Notable Coverage Tells From Defensive 2-High Shells**"),
+             md("Early Down Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022")) |> # don't forget to adjust your minimum
+  tab_style(style = cell_borders(sides = "top"),
+            locations = cells_title("title")) |> 
+  tab_options(
+    table.border.top.style = "a"
+  ) # |> 
+  # tab_footnote(
+  #   footnote = " ",
+  #   locations = cells_column_labels(
+  #     columns = `Predicted MOFC Rate`
+  #   )
+  # )
+
+gtsave(Telegraphs_2High_FancyTable_WithColors, "Telegraphs_2High_FancyTable_WithColors.png")
+
+# Now do it with no colors
+Telegraphs_2High_FancyTable_NoColors <- Telegraphs_2High_DF |>
+  # filter(officialPosition %in% c("OLB", "DE")) |> 
+  # mutate(rank = row_number()) |> 
+  # select(1:2, "Feature", "PostSnap_MOF_Num", "Explanation") |> 
+  head(20) |> 
+  gt() |>
+  tab_options(
+    table.border.top.color = "white",
+    row.striping.include_table_body = FALSE
+  ) |>
+  opt_table_font(
+    font = list(
+      google_font("Chivo"),
+      default_fonts()
+    )
+  ) |>
+  fmt_number(
+    columns = c(`Observed MOFC Rate`),
+    decimals = 3,
+  ) |>
+  fmt_number(
+    columns = c(`Predicted MOFC Rate`),
+    decimals = 3,
+  ) |>
+  cols_label(
+    Variable = md("**Variable**"), # the md is what makes the headers show up as bold
+    `Observed MOFC Rate` = md("**Observed MOFC Rate**"),
+    `Predicted MOFC Rate` = md("**Predicted MOFC Rate**"),
+    # `Predicted MOFC Rate` = html('<span style="text-decoration:overline; font-weight:bold">Predicted MOFC Rate</span>') ... use that only if we include a footnote
+  ) |> 
+  cols_align(
+    align = "center",
+    columns = Variable:`Observed MOFC Rate`
+  ) |> 
+  cols_align(
+    align = "center",
+    columns = Variable:`Predicted MOFC Rate`
+  ) |> 
+  tab_header(md("**Notable Coverage Tells From Defensive 2-High Shells**"),
+             md("Early Down Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022")) |> # don't forget to adjust your minimum
+  tab_style(style = cell_borders(sides = "top"),
+            locations = cells_title("title")) |> 
+  tab_options(
+    table.border.top.style = "a"
+  ) # |> 
+# tab_footnote(
+#   footnote = " ",
+#   locations = cells_column_labels(
+#     columns = `Predicted MOFC Rate`
+#   )
+# )
+
+gtsave(Telegraphs_2High_FancyTable_NoColors, "Telegraphs_2High_FancyTable_NoColors.png")
+
+# Now do the same for 1-high
+Telegraphs_1High_FancyTable_WithColors <- Telegraphs_1High_DF |>
+  # filter(officialPosition %in% c("OLB", "DE")) |> 
+  # mutate(rank = row_number()) |> 
+  # select(1:2, "Feature", "PostSnap_MOF_Num", "Explanation") |> 
+  head(20) |> 
+  gt() |>
+  tab_options(
+    table.border.top.color = "white",
+    row.striping.include_table_body = FALSE
+  ) |>
+  opt_table_font(
+    font = list(
+      google_font("Chivo"),
+      default_fonts()
+    )
+  ) |>
+  fmt_number(
+    columns = c(`Observed MOFC Rate`),
+    decimals = 3,
+  ) |>
+  fmt_number(
+    columns = c(`Predicted MOFC Rate`),
+    decimals = 3,
+  ) |>
+  data_color(
+    columns = c(`Observed MOFC Rate`),
+    colors = scales::col_numeric(
+      palette = c("darkgreen", "green"),
+      domain = NULL
+    )
+  ) |> 
+  data_color(
+    columns = c(`Predicted MOFC Rate`),
+    colors = scales::col_numeric(
+      palette = c("darkgreen", "green"),
+      domain = NULL
+    )
+  ) |> 
+  cols_label(
+    Variable = md("**Variable**"), # the md is what makes the headers show up as bold
+    `Observed MOFC Rate` = md("**Observed MOFC Rate**"),
+    `Predicted MOFC Rate` = md("**Predicted MOFC Rate**"),
+    # `Predicted MOFC Rate` = html('<span style="text-decoration:overline; font-weight:bold">Predicted MOFC Rate</span>') ... use that only if we include a footnote
+  ) |> 
+  cols_align(
+    align = "center",
+    columns = Variable:`Observed MOFC Rate`
+  ) |> 
+  cols_align(
+    align = "center",
+    columns = Variable:`Predicted MOFC Rate`
+  ) |> 
+  tab_header(md("**Notable Coverage Tells From Defensive 1-High Shells**"),
+             md("Early Down Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022")) |> # don't forget to adjust your minimum
+  tab_style(style = cell_borders(sides = "top"),
+            locations = cells_title("title")) |> 
+  tab_options(
+    table.border.top.style = "a"
+  ) # |> 
+# tab_footnote(
+#   footnote = " ",
+#   locations = cells_column_labels(
+#     columns = `Predicted MOFC Rate`
+#   )
+# )
+
+gtsave(Telegraphs_1High_FancyTable_WithColors, "Telegraphs_1High_FancyTable_WithColors.png")
+
+# Now do it with no colors
+Telegraphs_1High_FancyTable_NoColors <- Telegraphs_1High_DF |>
+  # filter(officialPosition %in% c("OLB", "DE")) |> 
+  # mutate(rank = row_number()) |> 
+  # select(1:2, "Feature", "PostSnap_MOF_Num", "Explanation") |> 
+  head(20) |> 
+  gt() |>
+  tab_options(
+    table.border.top.color = "white",
+    row.striping.include_table_body = FALSE
+  ) |>
+  opt_table_font(
+    font = list(
+      google_font("Chivo"),
+      default_fonts()
+    )
+  ) |>
+  fmt_number(
+    columns = c(`Observed MOFC Rate`),
+    decimals = 3,
+  ) |>
+  fmt_number(
+    columns = c(`Predicted MOFC Rate`),
+    decimals = 3,
+  ) |>
+  cols_label(
+    Variable = md("**Variable**"), # the md is what makes the headers show up as bold
+    `Observed MOFC Rate` = md("**Observed MOFC Rate**"),
+    `Predicted MOFC Rate` = md("**Predicted MOFC Rate**"),
+    # `Predicted MOFC Rate` = html('<span style="text-decoration:overline; font-weight:bold">Predicted MOFC Rate</span>') ... use that only if we include a footnote
+  ) |> 
+  cols_align(
+    align = "center",
+    columns = Variable:`Observed MOFC Rate`
+  ) |> 
+  cols_align(
+    align = "center",
+    columns = Variable:`Predicted MOFC Rate`
+  ) |> 
+  tab_header(md("**Notable Coverage Tells From Defensive 1-High Shells**"),
+             md("Early Down Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022")) |> # don't forget to adjust your minimum
+  tab_style(style = cell_borders(sides = "top"),
+            locations = cells_title("title")) |> 
+  tab_options(
+    table.border.top.style = "a"
+  ) # |> 
+# tab_footnote(
+#   footnote = " ",
+#   locations = cells_column_labels(
+#     columns = `Predicted MOFC Rate`
+#   )
+# )
+
+gtsave(Telegraphs_1High_FancyTable_NoColors, "Telegraphs_1High_FancyTable_NoColors.png")
 
 # And, make a gt table (either 2-high, or all plays) ranking features by how correlated they are with PostSnap_MOF_Num
 # First, gotta sort in descending order, starting with all plays ... but make it in descending order of ABSOLUTE correlation
