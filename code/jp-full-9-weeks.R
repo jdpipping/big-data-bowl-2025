@@ -1283,10 +1283,11 @@ MergedData <- MergedData %>% mutate(Y_SpeedTowardMOF_Diff_BetweenSafeties_AtSnap
 MergedData <- MergedData %>% mutate(Y_AccTowardMOF_Diff_BetweenSafeties_AtSnap = abs(Safety1_Y_AccTowardMOF_AtSnap - Safety2_Y_AccTowardMOF_AtSnap))
 
 # We can also directly mutate variables for the max/min X (i.e. vertical) velocity by a safety at the snap
+# Could repeat this for vertical acceleration too, if needed
 MergedData <- MergedData %>% 
-  mutate(Max_X_vel_TowardBall_AnySafety_AtSnap = pmax(Safety1_x_vel_component_AtSnap, Safety2_x_vel_component_AtSnap, na.rm = TRUE))
+  mutate(Max_X_vel_component_AnySafety_AtSnap = pmax(Safety1_x_vel_component_AtSnap, Safety2_x_vel_component_AtSnap, na.rm = TRUE))
 MergedData <- MergedData %>% 
-  mutate(Min_X_vel_TowardBall_AnySafety_AtSnap = pmin(Safety1_x_vel_component_AtSnap, Safety2_x_vel_component_AtSnap, na.rm = TRUE))
+  mutate(Min_X_vel_component_AnySafety_AtSnap = pmin(Safety1_x_vel_component_AtSnap, Safety2_x_vel_component_AtSnap, na.rm = TRUE))
 
 # AND don't forget difference in the absolute distances from MOF between the safeties at the snap
 # In other words, if one safety is 2 yards to his left of MOF, and other is 12 yards to his right, that's 10, not 14
