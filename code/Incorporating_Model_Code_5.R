@@ -137,7 +137,7 @@ rm(Dropbacks_Merged, missing_cols, final_dropbacks_1High, final_dropbacks_2High)
 # And change column name of minSafetyDistToMOF to make it less ambiguous
 final_dropbacks_merged <- final_dropbacks_merged %>% rename(min_SafetyAbsHorizDistToMOF_PreSnap = `minSafetyDistToMOF`)
 
-# Some good ones to check out where the model correctly guessed a disguised coverage
+# Some good ones to check out where the model correctly guessed a disguised coverage -- can use this to find video examples
 # And recall that PostSnap_MOF_Num in final_dropbacks_merged is equivalent to mofo_postsnap in the original NN_model_results_DF
 # View(NN_model_results_DF %>% filter((num_safeties_pre_snap == 2 & p < 0.3 & PostSnap_MOF_Num == 0) | (num_safeties_pre_snap == 1 & p > 0.7 & PostSnap_MOF_Num == 1)))
 # View(final_dropbacks_merged %>% filter(gameId == 2022091101, playId == 2298)) ... 2-high turns to Cover 3 Sky
