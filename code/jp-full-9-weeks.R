@@ -1210,7 +1210,7 @@ Safety2_PreSnapMovement_ByPlay <- MergedData_PreSnapFrames %>% filter(nflId == p
             Safety2_PosGroup = max(PosGroup), Safety2_position = max(position))
 rm(MergedData_PreSnapFrames)
 
-# Let's define "creep distance" as distance from ball at the time of line_set - distance from ball at the snap
+# Let's define "creep distance" as distance from ball at the time of line_set - distance from ball at the snap ... this way, positive value means moving toward ball
 # Another option is maximum distance from ball - distance from ball at the snap
 # And another is maximum distance from ball - minimum distance from ball
 # But we should probably account for players back-pedaling further away from the ball as well  ... i.e. we want negative values to be possible
