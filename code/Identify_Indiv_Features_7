@@ -1697,14 +1697,16 @@ print(final_plot_1High)
 
 # Now turn the top "telegraphs" into a reactable 
 # Start with 2-high
-Telegraphs_2High_Variables <- c("One safety crept 4+ yards up vertically", "Safeties’ diff in vertical velocities at snap is 4+ yards/sec", "Safeties have vertical stagger of 7+ yards at snap")
-Telegraphs_2High_ObservedMOFC <- c(1 - mean((Stats_ByFullPlay_2High %>% filter(Max_VertCreptDistance_AnySafety >= 4))$PostSnap_MOF_Num), 1 - mean((Stats_ByFullPlay_2High %>% filter(X_Vel_Diff_BetweenSafeties_AtSnap >= 4))$PostSnap_MOF_Num), 1 - mean((Stats_ByFullPlay_2High %>% filter(X_Diff_BetweenSafeties_AtSnap >= 7))$PostSnap_MOF_Num))
-Telegraphs_2High_PredictedMOFC <- c(1 - mean((Stats_ByFullPlay_2High %>% filter(Max_VertCreptDistance_AnySafety >= 4))$MOFO_probability_FDA), 1 - mean((Stats_ByFullPlay_2High %>% filter(X_Vel_Diff_BetweenSafeties_AtSnap >= 4))$MOFO_probability_FDA), 1 - mean((Stats_ByFullPlay_2High %>% filter(X_Diff_BetweenSafeties_AtSnap >= 7))$MOFO_probability_FDA))
-Telegraphs_2High_DF <- cbind(Telegraphs_2High_Variables, Telegraphs_2High_ObservedMOFC, Telegraphs_2High_PredictedMOFC)
-colnames(Telegraphs_2High_DF) <- c("Variable", "Observed MOFC Rate", "Predicted MOFC Rate")
+Telegraphs_2High_Variables <- c("One safety crept 4+ yards up vertically", "Safeties’ diff in vertical velocities at snap is 4+ yards/sec", "Safeties have vertical stagger of 7+ yards at snap", "Base Rate among all 2-high plays (early downs, 5+ yds to go)")
+Telegraphs_2High_ObservedMOFC <- c(1 - mean((Stats_ByFullPlay_2High %>% filter(Max_VertCreptDistance_AnySafety >= 4))$PostSnap_MOF_Num), 1 - mean((Stats_ByFullPlay_2High %>% filter(X_Vel_Diff_BetweenSafeties_AtSnap >= 4))$PostSnap_MOF_Num), 1 - mean((Stats_ByFullPlay_2High %>% filter(X_Diff_BetweenSafeties_AtSnap >= 7))$PostSnap_MOF_Num), 1 - mean(Stats_ByFullPlay_2High$PostSnap_MOF_Num))
+Telegraphs_2High_PredictedMOFC <- c(1 - mean((Stats_ByFullPlay_2High %>% filter(Max_VertCreptDistance_AnySafety >= 4))$MOFO_probability_FDA), 1 - mean((Stats_ByFullPlay_2High %>% filter(X_Vel_Diff_BetweenSafeties_AtSnap >= 4))$MOFO_probability_FDA), 1 - mean((Stats_ByFullPlay_2High %>% filter(X_Diff_BetweenSafeties_AtSnap >= 7))$MOFO_probability_FDA), 1 - mean(Stats_ByFullPlay_2High$MOFO_probability_FDA))
+Telegraphs_2High_Frequencies <- c((nrow(Stats_ByFullPlay_2High %>% filter(Max_VertCreptDistance_AnySafety >= 4)) / nrow(Stats_ByFullPlay_2High)), (nrow(Stats_ByFullPlay_2High %>% filter(X_Vel_Diff_BetweenSafeties_AtSnap >= 4)) / nrow(Stats_ByFullPlay_2High)), (nrow(Stats_ByFullPlay_2High %>% filter(X_Diff_BetweenSafeties_AtSnap >= 7)) / nrow(Stats_ByFullPlay_2High)), 1)
+Telegraphs_2High_DF <- cbind(Telegraphs_2High_Variables, Telegraphs_2High_ObservedMOFC, Telegraphs_2High_PredictedMOFC, Telegraphs_2High_Frequencies)
+colnames(Telegraphs_2High_DF) <- c("Variable", "Observed MOFC Rate", "Predicted MOFC Rate", "Frequency")
 Telegraphs_2High_DF <- as.data.frame(Telegraphs_2High_DF)
 class(Telegraphs_2High_DF$`Observed MOFC Rate`) <- "numeric"
 class(Telegraphs_2High_DF$`Predicted MOFC Rate`) <- "numeric"
+class(Telegraphs_2High_DF$`Frequency`) <- "numeric"
 Telegraphs_2High_DF <- Telegraphs_2High_DF %>% arrange(desc(`Predicted MOFC Rate`))
 
 # Function to count the maximum number of decimal places in a numeric column, for reactable() purposes
@@ -1729,14 +1731,16 @@ reactable(Telegraphs_2High_DF, defaultPageSize = 20, columns = map(Telegraphs_2H
 }))
 
 # Now repeat for 1-high
-Telegraphs_1High_Variables <- c("Safety is within 3 horiz yards of MOF at snap", "Safety is moving horizontally toward MOF at snap", "Safety is moving away from LOS at snap")
-Telegraphs_1High_ObservedMOFC <- c(1 - mean((Stats_ByFullPlay_1High %>% filter(Max_Y_AbsDistFromMOF_AtSnap_AnySafety < 3))$PostSnap_MOF_Num), 1 - mean((Stats_ByFullPlay_1High %>% filter(Max_Y_SpeedTowardMOF_AtSnap_AnySafety >= 0))$PostSnap_MOF_Num), 1 - mean((Stats_ByFullPlay_1High %>% filter(Max_X_vel_TowardBall_AnySafety_AtSnap < 0))$PostSnap_MOF_Num))
-Telegraphs_1High_PredictedMOFC <- c(1 - mean((Stats_ByFullPlay_1High %>% filter(Max_Y_AbsDistFromMOF_AtSnap_AnySafety < 3))$MOFO_probability_FDA), 1 - mean((Stats_ByFullPlay_1High %>% filter(Max_Y_SpeedTowardMOF_AtSnap_AnySafety >= 0))$MOFO_probability_FDA), 1 - mean((Stats_ByFullPlay_1High %>% filter(Max_X_vel_TowardBall_AnySafety_AtSnap < 0))$MOFO_probability_FDA))
-Telegraphs_1High_DF <- cbind(Telegraphs_1High_Variables, Telegraphs_1High_ObservedMOFC, Telegraphs_1High_PredictedMOFC)
-colnames(Telegraphs_1High_DF) <- c("Variable", "Observed MOFC Rate", "Predicted MOFC Rate")
+Telegraphs_1High_Variables <- c("Safety is within 3 horiz yards of MOF at snap", "Safety is moving horizontally toward MOF at snap", "Safety is moving away from LOS at snap", "Base Rate among all 1-high plays (early downs, 5+ yds to go)")
+Telegraphs_1High_ObservedMOFC <- c(1 - mean((Stats_ByFullPlay_1High %>% filter(Max_Y_AbsDistFromMOF_AtSnap_AnySafety < 3))$PostSnap_MOF_Num), 1 - mean((Stats_ByFullPlay_1High %>% filter(Max_Y_SpeedTowardMOF_AtSnap_AnySafety >= 0))$PostSnap_MOF_Num), 1 - mean((Stats_ByFullPlay_1High %>% filter(Max_X_vel_TowardBall_AnySafety_AtSnap < 0))$PostSnap_MOF_Num), 1 - mean(Stats_ByFullPlay_1High$PostSnap_MOF_Num))
+Telegraphs_1High_PredictedMOFC <- c(1 - mean((Stats_ByFullPlay_1High %>% filter(Max_Y_AbsDistFromMOF_AtSnap_AnySafety < 3))$MOFO_probability_FDA), 1 - mean((Stats_ByFullPlay_1High %>% filter(Max_Y_SpeedTowardMOF_AtSnap_AnySafety >= 0))$MOFO_probability_FDA), 1 - mean((Stats_ByFullPlay_1High %>% filter(Max_X_vel_TowardBall_AnySafety_AtSnap < 0))$MOFO_probability_FDA), 1 - mean(Stats_ByFullPlay_1High$MOFO_probability_FDA))
+Telegraphs_1High_Frequencies <- c((nrow(Stats_ByFullPlay_1High %>% filter(Max_Y_AbsDistFromMOF_AtSnap_AnySafety < 3)) / nrow(Stats_ByFullPlay_1High)), (nrow(Stats_ByFullPlay_1High %>% filter(Max_Y_SpeedTowardMOF_AtSnap_AnySafety >= 0)) / nrow(Stats_ByFullPlay_1High)), (nrow(Stats_ByFullPlay_1High %>% filter(Max_X_vel_TowardBall_AnySafety_AtSnap < 0)) / nrow(Stats_ByFullPlay_1High)), 1)
+Telegraphs_1High_DF <- cbind(Telegraphs_1High_Variables, Telegraphs_1High_ObservedMOFC, Telegraphs_1High_PredictedMOFC, Telegraphs_1High_Frequencies)
+colnames(Telegraphs_1High_DF) <- c("Variable", "Observed MOFC Rate", "Predicted MOFC Rate", "Frequency")
 Telegraphs_1High_DF <- as.data.frame(Telegraphs_1High_DF)
 class(Telegraphs_1High_DF$`Observed MOFC Rate`) <- "numeric"
 class(Telegraphs_1High_DF$`Predicted MOFC Rate`) <- "numeric"
+class(Telegraphs_1High_DF$`Frequency`) <- "numeric"
 Telegraphs_1High_DF <- Telegraphs_1High_DF %>% arrange(desc(`Predicted MOFC Rate`))
 
 # Now, create reactable with that conditional formatting
@@ -1771,6 +1775,10 @@ Telegraphs_2High_FancyTable_WithColors <- Telegraphs_2High_DF |>
     columns = c(`Predicted MOFC Rate`),
     decimals = 3,
   ) |>
+  fmt_number(
+    columns = c(`Frequency`),
+    decimals = 3,
+  ) |>
   data_color(
     columns = c(`Observed MOFC Rate`),
     colors = scales::col_numeric(
@@ -1790,19 +1798,23 @@ Telegraphs_2High_FancyTable_WithColors <- Telegraphs_2High_DF |>
     `Observed MOFC Rate` = md("**Observed MOFC Rate**"),
     `Predicted MOFC Rate` = md("**Predicted MOFC Rate**"),
     # `Predicted MOFC Rate` = html('<span style="text-decoration:overline; font-weight:bold">Predicted MOFC Rate</span>') ... use that only if we include a footnote
-  ) |> 
+    Frequency = md("**Frequency of Variable**"),
+    ) |> 
   cols_align(
     align = "center",
-    columns = Variable:`Observed MOFC Rate`
-  ) |> 
-  cols_align(
-    align = "center",
-    columns = Variable:`Predicted MOFC Rate`
+    columns = Variable:Frequency
   ) |> 
   tab_header(md("**Notable Coverage Tells From Defensive 2-High Shells**"),
              md("Early Down Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022")) |> # don't forget to adjust your minimum
   tab_style(style = cell_borders(sides = "top"),
             locations = cells_title("title")) |> 
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_body(
+      columns = everything(),
+      rows = 1:3 # this is how to make the top three rows have bold font
+    )
+  ) |>
   tab_options(
     table.border.top.style = "a"
   ) # |> 
@@ -1840,24 +1852,32 @@ Telegraphs_2High_FancyTable_NoColors <- Telegraphs_2High_DF |>
     columns = c(`Predicted MOFC Rate`),
     decimals = 3,
   ) |>
+  fmt_number(
+    columns = c(`Frequency`),
+    decimals = 3,
+  ) |>
   cols_label(
     Variable = md("**Variable**"), # the md is what makes the headers show up as bold
     `Observed MOFC Rate` = md("**Observed MOFC Rate**"),
     `Predicted MOFC Rate` = md("**Predicted MOFC Rate**"),
     # `Predicted MOFC Rate` = html('<span style="text-decoration:overline; font-weight:bold">Predicted MOFC Rate</span>') ... use that only if we include a footnote
-  ) |> 
+    Frequency = md("**Frequency of Variable**"),
+    ) |> 
   cols_align(
     align = "center",
-    columns = Variable:`Observed MOFC Rate`
-  ) |> 
-  cols_align(
-    align = "center",
-    columns = Variable:`Predicted MOFC Rate`
+    columns = Variable:Frequency
   ) |> 
   tab_header(md("**Notable Coverage Tells From Defensive 2-High Shells**"),
              md("Early Down Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022")) |> # don't forget to adjust your minimum
   tab_style(style = cell_borders(sides = "top"),
             locations = cells_title("title")) |> 
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_body(
+      columns = everything(),
+      rows = 1:3 # this is how to make the top three rows have bold font
+    )
+  ) |>
   tab_options(
     table.border.top.style = "a"
   ) # |> 
@@ -1895,6 +1915,10 @@ Telegraphs_1High_FancyTable_WithColors <- Telegraphs_1High_DF |>
     columns = c(`Predicted MOFC Rate`),
     decimals = 3,
   ) |>
+  fmt_number(
+    columns = c(`Frequency`),
+    decimals = 3,
+  ) |>
   data_color(
     columns = c(`Observed MOFC Rate`),
     colors = scales::col_numeric(
@@ -1914,19 +1938,23 @@ Telegraphs_1High_FancyTable_WithColors <- Telegraphs_1High_DF |>
     `Observed MOFC Rate` = md("**Observed MOFC Rate**"),
     `Predicted MOFC Rate` = md("**Predicted MOFC Rate**"),
     # `Predicted MOFC Rate` = html('<span style="text-decoration:overline; font-weight:bold">Predicted MOFC Rate</span>') ... use that only if we include a footnote
-  ) |> 
+    Frequency = md("**Frequency of Variable**"),
+    ) |> 
   cols_align(
     align = "center",
-    columns = Variable:`Observed MOFC Rate`
-  ) |> 
-  cols_align(
-    align = "center",
-    columns = Variable:`Predicted MOFC Rate`
+    columns = Variable:Frequency
   ) |> 
   tab_header(md("**Notable Coverage Tells From Defensive 1-High Shells**"),
              md("Early Down Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022")) |> # don't forget to adjust your minimum
   tab_style(style = cell_borders(sides = "top"),
             locations = cells_title("title")) |> 
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_body(
+      columns = everything(),
+      rows = 1:3 # this is how to make the top three rows have bold font
+    )
+  ) |>
   tab_options(
     table.border.top.style = "a"
   ) # |> 
@@ -1964,24 +1992,32 @@ Telegraphs_1High_FancyTable_NoColors <- Telegraphs_1High_DF |>
     columns = c(`Predicted MOFC Rate`),
     decimals = 3,
   ) |>
+  fmt_number(
+    columns = c(`Frequency`),
+    decimals = 3,
+  ) |>
   cols_label(
     Variable = md("**Variable**"), # the md is what makes the headers show up as bold
     `Observed MOFC Rate` = md("**Observed MOFC Rate**"),
     `Predicted MOFC Rate` = md("**Predicted MOFC Rate**"),
     # `Predicted MOFC Rate` = html('<span style="text-decoration:overline; font-weight:bold">Predicted MOFC Rate</span>') ... use that only if we include a footnote
-  ) |> 
+    Frequency = md("**Frequency of Variable**"),
+    ) |> 
   cols_align(
     align = "center",
-    columns = Variable:`Observed MOFC Rate`
-  ) |> 
-  cols_align(
-    align = "center",
-    columns = Variable:`Predicted MOFC Rate`
+    columns = Variable:Frequency
   ) |> 
   tab_header(md("**Notable Coverage Tells From Defensive 1-High Shells**"),
              md("Early Down Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022")) |> # don't forget to adjust your minimum
   tab_style(style = cell_borders(sides = "top"),
             locations = cells_title("title")) |> 
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_body(
+      columns = everything(),
+      rows = 1:3 # this is how to make the top three rows have bold font
+    )
+  ) |>
   tab_options(
     table.border.top.style = "a"
   ) # |> 
