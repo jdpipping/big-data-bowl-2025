@@ -7,6 +7,7 @@ library(tidyverse)
 # Stats_ByFullPlay_Final <- fread("Stats_ByFullPlay_Final.csv")
 Stats_ByFullPlay_All9Weeks <- fread("Stats_ByFullPlay_All9Weeks.csv")
 # mean(Stats_ByFullPlay_All9Weeks$PostSnap_MOF_Num) ... NOTE that across all of our project's plays, MOFO rate is 39.6%
+# mean(Stats_ByFullPlay_All9Weeks$MOFO_probability_FDA)  ... across all project plays, it's 39.4%
 
 colnames(Stats_ByFullPlay_9Weeks) # recall that Snap_Entropy is the continuous play-level one (HighEntropy is binary)
 
@@ -30,6 +31,8 @@ Stats_ByFullPlay_2High <- Stats_ByFullPlay_All9Weeks %>% filter(num_safeties_pre
 Stats_ByFullPlay_1High <- Stats_ByFullPlay_All9Weeks %>% filter(num_safeties_pre_snap == 1)
 # mean(Stats_ByFullPlay_2High$PostSnap_MOF_Num); it's 0.5016
 # mean(Stats_ByFullPlay_1High$PostSnap_MOF_Num); it's 0.1559
+# mean(Stats_ByFullPlay_2High$MOFO_probability_FDA); it's 0.4976
+# mean(Stats_ByFullPlay_1High$MOFO_probability_FDA); it's 0.1581
 
 MOFO_Features_AllPlays <- Stats_ByFullPlay_All9Weeks %>%
   select(c("PostSnap_MOF_Num", "X_Diff_BetweenSafeties_AtSnap", "TotDist_BetweenSafeties_AtSnap",
