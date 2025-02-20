@@ -1798,7 +1798,7 @@ Telegraphs_2High_FancyTable_WithColors <- Telegraphs_2High_DF |>
     `Observed MOFC Rate` = md("**Observed MOFC Rate**"),
     `Predicted MOFC Rate` = md("**Predicted MOFC Rate**"),
     # `Predicted MOFC Rate` = html('<span style="text-decoration:overline; font-weight:bold">Predicted MOFC Rate</span>') ... use that only if we include a footnote
-    Frequency = md("**Frequency of Variable**"),
+    Frequency = md("**Frequency**"),
     ) |> 
   cols_align(
     align = "center",
@@ -1861,7 +1861,7 @@ Telegraphs_2High_FancyTable_NoColors <- Telegraphs_2High_DF |>
     `Observed MOFC Rate` = md("**Observed MOFC Rate**"),
     `Predicted MOFC Rate` = md("**Predicted MOFC Rate**"),
     # `Predicted MOFC Rate` = html('<span style="text-decoration:overline; font-weight:bold">Predicted MOFC Rate</span>') ... use that only if we include a footnote
-    Frequency = md("**Frequency of Variable**"),
+    Frequency = md("**Frequency**"),
     ) |> 
   cols_align(
     align = "center",
@@ -1938,7 +1938,7 @@ Telegraphs_1High_FancyTable_WithColors <- Telegraphs_1High_DF |>
     `Observed MOFC Rate` = md("**Observed MOFC Rate**"),
     `Predicted MOFC Rate` = md("**Predicted MOFC Rate**"),
     # `Predicted MOFC Rate` = html('<span style="text-decoration:overline; font-weight:bold">Predicted MOFC Rate</span>') ... use that only if we include a footnote
-    Frequency = md("**Frequency of Variable**"),
+    Frequency = md("**Frequency**"),
     ) |> 
   cols_align(
     align = "center",
@@ -2001,7 +2001,7 @@ Telegraphs_1High_FancyTable_NoColors <- Telegraphs_1High_DF |>
     `Observed MOFC Rate` = md("**Observed MOFC Rate**"),
     `Predicted MOFC Rate` = md("**Predicted MOFC Rate**"),
     # `Predicted MOFC Rate` = html('<span style="text-decoration:overline; font-weight:bold">Predicted MOFC Rate</span>') ... use that only if we include a footnote
-    Frequency = md("**Frequency of Variable**"),
+    Frequency = md("**Frequency**"),
     ) |> 
   cols_align(
     align = "center",
