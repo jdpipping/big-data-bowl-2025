@@ -1520,7 +1520,7 @@ Stats_ByFullPlay_All9Weeks <- final_dropbacks_merged %>%
             Max_Y_AbsAcc_AtSnap_AnySafety = max(Max_Y_AbsAcc_AtSnap_AnySafety),              
             Max_Y_AbsDistFromMOF_AtSnap_AnySafety = max(Max_Y_AbsDistFromMOF_AtSnap_AnySafety),
             Max_Y_SpeedTowardMOF_AtSnap_AnySafety = max(Max_Y_SpeedTowardMOF_AtSnap_AnySafety),
-            Min_Y_SpeedTowardMOF_AtSnap_AnySafety = min(Max_Y_SpeedTowardMOF_AtSnap_AnySafety),
+            Min_Y_SpeedTowardMOF_AtSnap_AnySafety = min(Min_Y_SpeedTowardMOF_AtSnap_AnySafety),
             Max_Y_AccTowardMOF_AtSnap_AnySafety = max(Max_Y_AccTowardMOF_AtSnap_AnySafety),
             Min_Y_AccTowardMOF_AtSnap_AnySafety = min(Max_Y_AccTowardMOF_AtSnap_AnySafety),
             Safety1_Initial_X = Safety1_Initial_X[1], Safety1_Initial_Y = Safety1_Initial_Y[1], 
