@@ -10,11 +10,11 @@ colnames(Stats_ByFullPlay_All9Weeks) # recall that Snap_Entropy is the continuou
 
 # Before we make these matrices, adjust Min_PreSnap_X_vel_component_AnySafety and Min_PreSnap_X_acc_component_AnySafety
 # This is to get rid of the "double negative" idea ... in other words, make a high velocity toward the ball show up as a positive number
-Stats_ByFullPlay_9Weeks <- Stats_ByFullPlay_9Weeks %>% 
+Stats_ByFullPlay_All9Weeks <- Stats_ByFullPlay_All9Weeks %>% 
   mutate(Max_PreSnap_X_vel_TowardBall_AnySafety = -1 * Min_PreSnap_X_vel_component_AnySafety)
-Stats_ByFullPlay_9Weeks <- Stats_ByFullPlay_9Weeks %>% 
+Stats_ByFullPlay_All9Weeks <- Stats_ByFullPlay_All9Weeks %>% 
   mutate(Max_PreSnap_X_acc_TowardBall_AnySafety = -1 * Min_PreSnap_X_acc_component_AnySafety)
-Stats_ByFullPlay_9Weeks <- Stats_ByFullPlay_9Weeks %>% select(-c("Min_PreSnap_X_vel_component_AnySafety", "Min_PreSnap_X_acc_component_AnySafety"))
+Stats_ByFullPlay_All9Weeks <- Stats_ByFullPlay_All9Weeks %>% select(-c("Min_PreSnap_X_vel_component_AnySafety", "Min_PreSnap_X_acc_component_AnySafety"))
 
 # Repeat the same idea to avoid the "double negative" that we used for pre-snap vertical velocity
 # I.e., now the vertical velocity will show up as positive if the safety is moving closer to LOS at the snap
