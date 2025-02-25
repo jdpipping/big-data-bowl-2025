@@ -122,4 +122,96 @@ final_plot_A =
 ggsave("Cole_2High_Features_3Panel.png", 
        final_plot_A,width=15, height=6.5)
 
+# Here is an adjusted version to account for Ally Blake's recommendations
+
+# FIXME MANUALLY ADD THE 3 SEPARATE X AXES...
+# facet_x1 = "Vertical Stagger \nb/w Safeties at Snap (Yards)"
+# facet_x2 = "Difference in Vert Velocities \nb/w Safeties at Snap (Yds/Sec)"
+# facet_x3 = "Highest Vertical 'Creep' Distance \nby Safety From OL Set to Snap (Yards)"
+facet_x1 = "Vertical Stagger \nb/w Safeties at Snap"
+facet_x2 = "Difference in Vert Velocities \nb/w Safeties at Snap"
+facet_x3 = "Highest Vertical 'Creep' Distance \nby Safety"
+caption_text = paste0(
+  # str_remove_all(facet_x1,"\n"), ": ", " XX,\n",
+  # str_remove_all(facet_x2,"\n"), ": ", " XX,\n",
+  # str_remove_all(facet_x3,"\n"), ": ", " XX."
+ "Vert Velocities: toward LOS is negative, away from LOS is positive\n",
+ "'Creep' Distance: safety's distance moved forward b/w OL Set and Snap\n",
+ "Vertical Stagger: vert distance b/w safeties at time of snap"
+) 
+final_plot_A = 
+  Stats_ByFullPlay_2High %>%
+  select(
+    MOFO_probability_FDA, 
+    PostSnap_MOF_Num,
+    X_Diff_BetweenSafeties_AtSnap,
+    X_Vel_Diff_BetweenSafeties_AtSnap,
+    Max_VertCreptDistance_AnySafety
+  ) %>%
+  pivot_longer(-c(PostSnap_MOF_Num,MOFO_probability_FDA), names_to="var", values_to = "x") %>%
+  mutate(
+    featureLab = case_when(
+      var == "X_Diff_BetweenSafeties_AtSnap" ~ paste0(facet_x1, " (Yards)"),
+      var == "X_Vel_Diff_BetweenSafeties_AtSnap" ~ paste0(facet_x2, " (Yards/Sec)"),
+      var == "Max_VertCreptDistance_AnySafety" ~ paste0(facet_x3, " (Yards)")
+    )
+  ) %>%
+  filter(
+    (var == "X_Diff_BetweenSafeties_AtSnap" & 0 <= x & x <= 10) |
+      (var == "X_Vel_Diff_BetweenSafeties_AtSnap" & 0 <= x & x <= 9) |
+      (var == "Max_VertCreptDistance_AnySafety" & -4 <= x & x <= 8) 
+  ) %>%
+  ggplot() +
+  facet_wrap(~featureLab, scales="free_x") +
+  stat_smooth(mapping = 
+                aes(
+                  x = x, y = MOFO_probability_FDA, 
+                  # color = "Estimated \nMOFO \nProbability\n"
+                  color = "Estimated MOFO Probability"
+                ),
+              method = "gam", se = F, span = 0.75, linewidth=2) +
+  stat_smooth(mapping = 
+                aes(
+                  x = x, y = PostSnap_MOF_Num, 
+                  # color = "Observed \nMOFO \nRate\n"
+                  color = "Observed MOFO Rate"
+                ),
+              method.args = list(family = "binomial"), 
+              method = "gam", se = F, span = 0.75, linewidth=2) +
+  scale_x_continuous(breaks = seq(-10, 10, 2)) +
+  coord_cartesian(ylim = c(0, 1)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.25), labels = scales::percent_format(accuracy = 5L)) +
+  scale_color_manual(values = c("firebrick2", "dodgerblue2")) +
+  theme_bw() + 
+  labs(
+    x = "",
+    # x = "Feature",
+    y = "MOFO Probability",
+    title = "How Estimated & Observed MOFO Rate Depend on Key Features",
+    # caption = caption_text, # REMOVE THIS LINE IF WE DON'T WANT THE FULL CAPTION
+    caption = "'Creep' Distance: Distance Covered from OL Set to Snap",
+    subtitle = "Early Down 2-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022 (n = 3029)",
+    # color = "color"
+  ) +
+  theme(
+    plot.title = element_text(size = 30, hjust = 0.5),
+    plot.subtitle = element_text(size = 16, hjust = 0.5),
+    axis.title.y = element_text(size = 28),
+    axis.title.x = element_text(size = 25),
+    axis.text.y = element_text(size = 22),
+    axis.text.x = element_text(size = 22),
+    strip.text.x  = element_text(size = 20),
+    legend.key.width = unit(3, "line"),
+    legend.text = element_text(size = 25),
+    # legend.title = element_text(size = 25),
+    legend.title=element_blank(),
+    plot.caption.position = "plot",
+    plot.caption = element_text(size = 16, hjust = 0),
+    panel.spacing = unit(2, "lines"),
+    legend.position = "bottom"
+  )
+# final_plot_A
+ggsave("Cole_2High_Features_3Panel.png", 
+       final_plot_A,width=15, height=6.5)
+
 
