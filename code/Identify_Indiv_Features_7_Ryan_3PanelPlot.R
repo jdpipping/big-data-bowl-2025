@@ -123,8 +123,6 @@ ggsave("Cole_2High_Features_3Panel.png",
        final_plot_A,width=15, height=6.5)
 
 # Here is an adjusted version to account for Ally Blake's recommendations
-
-# FIXME MANUALLY ADD THE 3 SEPARATE X AXES...
 # facet_x1 = "Vertical Stagger \nb/w Safeties at Snap (Yards)"
 # facet_x2 = "Difference in Vert Velocities \nb/w Safeties at Snap (Yds/Sec)"
 # facet_x3 = "Highest Vertical 'Creep' Distance \nby Safety From OL Set to Snap (Yards)"
