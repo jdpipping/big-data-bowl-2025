@@ -1,7 +1,7 @@
 library(tidyverse)
 
 # Stats_ByFullPlay_Final was defined in the "Aggregating Frames to Plays" GitHub file
-# Stats_ByFullPlay_All9Weeks is a CSV with same format, defined on JP's computer
+# Stats_ByFullPlay_All9Weeks is a CSV with same format, defined on JP's computer (see jp-full-9-weeks)
 
 # Read in data if necessary: 
 Stats_ByFullPlay_All9Weeks <- read_csv("Stats_ByFullPlay_All9Weeks.csv")
@@ -10,14 +10,26 @@ colnames(Stats_ByFullPlay_All9Weeks) # recall that Snap_Entropy is the continuou
 
 # Before we make these matrices, adjust Min_PreSnap_X_vel_component_AnySafety and Min_PreSnap_X_acc_component_AnySafety
 # This is to get rid of the "double negative" idea ... in other words, make a high velocity toward the ball show up as a positive number
-Stats_ByFullPlay_All9Weeks <- Stats_ByFullPlay_All9Weeks %>% 
+Stats_ByFullPlay_9Weeks <- Stats_ByFullPlay_9Weeks %>% 
   mutate(Max_PreSnap_X_vel_TowardBall_AnySafety = -1 * Min_PreSnap_X_vel_component_AnySafety)
-Stats_ByFullPlay_All9Weeks <- Stats_ByFullPlay_All9Weeks %>% 
+Stats_ByFullPlay_9Weeks <- Stats_ByFullPlay_9Weeks %>% 
   mutate(Max_PreSnap_X_acc_TowardBall_AnySafety = -1 * Min_PreSnap_X_acc_component_AnySafety)
-Stats_ByFullPlay_All9Weeks <- Stats_ByFullPlay_All9Weeks %>% select(-c("Min_PreSnap_X_vel_component_AnySafety", "Min_PreSnap_X_acc_component_AnySafety"))
+Stats_ByFullPlay_9Weeks <- Stats_ByFullPlay_9Weeks %>% select(-c("Min_PreSnap_X_vel_component_AnySafety", "Min_PreSnap_X_acc_component_AnySafety"))
+
+# Repeat the same idea to avoid the "double negative" that we used for pre-snap vertical velocity
+# I.e., now the vertical velocity will show up as positive if the safety is moving closer to LOS at the snap
+Stats_ByFullPlay_All9Weeks <- Stats_ByFullPlay_All9Weeks %>% 
+  mutate(Max_X_vel_TowardBall_AnySafety_AtSnap = -1 * Min_X_vel_component_AnySafety_AtSnap)
+Stats_ByFullPlay_All9Weeks <- Stats_ByFullPlay_All9Weeks %>% 
+  mutate(Min_X_vel_TowardBall_AnySafety_AtSnap = -1 * Max_X_vel_component_AnySafety_AtSnap)
+Stats_ByFullPlay_All9Weeks <- Stats_ByFullPlay_All9Weeks %>% select(-c("Max_X_vel_component_AnySafety_AtSnap", "Min_X_vel_component_AnySafety_AtSnap"))
 
 Stats_ByFullPlay_2High <- Stats_ByFullPlay_All9Weeks %>% filter(num_safeties_pre_snap == 2)
 Stats_ByFullPlay_1High <- Stats_ByFullPlay_All9Weeks %>% filter(num_safeties_pre_snap == 1)
+# mean(Stats_ByFullPlay_2High$PostSnap_MOF_Num); it's 0.5016
+# mean(Stats_ByFullPlay_1High$PostSnap_MOF_Num); it's 0.1559
+# mean(Stats_ByFullPlay_2High$MOFO_probability_FDA); it's 0.4976
+# mean(Stats_ByFullPlay_1High$MOFO_probability_FDA); it's 0.1581
 
 ###
 #FIXME MANUALLY ADD THE 3 SEPARATE X AXES...
