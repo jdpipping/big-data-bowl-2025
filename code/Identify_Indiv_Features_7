@@ -279,7 +279,7 @@ Plot6 <- ggplot(data = Stats_ByFullPlay_All9Weeks) +
   stat_smooth(mapping = aes(x = X_Diff_BetweenSafeties_AtSnap, y = PostSnap_MOF_Num, color = "red"),
               method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
-  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.25), labels = scales::percent_format(accuracy = 5L)) +
   scale_x_continuous(breaks = seq(0, 10, 2)) +
   coord_cartesian(xlim = c(0, 10), ylim = c(0, 1)) +
   labs(x = "Vertical Stagger b/w Safeties at Snap (Yards)", y = "MOFO Coverage Rate",
@@ -305,7 +305,7 @@ Plot7 <- ggplot(data = Stats_ByFullPlay_All9Weeks) +
   stat_smooth(mapping = aes(x = X_Vel_Diff_BetweenSafeties_AtSnap, y = PostSnap_MOF_Num, color = "red"),
               method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
-  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.25), labels = scales::percent_format(accuracy = 5L)) +
   scale_x_continuous(breaks = seq(0, 10, 2)) +
   coord_cartesian(xlim = c(0, 6), ylim = c(0, 1)) +
   labs(x = "Difference in Vertical Velocities b/w Safeties at Snap (Yds/Sec)", y = "MOFO Coverage Rate",
@@ -331,7 +331,7 @@ Plot8 <- ggplot(data = Stats_ByFullPlay_All9Weeks) +
   stat_smooth(mapping = aes(x = Max_Y_AbsDistFromMOF_AtSnap_AnySafety, y = PostSnap_MOF_Num, color = "red"),
               method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
-  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.25), labels = scales::percent_format(accuracy = 5L)) +
   scale_x_continuous(breaks = seq(0, 14, 2)) +
   coord_cartesian(xlim = c(0, 14), ylim = c(0, 1)) +
   labs(x = "Highest Horiz Distance from MOF by a Safety at the Snap (Yards)", y = "MOFO Coverage Rate",
@@ -357,7 +357,7 @@ Plot9 <- ggplot(data = Stats_ByFullPlay_All9Weeks) +
   stat_smooth(mapping = aes(x =  min_SafetyAbsHorizDistToMOF_PreSnap, y = PostSnap_MOF_Num, color = "red"),
               method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
-  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.25), labels = scales::percent_format(accuracy = 5L)) +
   scale_x_continuous(breaks = seq(0, 10, 2)) +
   coord_cartesian(xlim = c(0, 10), ylim = c(0, 1)) +
   labs(x = "Minimum Pre-Snap Horizontal Distance from MOF by a Safety (Yards)", y = "MOFO Coverage Rate",
@@ -389,7 +389,7 @@ Plot10 <- ggplot(data = Stats_ByFullPlay_2High) +
   stat_smooth(mapping = aes(x = X_Diff_BetweenSafeties_AtSnap, y = PostSnap_MOF_Num, color = "red"),
               method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
-  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.25), labels = scales::percent_format(accuracy = 5L)) +
   scale_x_continuous(breaks = seq(0, 10, 2)) +
   coord_cartesian(xlim = c(0, 10), ylim = c(0, 1)) +
   labs(x = "Vertical Stagger b/w Safeties at Snap (Yards)", y = "MOFO Coverage Rate",
@@ -415,7 +415,7 @@ Plot11 <- ggplot(data = Stats_ByFullPlay_2High) +
   stat_smooth(mapping = aes(x = X_Vel_Diff_BetweenSafeties_AtSnap, y = PostSnap_MOF_Num, color = "red"),
               method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
-  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.25), labels = scales::percent_format(accuracy = 5L)) +
   scale_x_continuous(breaks = seq(0, 10, 2)) +
   coord_cartesian(xlim = c(0, 6), ylim = c(0, 1)) +
   labs(x = "Difference in Vertical Velocities b/w Safeties at Snap (Yds/Sec)", y = "MOFO Coverage Rate",
@@ -441,7 +441,7 @@ Plot12 <- ggplot(data = Stats_ByFullPlay_2High) +
   stat_smooth(mapping = aes(x = Max_VertCreptDistance_AnySafety, y = PostSnap_MOF_Num, color = "red"),
               method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
-  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.25), labels = scales::percent_format(accuracy = 5L)) +
   scale_x_continuous(breaks = seq(-4, 10, 2)) +
   coord_cartesian(xlim = c(-4, 8), ylim = c(0, 1)) +
   labs(x = "Highest Vertical 'Creep' Distance by a Safety (Yards)", y = "MOFO Coverage Rate",
@@ -467,7 +467,7 @@ Plot13 <- ggplot(data = Stats_ByFullPlay_2High) +
   stat_smooth(mapping = aes(x = Max_PreSnap_X_vel_TowardBall_AnySafety, y = PostSnap_MOF_Num, color = "red"),
               method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
-  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.25), labels = scales::percent_format(accuracy = 5L)) +
   scale_x_continuous(breaks = seq(0, 10, 2)) +
   coord_cartesian(xlim = c(-1, 5), ylim = c(0, 1)) +
   labs(x = "Maximum Pre-Snap Speed Toward Ball by a Safety (Yds/Sec)", y = "MOFO Coverage Rate",
@@ -496,7 +496,7 @@ Plot13_Alt <- ggplot(data = Stats_ByFullPlay_2High) +
               method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
   # geom_vline(xintercept = 0, col = "black", lty = 2) +
-  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.25), labels = scales::percent_format(accuracy = 5L)) +
   scale_x_continuous(breaks = seq(-4, 10, 2)) +
   coord_cartesian(xlim = c(-2, 4), ylim = c(0, 1)) +
   labs(x = "Max Vertical Velocity by Safety at Snap (Yds/Sec)", y = "MOFO Coverage Rate",
@@ -543,7 +543,7 @@ Plot14 <- ggplot(data = Stats_ByFullPlay_1High) +
   stat_smooth(mapping = aes(x = Max_Y_AbsSpeed_AtSnap_AnySafety, y = PostSnap_MOF_Num, color = "red"),
               method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
-  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.25), labels = scales::percent_format(accuracy = 5L)) +
   scale_x_continuous(breaks = seq(0, 10, 1)) +
   coord_cartesian(xlim = c(0, 3), ylim = c(0, 1)) +
   labs(x = "Absolute Horizontal Speed by Safety at Snap (Yds/Sec)", y = "MOFO Coverage Rate",
@@ -569,7 +569,7 @@ Plot15 <- ggplot(data = Stats_ByFullPlay_1High) +
   stat_smooth(mapping = aes(x = Max_Y_SpeedTowardMOF_AtSnap_AnySafety, y = PostSnap_MOF_Num, color = "red"),
               method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
-  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.25), labels = scales::percent_format(accuracy = 5L)) +
   scale_x_continuous(breaks = seq(-5, 5, 1)) +
   coord_cartesian(xlim = c(-2, 2), ylim = c(0, 1)) +
   labs(x = "Horizontal Speed Toward MOF by Safety at Snap (Yds/Sec)", y = "MOFO Coverage Rate",
@@ -595,7 +595,7 @@ Plot16 <- ggplot(data = Stats_ByFullPlay_1High) +
   stat_smooth(mapping = aes(x = Max_Y_AbsDistFromMOF_AtSnap_AnySafety, y = PostSnap_MOF_Num, color = "red"),
               method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
-  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.25), labels = scales::percent_format(accuracy = 5L)) +
   scale_x_continuous(breaks = seq(0, 10, 2)) +
   coord_cartesian(xlim = c(0, 9), ylim = c(0, 1)) +
   labs(x = "Safety's Horizontal Distance from MOF at the Snap (Yards)", y = "MOFO Coverage Rate",
@@ -621,7 +621,7 @@ Plot17 <- ggplot(data = Stats_ByFullPlay_1High) +
   stat_smooth(mapping = aes(x = Max_Y_AccTowardMOF_AtSnap_AnySafety, y = PostSnap_MOF_Num, color = "red"),
               method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
-  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.25), labels = scales::percent_format(accuracy = 5L)) +
   scale_x_continuous(breaks = seq(-4, 10, 2)) +
   coord_cartesian(xlim = c(-2, 2), ylim = c(0, 1)) +
   labs(x = "Horizontal Acceleration by Safety Toward MOF at Snap (Yds/Sec^2)", y = "MOFO Coverage Rate",
@@ -649,7 +649,7 @@ Plot17_Alt <- ggplot(data = Stats_ByFullPlay_1High) +
   stat_smooth(mapping = aes(x = Max_X_vel_TowardBall_AnySafety_AtSnap, y = PostSnap_MOF_Num, color = "red"),
               method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
-  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.25), labels = scales::percent_format(accuracy = 5L)) +
   scale_x_continuous(breaks = seq(-4, 10, 2)) +
   coord_cartesian(xlim = c(-2, 2), ylim = c(0, 1)) +
   labs(x = "Vertical Velocity by Safety at Snap (Yds/Sec)", y = "MOFO Coverage Rate",
@@ -721,7 +721,7 @@ Plot10B <- ggplot(data = Stats_ByFullPlay_2High) +
   stat_smooth(mapping = aes(x = X_Diff_BetweenSafeties_AtSnap, y = MOFO_probability_FDA, color = "red"),
               method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
-  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.25), labels = scales::percent_format(accuracy = 5L)) +
   scale_x_continuous(breaks = seq(0, 10, 2)) +
   coord_cartesian(xlim = c(0, 10), ylim = c(0, 1)) +
   labs(x = "Vertical Stagger b/w Safeties at Snap (Yards)", y = "Predicted MOFO Rate",
@@ -747,7 +747,7 @@ Plot11B <- ggplot(data = Stats_ByFullPlay_2High) +
   stat_smooth(mapping = aes(x = X_Vel_Diff_BetweenSafeties_AtSnap, y = MOFO_probability_FDA, color = "red"),
               method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
-  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.25), labels = scales::percent_format(accuracy = 5L)) +
   scale_x_continuous(breaks = seq(0, 10, 2)) +
   coord_cartesian(xlim = c(0, 6), ylim = c(0, 1)) +
   labs(x = "Difference in Vertical Velocities b/w Safeties at Snap (Yds/Sec)", y = "Predicted MOFO Rate",
@@ -773,7 +773,7 @@ Plot12B <- ggplot(data = Stats_ByFullPlay_2High) +
   stat_smooth(mapping = aes(x = Max_VertCreptDistance_AnySafety, y = MOFO_probability_FDA, color = "red"),
               method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
-  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.25), labels = scales::percent_format(accuracy = 5L)) +
   scale_x_continuous(breaks = seq(-4, 10, 2)) +
   coord_cartesian(xlim = c(-4, 8), ylim = c(0, 1)) +
   labs(x = "Highest Vertical 'Creep' Distance by a Safety (Yards)", y = "Predicted MOFO Rate",
@@ -799,7 +799,7 @@ Plot13B <- ggplot(data = Stats_ByFullPlay_2High) +
   stat_smooth(mapping = aes(x = Max_PreSnap_X_vel_TowardBall_AnySafety, y = MOFO_probability_FDA, color = "red"),
               method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
-  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.25), labels = scales::percent_format(accuracy = 5L)) +
   scale_x_continuous(breaks = seq(0, 10, 2)) +
   coord_cartesian(xlim = c(-1, 5), ylim = c(0, 1)) +
   labs(x = "Maximum Pre-Snap Speed Toward Ball by a Safety (Yds/Sec)", y = "Predicted MOFO Rate",
@@ -828,7 +828,7 @@ Plot13B_Alt <- ggplot(data = Stats_ByFullPlay_2High) +
               method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
   # geom_vline(xintercept = 0, col = "black", lty = 2) +
-  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.25), labels = scales::percent_format(accuracy = 5L)) +
   scale_x_continuous(breaks = seq(-4, 10, 2)) +
   coord_cartesian(xlim = c(-2, 4), ylim = c(0, 1)) +
   labs(x = "Max Vertical Velocity by Safety at Snap (Yds/Sec)", y = "Predicted MOFO Rate",
@@ -877,7 +877,7 @@ Plot14B <- ggplot(data = Stats_ByFullPlay_1High) +
   stat_smooth(mapping = aes(x = Max_Y_AbsDistFromMOF_AtSnap_AnySafety, y = MOFO_probability_FDA, color = "red"),
               method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
-  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.25), labels = scales::percent_format(accuracy = 5L)) +
   scale_x_continuous(breaks = seq(0, 10, 2)) +
   coord_cartesian(xlim = c(0, 8), ylim = c(0, 1)) +
   labs(x = "Safety's Horizontal Distance from MOF at the Snap (Yards)", y = "Predicted MOFO Rate",
@@ -903,7 +903,7 @@ Plot15B <- ggplot(data = Stats_ByFullPlay_1High) +
   stat_smooth(mapping = aes(x = min_SafetyAbsHorizDistToMOF_PreSnap, y = MOFO_probability_FDA, color = "red"),
               method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
-  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.25), labels = scales::percent_format(accuracy = 5L)) +
   scale_x_continuous(breaks = seq(0, 10, 1)) +
   coord_cartesian(xlim = c(0, 8), ylim = c(0, 1)) +
   labs(x = "Safety's Minimum Pre-Snap Horiz Distance from MOF (Yards)", y = "Predicted MOFO Rate",
@@ -929,7 +929,7 @@ Plot16B <- ggplot(data = Stats_ByFullPlay_1High) +
   stat_smooth(mapping = aes(x = Max_Y_SpeedTowardMOF_AtSnap_AnySafety, y = MOFO_probability_FDA, color = "red"),
               method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
-  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.25), labels = scales::percent_format(accuracy = 5L)) +
   scale_x_continuous(breaks = seq(-5, 5, 1)) +
   coord_cartesian(xlim = c(-3, 3), ylim = c(0, 1)) +
   labs(x = "Horizontal Speed Toward MOF by Safety at Snap (Yds/Sec)", y = "Predicted MOFO Rate",
@@ -955,7 +955,7 @@ Plot17B <- ggplot(data = Stats_ByFullPlay_1High) +
   stat_smooth(mapping = aes(x = Max_PreSnap_X_vel_TowardBall_AnySafety, y = MOFO_probability_FDA, color = "red"),
               method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
-  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.25), labels = scales::percent_format(accuracy = 5L)) +
   scale_x_continuous(breaks = seq(-4, 10, 2)) +
   coord_cartesian(xlim = c(-2, 2), ylim = c(0, 1)) +
   labs(x = "Safety's Maximum Pre-Snap Vertical Velocity Toward LOS (Yds/Sec)", y = "Predicted MOFO Rate",
@@ -983,7 +983,7 @@ Plot17B_Alt <- ggplot(data = Stats_ByFullPlay_1High) +
   stat_smooth(mapping = aes(x = Max_X_vel_TowardBall_AnySafety_AtSnap, y = MOFO_probability_FDA, color = "red"),
               method = "gam", method.args = list(family = "binomial"), se = T, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
-  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.25), labels = scales::percent_format(accuracy = 5L)) +
   scale_x_continuous(breaks = seq(-4, 10, 2)) +
   coord_cartesian(xlim = c(-2, 2), ylim = c(0, 1)) +
   labs(x = "Vertical Velocity by Safety at Snap (Yds/Sec)", y = "Predicted MOFO Rate",
@@ -1054,7 +1054,7 @@ Plot10C <- ggplot(data = Stats_ByFullPlay_2High) +
   stat_smooth(mapping = aes(x = X_Diff_BetweenSafeties_AtSnap, y = PostSnap_MOF_Num, color = "Actual MOFO Rate"),
               method = "gam", method.args = list(family = "binomial"), se = F, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
-  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.25), labels = scales::percent_format(accuracy = 5L)) +
   scale_x_continuous(breaks = seq(0, 10, 2)) +
   coord_cartesian(xlim = c(0, 10), ylim = c(0, 1)) +
   labs(x = "Vertical Stagger b/w Safeties at Snap (Yards)", y = "MOFO Coverage Rate",
@@ -1081,7 +1081,7 @@ Plot11C <- ggplot(data = Stats_ByFullPlay_2High) +
   stat_smooth(mapping = aes(x = X_Vel_Diff_BetweenSafeties_AtSnap, y = PostSnap_MOF_Num, color = "Actual MOFO Rate"),
               method = "gam", method.args = list(family = "binomial"), se = F, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
-  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.25), labels = scales::percent_format(accuracy = 5L)) +
   scale_x_continuous(breaks = seq(0, 10, 2)) +
   coord_cartesian(xlim = c(0, 8), ylim = c(0, 1)) +
   labs(x = "Difference in Vertical Velocities b/w Safeties at Snap (Yds/Sec)", y = "MOFO Coverage Rate",
@@ -1108,7 +1108,7 @@ Plot12C <- ggplot(data = Stats_ByFullPlay_2High) +
   stat_smooth(mapping = aes(x = Max_VertCreptDistance_AnySafety, y = PostSnap_MOF_Num, color = "Actual MOFO Rate"),
               method = "gam", method.args = list(family = "binomial"), se = F, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
-  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.25), labels = scales::percent_format(accuracy = 5L)) +
   scale_x_continuous(breaks = seq(-4, 10, 2)) +
   coord_cartesian(xlim = c(-4, 8), ylim = c(0, 1)) +
   labs(x = "Highest Vertical 'Creep' Distance by a Safety (Yards)", y = "MOFO Coverage Rate",
@@ -1135,7 +1135,7 @@ Plot13C <- ggplot(data = Stats_ByFullPlay_2High) +
   stat_smooth(mapping = aes(x = Max_PreSnap_X_vel_TowardBall_AnySafety, y = PostSnap_MOF_Num, color = "Actual MOFO Rate"),
               method = "gam", method.args = list(family = "binomial"), se = F, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
-  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.25), labels = scales::percent_format(accuracy = 5L)) +
   scale_x_continuous(breaks = seq(-4, 10, 2)) +
   coord_cartesian(xlim = c(-1, 5), ylim = c(0, 1)) +
   labs(x = "Maximum Pre-Snap Speed Toward Ball by a Safety (Yds/Sec)", y = "MOFO Coverage Rate",
@@ -1166,7 +1166,7 @@ Plot13C_Alt <- ggplot(data = Stats_ByFullPlay_2High) +
               method = "gam", method.args = list(family = "binomial"), se = F, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
   # geom_vline(xintercept = 0, col = "black", lty = 2) +
-  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.25), labels = scales::percent_format(accuracy = 5L)) +
   scale_x_continuous(breaks = seq(-4, 10, 2)) +
   coord_cartesian(xlim = c(-2, 4), ylim = c(0, 1)) +
   labs(x = "Max Vertical Velocity by Safety at Snap (Yds/Sec)", y = "MOFO Coverage Rate",
@@ -1214,7 +1214,7 @@ Plot10D <- ggplot(data = Stats_ByFullPlay_2High) +
   stat_smooth(mapping = aes(x = X_Diff_BetweenSafeties_AtSnap, y = PostSnap_MOF_Num, color = "Observed \nMOFO \nRate\n"),
               method = "gam", method.args = list(family = "binomial"), se = F, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
-  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.25), labels = scales::percent_format(accuracy = 5L)) +
   scale_x_continuous(breaks = seq(0, 10, 2)) +
   coord_cartesian(xlim = c(0, 10), ylim = c(0, 1)) +
   labs(x = "Vertical Stagger b/w Safeties at Snap (Yards)", y = "MOFO Probability",
@@ -1241,7 +1241,7 @@ Plot11D <- ggplot(data = Stats_ByFullPlay_2High) +
   stat_smooth(mapping = aes(x = X_Vel_Diff_BetweenSafeties_AtSnap, y = PostSnap_MOF_Num, color = "Observed \nMOFO \nRate\n"),
               method = "gam", method.args = list(family = "binomial"), se = F, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
-  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.25), labels = scales::percent_format(accuracy = 5L)) +
   scale_x_continuous(breaks = seq(0, 10, 2)) +
   coord_cartesian(xlim = c(0, 8), ylim = c(0, 1)) +
   labs(x = "Difference in Vert Velocities b/w Safeties at Snap (Yds/Sec)", y = "MOFO Probability",
@@ -1268,7 +1268,7 @@ Plot12D <- ggplot(data = Stats_ByFullPlay_2High) +
   stat_smooth(mapping = aes(x = Max_VertCreptDistance_AnySafety, y = PostSnap_MOF_Num, color = "Observed \nMOFO \nRate\n"),
               method = "gam", method.args = list(family = "binomial"), se = F, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
-  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.25), labels = scales::percent_format(accuracy = 5L)) +
   scale_x_continuous(breaks = seq(-4, 10, 2)) +
   coord_cartesian(xlim = c(-4, 8), ylim = c(0, 1)) +
   labs(x = "Highest Vertical 'Creep' Distance by Safety (Yards)", y = "MOFO Probability",
@@ -1295,7 +1295,7 @@ Plot13D <- ggplot(data = Stats_ByFullPlay_2High) +
   stat_smooth(mapping = aes(x = Max_PreSnap_X_vel_TowardBall_AnySafety, y = PostSnap_MOF_Num, color = "Observed \nMOFO \nRate\n"),
               method = "gam", method.args = list(family = "binomial"), se = F, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
-  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.25), labels = scales::percent_format(accuracy = 5L)) +
   scale_x_continuous(breaks = seq(-4, 10, 2)) +
   coord_cartesian(xlim = c(-1, 5), ylim = c(0, 1)) +
   labs(x = "Maximum Pre-Snap Speed Toward Ball by a Safety (Yds/Sec)", y = "MOFO Probability",
@@ -1326,7 +1326,7 @@ Plot13D_Alt <- ggplot(data = Stats_ByFullPlay_2High) +
               method = "gam", method.args = list(family = "binomial"), se = F, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
   # geom_vline(xintercept = 0, col = "black", lty = 2) +
-  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.25), labels = scales::percent_format(accuracy = 5L)) +
   scale_x_continuous(breaks = seq(-4, 10, 2)) +
   coord_cartesian(xlim = c(-2, 4), ylim = c(0, 1)) +
   labs(x = "Max Vertical Velocity by Safety at Snap (Yds/Sec)", y = "MOFO Coverage Rate",
@@ -1385,7 +1385,7 @@ Plot14C <- ggplot(data = Stats_ByFullPlay_1High) +
   stat_smooth(mapping = aes(x = Max_Y_AbsDistFromMOF_AtSnap_AnySafety, y = PostSnap_MOF_Num, color = "Observed MOFO Rate"),
               method = "gam", method.args = list(family = "binomial"), se = F, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
-  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.25), labels = scales::percent_format(accuracy = 5L)) +
   scale_x_continuous(breaks = seq(0, 10, 2)) +
   coord_cartesian(xlim = c(0, 8), ylim = c(0, 1)) +
   labs(x = "Safety's Horizontal Distance from MOF at the Snap (Yards)", y = "MOFO Coverage Rate",
@@ -1413,7 +1413,7 @@ Plot15C <- ggplot(data = Stats_ByFullPlay_1High) +
   stat_smooth(mapping = aes(x = min_SafetyAbsHorizDistToMOF_PreSnap, y = PostSnap_MOF_Num, color = "Observed MOFO Rate"),
               method = "gam", method.args = list(family = "binomial"), se = F, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
-  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.25), labels = scales::percent_format(accuracy = 5L)) +
   scale_x_continuous(breaks = seq(0, 10, 2)) +
   coord_cartesian(xlim = c(0, 8), ylim = c(0, 1)) +
   labs(x = "Safety's Minimum Pre-Snap Horiz Distance from MOF (Yards)", y = "MOFO Coverage Rate",
@@ -1441,7 +1441,7 @@ Plot16C <- ggplot(data = Stats_ByFullPlay_1High) +
   stat_smooth(mapping = aes(x = Max_Y_SpeedTowardMOF_AtSnap_AnySafety, y = PostSnap_MOF_Num, color = "Observed MOFO Rate"),
               method = "gam", method.args = list(family = "binomial"), se = F, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
-  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.25), labels = scales::percent_format(accuracy = 5L)) +
   scale_x_continuous(breaks = seq(-5, 5, 1)) +
   coord_cartesian(xlim = c(-2, 2), ylim = c(0, 1)) +
   labs(x = "Horizontal Speed Toward MOF by Safety at Snap (Yds/Sec)", y = "MOFO Coverage Rate",
@@ -1469,7 +1469,7 @@ Plot17C <- ggplot(data = Stats_ByFullPlay_1High) +
   stat_smooth(mapping = aes(x = Max_Y_AccTowardMOF_AtSnap_AnySafety, y = PostSnap_MOF_Num, color = "Observed MOFO Rate"),
               method = "gam", method.args = list(family = "binomial"), se = F, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
-  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.25), labels = scales::percent_format(accuracy = 5L)) +
   scale_x_continuous(breaks = seq(-4, 10, 2)) +
   coord_cartesian(xlim = c(-2, 2), ylim = c(0, 1)) +
   labs(x = "Horizontal Acceleration by Safety Toward MOF at Snap (Yds/Sec^2)", y = "MOFO Coverage Rate",
@@ -1499,7 +1499,7 @@ Plot17C_Alt <- ggplot(data = Stats_ByFullPlay_1High) +
   stat_smooth(mapping = aes(x = Max_X_vel_TowardBall_AnySafety_AtSnap, y = PostSnap_MOF_Num, color = "Observed MOFO Rate"),
               method = "gam", method.args = list(family = "binomial"), se = F, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
-  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.25), labels = scales::percent_format(accuracy = 5L)) +
   scale_x_continuous(breaks = seq(-4, 10, 2)) +
   coord_cartesian(xlim = c(-2, 2), ylim = c(0, 1)) +
   labs(x = "Vertical Velocity by Safety at Snap (Yds/Sec)", y = "MOFO Coverage Rate",
@@ -1548,7 +1548,7 @@ Plot14D <- ggplot(data = Stats_ByFullPlay_1High) +
   stat_smooth(mapping = aes(x = Max_Y_AbsDistFromMOF_AtSnap_AnySafety, y = PostSnap_MOF_Num, color = "Observed \nMOFO \nRate\n"),
               method = "gam", method.args = list(family = "binomial"), se = F, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
-  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.25), labels = scales::percent_format(accuracy = 5L)) +
   scale_x_continuous(breaks = seq(0, 10, 2)) +
   coord_cartesian(xlim = c(0, 8), ylim = c(0, 1)) +
   labs(x = "Safety's Horizontal Distance from MOF at the Snap (Yards)", y = "MOFO Probability",
@@ -1575,7 +1575,7 @@ Plot15D <- ggplot(data = Stats_ByFullPlay_1High) +
   stat_smooth(mapping = aes(x = min_SafetyAbsHorizDistToMOF_PreSnap, y = PostSnap_MOF_Num, color = "Observed \nMOFO \nRate\n"),
               method = "gam", method.args = list(family = "binomial"), se = F, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
-  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.25), labels = scales::percent_format(accuracy = 5L)) +
   scale_x_continuous(breaks = seq(0, 10, 2)) +
   coord_cartesian(xlim = c(0, 8), ylim = c(0, 1)) +
   labs(x = "Safety's Minimum Pre-Snap Horiz Distance from MOF (Yards)", y = "MOFO Probability",
@@ -1602,7 +1602,7 @@ Plot16D <- ggplot(data = Stats_ByFullPlay_1High) +
   stat_smooth(mapping = aes(x = Max_Y_SpeedTowardMOF_AtSnap_AnySafety, y = PostSnap_MOF_Num, color = "Observed \nMOFO \nRate\n"),
               method = "gam", method.args = list(family = "binomial"), se = F, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
-  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.25), labels = scales::percent_format(accuracy = 5L)) +
   scale_x_continuous(breaks = seq(-5, 5, 1)) +
   coord_cartesian(xlim = c(-2, 2), ylim = c(0, 1)) +
   labs(x = "Horizontal Speed Toward MOF by Safety at Snap (Yds/Sec)", y = "MOFO Probability",
@@ -1629,7 +1629,7 @@ Plot17D <- ggplot(data = Stats_ByFullPlay_1High) +
   stat_smooth(mapping = aes(x = Max_Y_AccTowardMOF_AtSnap_AnySafety, y = PostSnap_MOF_Num, color = "Observed \nMOFO \nRate\n"),
               method = "gam", method.args = list(family = "binomial"), se = F, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
-  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.25), labels = scales::percent_format(accuracy = 5L)) +
   scale_x_continuous(breaks = seq(-4, 10, 2)) +
   coord_cartesian(xlim = c(-2, 2), ylim = c(0, 1)) +
   labs(x = "Horizontal Acceleration by Safety Toward MOF at Snap (Yds/Sec^2)", y = "MOFO Probability",
@@ -1657,7 +1657,7 @@ Plot17D_Alt <- ggplot(data = Stats_ByFullPlay_1High) +
               method = "gam", method.args = list(family = "binomial"), se = F, span = 0.75) +
   # geom_abline(intercept = 0, slope = 0) +
   # geom_vline(xintercept = 0, col = "black", lty = 2) +
-  # scale_y_continuous(breaks = seq(70, 130, 20)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.25), labels = scales::percent_format(accuracy = 5L)) +
   scale_x_continuous(breaks = seq(-4, 10, 2)) +
   coord_cartesian(xlim = c(-2, 2), ylim = c(0, 1)) +
   labs(x = "Vertical Velocity by Safety at Snap (Yds/Sec)", y = "MOFO Probability",
