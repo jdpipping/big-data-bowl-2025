@@ -2489,7 +2489,7 @@ top_variables_PredAndActual_MOFO_2High <- top_variables_PredAndActual_MOFO_2High
 top_variables_PredAndActual_MOFO_2High <- top_variables_PredAndActual_MOFO_2High %>% 
   mutate(Feature = ifelse(Feature %in% "Max_TotalCreptDistance_ToBall_AnySafety", "Max Total Creep Distance Toward Ball By a Safety", Feature))
 top_variables_PredAndActual_MOFO_2High <- top_variables_PredAndActual_MOFO_2High %>% 
-  mutate(Feature = ifelse(Feature %in% "X_Vel_Diff_BetweenSafeties_AtSnap", "Difference in Vertical Velocities Between Safeties at the Snap", Feature))
+  mutate(Feature = ifelse(Feature %in% "X_Vel_Diff_BetweenSafeties_AtSnap", "Diff in Vertical Velocities Between Safeties at the Snap", Feature))
 top_variables_PredAndActual_MOFO_2High <- top_variables_PredAndActual_MOFO_2High %>% 
   mutate(Feature = ifelse(Feature %in% "Max_PreSnap_X_acc_TowardBall_AnySafety", "Max Pre-Snap Vertical Acceleration Toward LOS By a Safety", Feature))
 top_variables_PredAndActual_MOFO_2High <- top_variables_PredAndActual_MOFO_2High %>% 
@@ -2566,6 +2566,13 @@ PredAndActual_MOFO_Features_2High_FancyTable <- PredAndActual_MOFO_Features_2Hig
              md("Early Down 2-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022")) |> # don't forget to adjust your minimum
   tab_style(style = cell_borders(sides = "top"),
             locations = cells_title("title")) |> 
+  tab_style( # get rid of these lines if we don't care about having bold font (Ally Blake recommends it)
+    style = cell_text(weight = "bold"),
+    locations = cells_body(
+      columns = everything(),
+      rows = 1:6 # this is how to make the top six rows have bold font in GT table
+    )
+  ) |>
   tab_options(
     table.border.top.style = "a"
   ) |> 
