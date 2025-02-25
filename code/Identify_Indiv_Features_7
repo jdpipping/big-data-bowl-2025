@@ -1,7 +1,7 @@
 library(tidyverse)
 
 # Stats_ByFullPlay_Final was defined in the "Aggregating Frames to Plays" GitHub file
-# Stats_ByFullPlay_All9Weeks is a CSV with same format, defined on JP's computer
+# Stats_ByFullPlay_All9Weeks is a CSV with same format, defined on JP's computer (see jp-full-9-weeks)
 
 # Read in data if necessary: 
 # Stats_ByFullPlay_Final <- fread("Stats_ByFullPlay_Final.csv")
