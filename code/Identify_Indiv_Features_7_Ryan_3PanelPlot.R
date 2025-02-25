@@ -123,12 +123,13 @@ ggsave("Cole_2High_Features_3Panel.png",
        final_plot_A,width=15, height=6.5)
 
 # Here is an adjusted version to account for Ally Blake's recommendations
+# FIXME MANUALLY ADD THE 3 SEPARATE X AXES...
 # facet_x1 = "Vertical Stagger \nb/w Safeties at Snap (Yards)"
 # facet_x2 = "Difference in Vert Velocities \nb/w Safeties at Snap (Yds/Sec)"
 # facet_x3 = "Highest Vertical 'Creep' Distance \nby Safety From OL Set to Snap (Yards)"
 facet_x1 = "Vertical Stagger \nb/w Safeties at Snap"
 facet_x2 = "Difference in Vert Velocities \nb/w Safeties at Snap"
-facet_x3 = "Highest Vertical 'Creep' Distance \nby Safety"
+facet_x3 = "Highest Vertical 'Creep' Distance \nby Safety From OL Set to Snap"
 caption_text = paste0(
   # str_remove_all(facet_x1,"\n"), ": ", " XX,\n",
   # str_remove_all(facet_x2,"\n"), ": ", " XX,\n",
@@ -149,9 +150,9 @@ final_plot_A =
   pivot_longer(-c(PostSnap_MOF_Num,MOFO_probability_FDA), names_to="var", values_to = "x") %>%
   mutate(
     featureLab = case_when(
-      var == "X_Diff_BetweenSafeties_AtSnap" ~ paste0(facet_x1, " (Yards)"),
-      var == "X_Vel_Diff_BetweenSafeties_AtSnap" ~ paste0(facet_x2, " (Yards/Sec)"),
-      var == "Max_VertCreptDistance_AnySafety" ~ paste0(facet_x3, " (Yards)")
+      var == "X_Diff_BetweenSafeties_AtSnap" ~ paste0(facet_x1),
+      var == "X_Vel_Diff_BetweenSafeties_AtSnap" ~ paste0(facet_x2),
+      var == "Max_VertCreptDistance_AnySafety" ~ paste0(facet_x3)
     )
   ) %>%
   filter(
@@ -182,12 +183,11 @@ final_plot_A =
   scale_color_manual(values = c("firebrick2", "dodgerblue2")) +
   theme_bw() + 
   labs(
-    x = "",
+    x = "", # Take care of this by inserting text box in Preview app
     # x = "Feature",
     y = "MOFO Probability",
     title = "How Estimated & Observed MOFO Rate Depend on Key Features",
     # caption = caption_text, # REMOVE THIS LINE IF WE DON'T WANT THE FULL CAPTION
-    caption = "'Creep' Distance: Distance Covered from OL Set to Snap",
     subtitle = "Early Down 2-High Dropbacks, 5+ Yards to Go: Weeks 1-9, 2022 (n = 3029)",
     # color = "color"
   ) +
@@ -211,5 +211,4 @@ final_plot_A =
 # final_plot_A
 ggsave("Cole_2High_Features_3Panel.png", 
        final_plot_A,width=15, height=6.5)
-
 
